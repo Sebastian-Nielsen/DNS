@@ -1,0 +1,78 @@
+\documentclass[8pt]{article}
+\usepackage{hyperref}
+\title{Getting Going}
+\date{}
+\begin{document}
+\maketitle
+\section{Installing Go}
+
+Go is a friendly language, but before we use it we (unsurprisingly) have to install it.
+Go is open source, which means you can read the source code as much and as often as you desire.
+
+A guide to installation is provided here: \url{https://golang.org/doc/install}.
+
+We recommend you use vscode, as this is both simplest to install and has the richest set of
+features. It has multi-language support, but for setting it up with Go in particular, the
+following links are helpful:
+\begin{itemize}
+  \item \url{https://code.visualstudio.com}
+  \item \url{https://github.com/Microsoft/vscode-go}
+  \item  \url{https://marketplace.visualstudio.com/items?itemName=ms-vscode.Go}
+\end{itemize}
+
+(If you have strong editor preferences, you'll need to set your path and gopath in your 
+\texttt{.bashrc} or similar. Check if the \texttt{GOPATH} has been set
+correctly by running the command \texttt{go env} in a terminal, and inspecting the \texttt{GOPATH} variable.)
+
+\section{Using Go}
+
+Go uses packages like Java, but to import you just need the package name, not the whole path to the directory.
+This is made possible because all the packages live in your \texttt{GOPATH} (which will be set by vscode).
+
+An introduction to Go for Java Programmers is found at \url{https://talks.golang.org/2015/go-for-java-programmers.slide#1},
+and there is another at
+\url{https://dzone.com/articles/quick-go-lang-for-java-developers}.
+
+%
+%The main function is the entrypoint to a package you've named `main`, and it is executed using `go run`.
+%The main argument must take no argument and return no values. The function declaration is then the
+%minimum possible:
+%
+%```
+%func main() {
+%  // function goes here
+%}
+%```
+%
+%Different functions can take arguments and have (even multiple) return values.
+%The arguments go in the parentheses, and the type of the return variable comes after:
+%
+%
+%```
+%func funWithArgs(arg1 int, arg2 int) int {
+%  // function goes here
+%  return x
+%}
+%```
+%
+%The return variables generally aren't named in the function declaration.
+%Returning more than one variable is done as follows:
+%
+%
+%```
+%func funWithReturns(arg1 int) (int, int) {
+%  // function goes here
+%  return x, y
+%}
+%```
+%
+%Methods are called on a type, and this appears in parentheses before the function name:
+%
+%```
+%func (T type) someMethod(arg int) (int, int, int, int) {
+%  // function goes here
+%  return T.x, T.y, T.u, T.v
+%}
+%```
+%
+\end{document}
