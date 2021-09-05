@@ -1,0 +1,8 @@
+github.com/gorilla/websocket v1.4.2 h1:+/TMaTYc4QFitKJxsQ7Yye35DkWvkdLcvGKqM+x0Ufc=
+github.com/gorilla/websocket v1.4.2/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=
+github.com/hprose/hprose-go v0.0.0-20161031134501-83de97da5004 h1:hr/K705SMVUpLDmb67KpTxstic+27xJ69tHL4f9VmiI=
+github.com/hprose/hprose-go v0.0.0-20161031134501-83de97da5004/go.mod h1:Gy/LQeA+0cY0XHdkdjbTDhP41s1DTCPApEmeScEiAco=
+github.com/hprose/hprose-golang v2.0.6+incompatible h1:sr5ovwMOacwoKThR36WJqV37ia72VOjBD9u9z5xi5Bk=
+github.com/hprose/hprose-golang v2.0.6+incompatible/go.mod h1:FfwwCUQFF3f5t03SrzdSghXVZkC01uEJS6Xwzcz0NOo=
+github.com/lossdev/stack v1.0.5 h1:/kaKhI0Reoi7y7hLj2toLpDHNpobA9iUp3GzEj/T6TE=
+github.com/lossdev/stack v1.0.5/go.mod h1:hfhRy+k8UG39xygWSQwuguM4KGSxzM6rlgGFCJd2I+4=

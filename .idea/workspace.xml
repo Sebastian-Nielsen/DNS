@@ -4,7 +4,20 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a473623c-3760-4b60-9758-0b085a2e5373" name="Changes" comment="" />
+    <list default="true" id="a473623c-3760-4b60-9758-0b085a2e5373" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/handin/Helper/Stack.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handin/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handin/main_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/main_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handin/tcpServer.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/handin_1/Helper/SafeSet.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/handin_1/Helper/Socket.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/handin_1/main.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/handin_1/tcpClient.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/handin_1/tcpServer.go" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -17,7 +30,10 @@
       </list>
     </option>
   </component>
-  <component name="GOROOT" url="file://$PROJECT_DIR$/../../../../Program Files (x86)/Go" />
+  <component name="GOROOT" url="file://$PROJECT_DIR$/../../../../Program Files/Go" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="GitSEFilterConfiguration">
     <file-type-list>
       <filtered-out-file-type name="LOCAL_BRANCH" />
@@ -41,32 +57,45 @@
     <auto-save>true</auto-save>
   </component>
   <component name="ProjectId" id="1xa6g8MFaY4TTx5CaUxQYpW33h5" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="DefaultGoTemplateProperty" value="Go File" />
     <property name="JavaScriptWeakerCompletionTypeGuess" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="codeWithMe.voiceChat.enabledByDefault" value="false" />
     <property name="configurable..is.expanded" value="true" />
     <property name="configurable.GoLibrariesConfigurable.is.expanded" value="true" />
     <property name="go.formatter.settings.were.checked" value="true" />
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.modules.go.list.on.any.changes.was.set" value="true" />
-    <property name="last_opened_file_path" value="$USER_HOME$" />
+    <property name="go.sdk.automatically.set" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
-    <property name="settings.editor.selected.configurable" value="preferences.keymap" />
+    <property name="settings.editor.selected.configurable" value="goland.project.structure" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\sebas\GolandProjects\Distribuerede_systemer_og_sikkerhed" />
+      <recent name="C:\Users\sebas\GolandProjects\Distribuerede_systemer_og_sikkerhed\exercise2-2" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\sebas\GolandProjects\Distribuerede_systemer_og_sikkerhed\exercise2-2" />
+      <recent name="C:\Users\sebas\GolandProjects\Distribuerede_systemer_og_sikkerhed\handin_1\Helper" />
+      <recent name="C:\Users\sebas\GolandProjects\Distribuerede_systemer_og_sikkerhed\handin_1" />
       <recent name="C:\Users\sebastian\GolandProjects\DNO" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Build.go build DNO/exercise2-2">
+  <component name="RunManager" selected="Go Test.TestInteractionBetweenTwoNodes in DNO/handin">
     <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
       <module name="DNO" />
       <working_directory value="$PROJECT_DIR$" />
@@ -92,17 +121,21 @@
       <filePath value="$PROJECT_DIR$/exercise2-2/main.go" />
       <method v="2" />
     </configuration>
-    <configuration default="true" type="GoTestRunConfiguration" factoryName="Go Test">
+    <configuration name="TestInteractionBetweenTwoNodes in DNO/handin" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="DNO" />
-      <working_directory value="$PROJECT_DIR$" />
-      <kind value="DIRECTORY" />
+      <working_directory value="$PROJECT_DIR$/handin" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="DNO/handin" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
+      <pattern value="^\QTestInteractionBetweenTwoNodes\E$" />
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.TestInteractionBetweenTwoNodes in DNO/handin" />
         <item itemvalue="Go Build.go build DNO/exercise2-2" />
         <item itemvalue="Go Build.go build main.go" />
       </list>
@@ -111,6 +144,9 @@
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
