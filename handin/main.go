@@ -86,9 +86,11 @@ func (p *PeerNode) handleIncomming(packet Packet, connPacketWasReceivedOn net.Co
 }
 func (p *PeerNode) HandlePullReplyPacket(packet Packet) {
 	// Add all messages contained in the PULL-REPLY packet to our set of messages
-	fmt.Println("Adding messages:")
+	if len(packet.MessagesSent) != 0 {
+		fmt.Println("Adding messages:")
+	}
 	for msg := range packet.MessagesSent {
-		fmt.Println("\t", msg)
+		fmt.Printf("\t'%s'", msg)
 		p.MessagesSent.Add(msg)
 	}
 
@@ -110,8 +112,8 @@ func (p *PeerNode) Broadcast(packet Packet) {
 	fmt.Printf("Adding msg: '%s'\n", packet.Msg)
 	p.MessagesSent.Add(packet.Msg)
 
-	fmt.Printf("Broadcasting msg: %s '\n", packet.Msg)
-	printf("[Broadcasting] to %d clients", len(p.OpenConnections.Values))
+	fmt.Printf("Broadcasting msg: '%s'\n", packet.Msg)
+	printf("[Broadcasting] to %d clients\n", len(p.OpenConnections.Values))
 	for openConn := range p.OpenConnections.Values {
 		println("Sending msg to openConn:", openConn.RemoteAddr())
 		p.Ipc.Send(packet, openConn)
@@ -137,11 +139,11 @@ func (p *PeerNode) startServer(port string) {
 func (p *PeerNode) Start(atPort string) {
 	p.dialRemoteSocket() // prompt the user for a socket to dial; add the connection to peerNode.OpenConnections if successful
 
-	go p.startServer(atPort)
+	go p.startServer(atPort) // Starts a connection and then starts listening for new connections
 
 	go p.PullFromNeighbors() // Occassionally send pull-requests to neighbors, asking for their messagesSent set
 
-	p.send() // Continously prompt the user to input msgs for the peerNode to broadcast
+	p.send() // Continously prompt the user msgs for the peerNode to broadcast
 }
 
 const DEBUG_MODE = false
@@ -162,8 +164,8 @@ func main() {
 func (p* PeerNode) send() {
 	/* Continously prompt the user for messages to send */
 	fmt.Println("[PeerNode:send] Awaiting input to send ... ")
-	fmt.Println("[PeerNode:send] > Type 'm' to view MessagesSent ")
-	fmt.Println("[PeerNode:send] > Type 'c' to view OpenConnections ")
+	//fmt.Println("[PeerNode:send] > Type 'm' to view MessagesSent ")
+	//fmt.Println("[PeerNode:send] > Type 'c' to view OpenConnections ")
 	for {
 		msg := strings.TrimSpace(input(p))
 		if msg == "m" {

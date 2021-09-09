@@ -7,8 +7,12 @@
     <list default="true" id="a473623c-3760-4b60-9758-0b085a2e5373" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/handin/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handin/main_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/main_test.go" afterDir="false" />
     </list>
-    <list id="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" name="Changes by Andreas 🌚" comment="" />
+    <list id="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" name="Changes by Andreas 🌚" comment="">
+      <change beforePath="$PROJECT_DIR$/handin/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handin/main_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/main_test.go" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -51,6 +55,25 @@
     <other-services-enabled>true</other-services-enabled>
     <auto-save>true</auto-save>
   </component>
+  <component name="LineStatusTrackerManager">
+    <file path="$PROJECT_DIR$/handin/main.go">
+      <ranges>
+        <range start1="88" end1="89" start2="88" end2="91" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
+        <range start1="90" end1="91" start2="92" end2="93" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="112" end1="114" start2="114" end2="116" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="139" end1="140" start2="141" end2="142" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
+        <range start1="143" end1="144" start2="145" end2="146" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="164" end1="166" start2="166" end2="168" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+      </ranges>
+    </file>
+    <file path="$PROJECT_DIR$/handin/main_test.go">
+      <ranges>
+        <range start1="8" end1="8" start2="8" end2="12" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="16" end1="16" start2="20" end2="54" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
+        <range start1="18" end1="18" start2="56" end2="90" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+      </ranges>
+    </file>
+  </component>
   <component name="ProjectId" id="1xa6g8MFaY4TTx5CaUxQYpW33h5" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
@@ -73,7 +96,7 @@
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.modules.go.list.on.any.changes.was.set" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$USER_HOME$/IdeaProjects/oversættelse" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
     <property name="settings.editor.selected.configurable" value="goland.project.structure" />
@@ -90,7 +113,19 @@
       <recent name="C:\Users\sebastian\GolandProjects\DNO" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Test.main_test.go (2)">
+  <component name="RunManager" selected="Go Test.main_test.go (3)">
+    <configuration name="TestMessageIsSentFromNode1To3Via2 in DNO/handin" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="DNO" />
+      <working_directory value="$PROJECT_DIR$/handin" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="DNO/handin" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestMessageIsSentFromNode1To3Via2\E$" />
+      <method v="2" />
+    </configuration>
     <configuration name="TestPeer1CanConnectToPeer2 in DNO/handin (1)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="DNO" />
       <working_directory value="$PROJECT_DIR$/handin" />
@@ -101,18 +136,6 @@
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
       <pattern value="^\QTestPeer1CanConnectToPeer2\E$" />
-      <method v="2" />
-    </configuration>
-    <configuration name="TestPeer1ReceivesMsgFromPeer2 in DNO/handin" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="DNO" />
-      <working_directory value="$PROJECT_DIR$/handin" />
-      <root_directory value="$PROJECT_DIR$" />
-      <kind value="PACKAGE" />
-      <package value="DNO/handin" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <framework value="gotest" />
-      <pattern value="^\QTestPeer1ReceivesMsgFromPeer2\E$" />
       <method v="2" />
     </configuration>
     <configuration name="main_test.go (1)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -137,7 +160,7 @@
       <framework value="gotest" />
       <method v="2" />
     </configuration>
-    <configuration name="main_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="main_test.go (3)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="DNO" />
       <working_directory value="$PROJECT_DIR$/handin" />
       <root_directory value="$PROJECT_DIR$" />
@@ -150,11 +173,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.main_test.go (3)" />
+        <item itemvalue="Go Test.TestMessageIsSentFromNode1To3Via2 in DNO/handin" />
         <item itemvalue="Go Test.main_test.go (2)" />
         <item itemvalue="Go Test.main_test.go (1)" />
         <item itemvalue="Go Test.TestPeer1CanConnectToPeer2 in DNO/handin (1)" />
-        <item itemvalue="Go Test.main_test.go" />
-        <item itemvalue="Go Test.TestPeer1ReceivesMsgFromPeer2 in DNO/handin" />
       </list>
     </recent_temporary>
   </component>
