@@ -27,10 +27,8 @@ type PeerNode struct {
 	TestMock                 Mock
 }
 
-var DEBUG_MODE = false
-
 func (p* PeerNode) dialRemoteSocket() {
-	// Dial the socket and add the connection to peerNode.OpenConnections if successful
+	// prompt the user for a socket to dial; add the connection to peerNode.OpenConnections if successful
 	remoteSocket := PromptForRemoteSocket(p)
 
 	conn, err := net.Dial("tcp", remoteSocket.ToString())
@@ -128,21 +126,22 @@ func (p *PeerNode) PullFromNeighbors() {
 
 	}
 }
-
-func (p *PeerNode) Start(port string) {
+func (p *PeerNode) startServer(port string) {
 	p.Listener, _ = net.Listen("tcp", ":" + port)
-
-	println("[PeerNode:Start]", p.Listener.Addr())
-
-	p.dialRemoteSocket() // Dial the socket and add the connection to peerNode.OpenConnections if successful
-
+	println("[PeerNode:startServer] At:", p.Listener.Addr())
 	go p.ListenForNewConns()
+}
+func (p *PeerNode) Start(atPort string) {
+	go p.startServer(atPort)
+
+	p.dialRemoteSocket() // prompt the user for a socket to dial; add the connection to peerNode.OpenConnections if successful
 
 	go p.PullFromNeighbors() // Occassionally send pull-requests to neighbors, asking for their messagesSent set
 
-	p.send() // Continously ask for user input to send
+	p.send() // Continously prompt the user to input msgs for the peerNode to broadcast
 }
 
+const DEBUG_MODE = false
 func main() {
 	var peerNode = PeerNode{
 		OpenConnections:          SafeSet_Conn{   Values: make(map[net.Conn]bool) },
@@ -154,16 +153,14 @@ func main() {
 
 	peerNode.Start("")
 
-
 	println("---------------------\nTerminating...")
 }
 
 func (p* PeerNode) send() {
-	// Continously ask for input to send
-	fmt.Println("-----------------------------------------")
-	fmt.Println("[TcpClient] > Awaiting input to send ... ")
-	fmt.Println("Type 'm' to view messagesSent ")
-	fmt.Println("-----------------------------------------")
+	/* Continously prompt the user for messages to send */
+	fmt.Println("[PeerNode:send] Awaiting input to send ... ")
+	fmt.Println("[PeerNode:send] > Type 'm' to view MessagesSent ")
+	fmt.Println("[PeerNode:send] > Type 'c' to view OpenConnections ")
 	for {
 		msg := strings.TrimSpace(input(p))
 		if msg == "m" { println(p.MessagesSent.Values); continue }
@@ -176,6 +173,7 @@ func PromptForRemoteSocket(p* PeerNode) Socket {
 	//fmt.Print("IP address:\n> ")
 	//fmt.Scanln(&ip)
 	//ip := input()
+	//ip := strings.TrimSpace(input(p))
 	ip := "127.0.0.1"  // The handin asks us to also prompt the user for an ip, but really no need for it ...
 
 
