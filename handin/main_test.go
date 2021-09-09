@@ -2,7 +2,6 @@ package main
 
 import (
 	. "DNO/handin/Helper"
-	"fmt"
 	"net"
 	"testing"
 	"time"
@@ -16,11 +15,11 @@ func createPeerNode( shouldMockInput bool) PeerNode {
 	}
 }
 
-const peerNode1_port = "50001"
-const peerNode2_port = "50002"
-
 
 func TestPeer1ReceivesMsgFromPeer2(t *testing.T) {
+
+	const peerNode1_port = "50001"
+	const peerNode2_port = "50002"
 
 	peerNode1 := createPeerNode(true)
 	peerNode2 := createPeerNode(true)
@@ -29,36 +28,41 @@ func TestPeer1ReceivesMsgFromPeer2(t *testing.T) {
 	peerNode2.TestMock.SimulatedInputString = peerNode1_port
 
 	go peerNode1.Start(peerNode1_port)
-
-	time.Sleep(3 * time.Second)
-
 	go peerNode2.Start(peerNode2_port)
 
-	time.Sleep(3 * time.Second)
-	fmt.Println(peerNode1.OpenConnections.Values, len(peerNode1.OpenConnections.Values))
-	if  len(peerNode1.OpenConnections.Values) != 1 &&
-		len(peerNode2.OpenConnections.Values) != 1 {
-		t.Errorf("asdflkjasdflk sadfkl asdf")
+	time.Sleep(1 * time.Second)
+
+	peerNode1.TestMock.SimulatedInputString = "some_msg"
+
+	time.Sleep(1 * time.Second)
+
+	if !peerNode2.MessagesSent.Contains("some_msg") {
+		t.Errorf("peerNode2 didn't receive peerNode1's msg")
 	}
+
 }
 
 func TestPeer1CanConnectToPeer2(t *testing.T) {
 
+	const peerNode1_port = "50003"
+	const peerNode2_port = "50004"
+
+	peerNode1 := createPeerNode(true)
+	peerNode2 := createPeerNode(true)
 
 	peerNode1.TestMock.SimulatedInputString = "dont_connect_to_any_peer"
 	peerNode2.TestMock.SimulatedInputString = peerNode1_port
 
 	go peerNode1.Start(peerNode1_port)
-
-	time.Sleep(3 * time.Second)
-
 	go peerNode2.Start(peerNode2_port)
 
-	time.Sleep(3 * time.Second)
-	fmt.Println(peerNode1.OpenConnections.Values, len(peerNode1.OpenConnections.Values))
-	if  len(peerNode1.OpenConnections.Values) != 1 &&
-		len(peerNode2.OpenConnections.Values) != 1 {
-		t.Errorf("asdflkjasdflk sadfkl asdf")
+	time.Sleep(1 * time.Second)
+
+	if len(peerNode1.OpenConnections.Values) != 1 {
+		t.Errorf("peerNode1 doesn't have peerNode2 in its openConnections set")
+	}
+	if len(peerNode2.OpenConnections.Values) != 1 {
+		t.Errorf("peerNode2 doesn't have peerNode1 in its openConnections set")
 	}
 }
 

@@ -27,13 +27,7 @@ type PeerNode struct {
 	TestMock                 Mock
 }
 
-var peerNode = PeerNode{
-	OpenConnections:          SafeSet_Conn{   Values: make(map[net.Conn]bool) },
-	MessagesSent:             SafeSet_string{ Values: make(map[string  ]bool) },
-	Ipc:                      IPC{},
-	simulatedInputForTesting: "",
-	TestMock:                 Mock{ ShouldMockInput: false },
-}
+var DEBUG_MODE = false
 
 func (p* PeerNode) dialRemoteSocket() {
 	// Dial the socket and add the connection to peerNode.OpenConnections if successful
@@ -41,29 +35,27 @@ func (p* PeerNode) dialRemoteSocket() {
 
 	conn, err := net.Dial("tcp", remoteSocket.ToString())
 
-	dialIsSuccess := err == nil
+	    dialIsSuccess := err == nil
 	if !dialIsSuccess {
 		fmt.Println("Dial failed")
 		return
 	} else {
-		fmt.Println("--------------")
-		fmt.Println("Our Ip:", conn.LocalAddr())
-		fmt.Println("--------------")
+		println("--------------")
+		println("Our Ip:", conn.LocalAddr())
+		println("--------------")
 
-		fmt.Println("Dial successful")
-		peerNode.OpenConnections.Add(conn)
-		go peerNode.Listen(conn)
+		println("Dial successful")
+		p.OpenConnections.Add(conn)
+		go p.Listen(conn)
 	}
 }
 func (p* PeerNode) ListenForNewConns() {
 	// Continously listen for new connection requests
-	fmt.Println("[PeerNode] > Listening for new connections ...")
+	println("Listening for new connections ...")
 	for {
-		fmt.Println("DEBUG 1")
 		newConn, _ := p.Listener.Accept()
-		fmt.Println("DEBUG 2")
 		p.OpenConnections.Add(newConn)
-		fmt.Println("[PeerNode] > Got a new connection ...")
+		println("Got a new connection ...")
 		go p.Listen(newConn)
 	}
 }
@@ -80,17 +72,17 @@ func (p* PeerNode) handleIncomming(packet Packet, connPacketWasReceivedOn net.Co
 	switch packet.Type {
 	case "UPDATE":
 		if p.MessagesSent.Contains(packet.Msg) {
-			fmt.Sprintf("Received msg we already have: %s", packet.Msg)
+			printf("Received msg we already have: %s", packet.Msg)
 			return  // Ignore the packet
 		}
-		fmt.Println("Received packet: [Type: UPDATE][Msg: never_seen_before_msg] ... Broadcasting it")
+		println("Received packet: [Type: UPDATE][Msg: never_seen_before_msg] ... Broadcasting it")
 		p.Broadcast(packet)
 	case "PULL":
-		fmt.Println("Received packet: [Type: PULL] ... Sending entire messagesSent-set back to sender")
+		println("Received packet: [Type: PULL] ... Sending entire messagesSent-set back to sender")
 		packet = Packet{ Type: "PULL-REPLY", MessagesSent: p.MessagesSent.Values }
 		p.Ipc.Send(packet, connPacketWasReceivedOn)
 	case "PULL-REPLY":
-		fmt.Println("Received packet: [Type: PULL-REPLY] ... Extending our messagesSent set with the messages in the packet")
+		println("Received packet: [Type: PULL-REPLY] ... Extending our messagesSent set with the messages in the packet")
 		p.HandlePullReplyPacket(packet)
 	}
 }
@@ -105,7 +97,7 @@ func (p *PeerNode) HandleOutgoing(packet Packet) {
 	switch packet.Type {
 	case "UPDATE":
 		if p.MessagesSent.Contains(packet.Msg) {
-			fmt.Sprintf("Cancelling the sending of msg: '%s' (reason: already in messagesSent)", packet.Msg)
+			printf("Cancelling the sending of msg: '%s' (reason: already in messagesSent)", packet.Msg)
 			return // Ignore packet
 		}
 		p.Broadcast(packet)
@@ -115,12 +107,12 @@ func (p *PeerNode) HandleOutgoing(packet Packet) {
 }
 func (p *PeerNode) Broadcast(packet Packet) {
 
-	fmt.Println(p.MessagesSent.Values)
 	p.MessagesSent.Add(packet.Msg)
 
-	fmt.Println("Broadcasting msg: '" + packet.Msg + "'")
+	fmt.Printf("Broadcasting msg: %s '",  packet.Msg)
+	printf("[Broadcasting] to %d clients", len(p.OpenConnections.Values))
 	for openConn := range p.OpenConnections.Values {
-		fmt.Println("Sending msg to openConn:", openConn.RemoteAddr())
+		println("Sending msg to openConn:", openConn.RemoteAddr())
 		p.Ipc.Send(packet, openConn)
 	}
 }
@@ -129,9 +121,9 @@ func (p *PeerNode) PullFromNeighbors() {
 	packet := Packet{ Type: "PULL" }
 	for {
 		for openConn := range p.OpenConnections.Values {
-			time.Sleep(30 * time.Second)
-			fmt.Println("Sending pull-request to neighbor:", openConn.RemoteAddr().String())
+			println("Sending pull-request to neighbor:", openConn.RemoteAddr().String())
 			p.Ipc.Send( packet, openConn )
+			time.Sleep(30 * time.Second)
 		}
 
 	}
@@ -140,7 +132,7 @@ func (p *PeerNode) PullFromNeighbors() {
 func (p *PeerNode) Start(port string) {
 	p.Listener, _ = net.Listen("tcp", ":" + port)
 
-	fmt.Println("[PeerNode:Start]", p.Listener.Addr())
+	println("[PeerNode:Start]", p.Listener.Addr())
 
 	p.dialRemoteSocket() // Dial the socket and add the connection to peerNode.OpenConnections if successful
 
@@ -152,10 +144,18 @@ func (p *PeerNode) Start(port string) {
 }
 
 func main() {
+	var peerNode = PeerNode{
+		OpenConnections:          SafeSet_Conn{   Values: make(map[net.Conn]bool) },
+		MessagesSent:             SafeSet_string{ Values: make(map[string  ]bool) },
+		Ipc:                      IPC{},
+		simulatedInputForTesting: "",
+		TestMock:                 Mock{ ShouldMockInput: false },
+	}
+
 	peerNode.Start("")
 
 
-	fmt.Println("---------------------\nTerminating...")
+	println("---------------------\nTerminating...")
 }
 
 func (p* PeerNode) send() {
@@ -165,9 +165,10 @@ func (p* PeerNode) send() {
 	fmt.Println("Type 'm' to view messagesSent ")
 	fmt.Println("-----------------------------------------")
 	for {
-		msg := input(p)
-		if strings.TrimSpace(msg) == "m" { fmt.Println(peerNode.MessagesSent.Values); continue }
-		peerNode.HandleOutgoing( Packet{Type: "UPDATE", Msg: strings.TrimSpace(msg)} )
+		msg := strings.TrimSpace(input(p))
+		if msg == "m" { println(p.MessagesSent.Values); continue }
+		if msg == "c" { println(p.OpenConnections.Values); continue }
+		p.HandleOutgoing( Packet{Type: "UPDATE", Msg: msg} )
 	}
 }
 func PromptForRemoteSocket(p* PeerNode) Socket {
@@ -179,13 +180,12 @@ func PromptForRemoteSocket(p* PeerNode) Socket {
 
 
 	fmt.Print("Port number: ")
-	port := input(p)
-	fmt.Printf("You wrote port: '%s'\n", port)
+	port := strings.TrimSpace(input(p))
+	printf("You wrote port: '%s'\n", port)
 
 
 	return Socket{ip, port}
 }
-
 func input(p* PeerNode) string {
 	if !p.TestMock.ShouldMockInput {
 		var returnString string
@@ -199,3 +199,16 @@ func input(p* PeerNode) string {
 	return returnString
 
 }
+
+func printf(text string, args ...interface{}) {
+	if DEBUG_MODE {
+		fmt.Printf(text, args...)
+	}
+}
+func println(args ...interface{}) {
+	if DEBUG_MODE {
+		fmt.Println(args...)
+	}
+}
+
+

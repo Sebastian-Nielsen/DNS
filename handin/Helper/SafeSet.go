@@ -1,6 +1,7 @@
 package Helper
 
 import (
+	"fmt"
 	"net"
 	"sync"
 )
@@ -34,6 +35,7 @@ type SafeSet_string struct {
 	Values map[string]bool
 }
 func (s *SafeSet_string) Add(str string) {
+	fmt.Printf("Adding msg: '%s'", str)
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	s.Values[str] = true
