@@ -1,7 +1,6 @@
 package Helper
 
 import (
-	"fmt"
 	"net"
 	"sync"
 )
@@ -9,11 +8,12 @@ import (
 /*
 	SafeSet
 	A set that avoids race-conditions
- */
+*/
 type SafeSet_Conn struct {
 	mu     sync.Mutex
 	Values map[net.Conn]bool
 }
+
 func (s *SafeSet_Conn) Add(conn net.Conn) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -25,7 +25,6 @@ func (s *SafeSet_Conn) Delete(conn net.Conn) {
 	delete(s.Values, conn)
 }
 
-
 /*
 	SafeSet
 	A set that avoids race-conditions
@@ -34,8 +33,8 @@ type SafeSet_string struct {
 	mu     sync.Mutex
 	Values map[string]bool
 }
+
 func (s *SafeSet_string) Add(str string) {
-	fmt.Printf("Adding msg: '%s'", str)
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	s.Values[str] = true
