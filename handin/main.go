@@ -23,14 +23,16 @@ type PeerNode struct {
 	MessagesSent             SafeSet_string
 	Listener                 net.Listener
 	Ipc                      IPC
-	simulatedInputForTesting string
 	TestMock                 Mock
 }
 
-func (p *PeerNode) dialRemoteSocket() {
-	// prompt the user for a socket to dial; add the connection to peerNode.OpenConnections if successful
-	remoteSocket := PromptForRemoteSocket(p)
-
+func (p *PeerNode) createSocket(remotePort string) Socket {
+	if remotePort != "" {
+		return Socket{Ip: "127.0.0.1", Port: remotePort}
+	}
+	return PromptForRemoteSocket(p)
+}
+func (p *PeerNode) Dial(remoteSocket Socket) {
 	conn, err := net.Dial("tcp", remoteSocket.ToString())
 
 	dialIsSuccess := err == nil
@@ -136,31 +138,6 @@ func (p *PeerNode) startServer(port string) {
 	printPort(p.Listener)
 	go p.ListenForNewConns()
 }
-func (p *PeerNode) Start(atPort string) {
-	p.dialRemoteSocket() // prompt the user for a socket to dial; add the connection to peerNode.OpenConnections if successful
-
-	go p.startServer(atPort) // Starts a connection and then starts listening for new connections
-
-	go p.PullFromNeighbors() // Occassionally send pull-requests to neighbors, asking for their messagesSent set
-
-	p.send() // Continously prompt the user msgs for the peerNode to broadcast
-}
-
-const DEBUG_MODE = false
-func main() {
-	var peerNode = PeerNode{
-		OpenConnections:          SafeSet_Conn{   Values: make(map[net.Conn]bool) },
-		MessagesSent:             SafeSet_string{ Values: make(map[string  ]bool) },
-		Ipc:                      IPC{},
-		simulatedInputForTesting: "",
-		TestMock:                 Mock{ ShouldMockInput: false },
-	}
-
-	peerNode.Start("")
-
-	println("---------------------\nTerminating...")
-}
-
 func (p* PeerNode) send() {
 	/* Continously prompt the user for messages to send */
 	fmt.Println("[PeerNode:send] Awaiting input to send ... ")
@@ -179,6 +156,36 @@ func (p* PeerNode) send() {
 		p.HandleOutgoing(Packet{Type: "UPDATE", Msg: msg})
 	}
 }
+/*
+	atPort: port at which the PeerNode should listen at.
+	remotePort: port of remote PeerNode to connect to initially.
+				if remotePort is "" (empty string) then prompt the
+				user for a port.
+ */
+func (p *PeerNode) Start(atPort string, remotePort string) {
+	p.Dial(p.createSocket(remotePort))
+
+	go p.startServer(atPort) // Starts a connection and then starts listening for new connections
+
+	go p.PullFromNeighbors() // Occassionally send pull-requests to neighbors, asking for their messagesSent set
+
+	p.send() // Continously prompt the user msgs for the peerNode to broadcast
+}
+
+const DEBUG_MODE = false
+func main() {
+	var peerNode = PeerNode{
+		OpenConnections:          SafeSet_Conn{   Values: make(map[net.Conn]bool) },
+		MessagesSent:             SafeSet_string{ Values: make(map[string  ]bool) },
+		Ipc:                      IPC{},
+		TestMock:                 Mock{ ShouldMockInput: false },
+	}
+
+	peerNode.Start("", "")
+
+	println("---------------------\nTerminating...")
+}
+
 func PromptForRemoteSocket(p *PeerNode) Socket {
 
 	ip := "127.0.0.1"  // The handin asks us to also prompt the user for an ip, but really no need for it ...

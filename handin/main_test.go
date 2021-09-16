@@ -19,8 +19,6 @@ func createPeerNode( shouldMockInput bool) PeerNode {
 	}
 }
 
-
-
 func TestMessageIsSentFromNode1To3Via2(t *testing.T) {
 
 	const peerNode1_port = "50007"
@@ -31,16 +29,11 @@ func TestMessageIsSentFromNode1To3Via2(t *testing.T) {
 	peerNode2 := createPeerNode(true)
 	peerNode3 := createPeerNode(true)
 
-
-	peerNode1.TestMock.SimulatedInputString = "no_port"
-	peerNode2.TestMock.SimulatedInputString = peerNode1_port
-	peerNode3.TestMock.SimulatedInputString = peerNode2_port
-
-	go peerNode1.Start(peerNode1_port)
+	go peerNode1.Start(peerNode1_port, "no_port")
 	time.Sleep(500 * time.Millisecond)
-	go peerNode2.Start(peerNode2_port)
+	go peerNode2.Start(peerNode2_port, peerNode1_port)
 	time.Sleep(500 * time.Millisecond)
-	go peerNode3.Start(peerNode3_port)
+	go peerNode3.Start(peerNode3_port, peerNode2_port)
 	time.Sleep(500 * time.Millisecond)
 
 	peerNode1.TestMock.SimulatedInputString = "some_msg"
@@ -62,11 +55,7 @@ func TestLatercomerNodeEventuallyGetsAllMsgs(t *testing.T) {
 	peerNode1 := createPeerNode(true)
 	peerNode2 := createPeerNode(true)
 
-	peerNode1.TestMock.SimulatedInputString = "no_port"
-	peerNode2.TestMock.SimulatedInputString = peerNode1_port
-
-	go peerNode1.Start(peerNode1_port)
-
+	go peerNode1.Start(peerNode1_port, "no_port")
 
 	time.Sleep(1 * time.Second)
 	peerNode1.TestMock.SimulatedInputString = "some_msg_1"
@@ -76,7 +65,7 @@ func TestLatercomerNodeEventuallyGetsAllMsgs(t *testing.T) {
 	peerNode1.TestMock.SimulatedInputString = "some_msg_3"
 	time.Sleep(1 * time.Second)
 
-	go peerNode2.Start(peerNode2_port)
+	go peerNode2.Start(peerNode2_port, peerNode1_port)
 
 	time.Sleep(1 * time.Second)
 
@@ -96,11 +85,8 @@ func TestPeer1ReceivesMsgFromPeer2(t *testing.T) {
 	peerNode1 := createPeerNode(true)
 	peerNode2 := createPeerNode(true)
 
-	peerNode1.TestMock.SimulatedInputString = "no_port"
-	peerNode2.TestMock.SimulatedInputString = peerNode1_port
-
-	go peerNode1.Start(peerNode1_port)
-	go peerNode2.Start(peerNode2_port)
+	go peerNode1.Start(peerNode1_port, "no_port")
+	go peerNode2.Start(peerNode2_port, peerNode1_port)
 
 	time.Sleep(1 * time.Second)
 
@@ -122,11 +108,8 @@ func TestPeer1CanConnectToPeer2(t *testing.T) {
 	peerNode1 := createPeerNode(true)
 	peerNode2 := createPeerNode(true)
 
-	peerNode1.TestMock.SimulatedInputString = "dont_connect_to_any_peer"
-	peerNode2.TestMock.SimulatedInputString = peerNode1_port
-
-	go peerNode1.Start(peerNode1_port)
-	go peerNode2.Start(peerNode2_port)
+	go peerNode1.Start(peerNode1_port, "dont_connect_to_any_peer")
+	go peerNode2.Start(peerNode2_port, peerNode1_port)
 
 	time.Sleep(1 * time.Second)
 
