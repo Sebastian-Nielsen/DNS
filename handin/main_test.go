@@ -3,6 +3,7 @@ package main
 import (
 	. "DNO/handin/Helper"
 	"net"
+	"reflect"
 	"testing"
 	"time"
 )
@@ -13,12 +14,45 @@ import (
 
 func createPeerNode( shouldMockInput bool) PeerNode {
 	return PeerNode{
-		OpenConnections: SafeSet_Conn{   Values: make(map[net.Conn]bool) },
-		MessagesSent:    SafeSet_string{ Values: make(map[string  ]bool) },
-		TestMock:        Mock{ ShouldMockInput: shouldMockInput },
+		OpenConnections: 		SafeSet_Conn{   Values: make(map[net.Conn]bool) },
+		PeersInArrivalOrder: 	Array_string{},
+		MessagesSent:    		SafeSet_string{ Values: make(map[string  ]bool) },
+		TestMock:        		Mock{ ShouldMockInput: shouldMockInput },
 	}
 }
 
+
+func TestReceivedPeerListWhenJoining(t *testing.T) {
+
+	const peerNode1_port = "50010"
+	const peerNode2_port = "50011"
+	const peerNode3_port = "50012"
+	const peerNode4_port = "50013"
+
+	peerNode1 := createPeerNode(true)
+	peerNode2 := createPeerNode(true)
+	peerNode3 := createPeerNode(true)
+	peerNode4 := createPeerNode(true)
+
+	go peerNode1.Start(peerNode1_port, "no_port")
+	time.Sleep(500 * time.Millisecond)
+	go peerNode2.Start(peerNode2_port, peerNode1_port)
+	time.Sleep(500 * time.Millisecond)
+	go peerNode3.Start(peerNode3_port, peerNode1_port)
+	time.Sleep(500 * time.Millisecond)
+	go peerNode4.Start(peerNode4_port, peerNode1_port)
+	time.Sleep(500 * time.Millisecond)
+
+	expectedList := []string{peerNode1_port, peerNode2_port, peerNode3_port, peerNode4_port}
+	if len(peerNode4.PeersInArrivalOrder.Values) == 0 {
+		t.Errorf("peerNode4 didn't receive peerNode1's list of peers")
+	}
+	if !reflect.DeepEqual(peerNode4.PeersInArrivalOrder.Values, expectedList) {
+		t.Errorf("peerNode4 received peerNode1's list of peers in the wrong order")
+	}
+
+
+}
 func TestMessageIsSentFromNode1To3Via2(t *testing.T) {
 
 	const peerNode1_port = "50007"
@@ -43,10 +77,6 @@ func TestMessageIsSentFromNode1To3Via2(t *testing.T) {
 		t.Errorf("peerNode3 didn't receive peerNode1's msgs")
 	}
 }
-
-
-
-
 func TestLatercomerNodeEventuallyGetsAllMsgs(t *testing.T) {
 
 	const peerNode1_port = "50005"
@@ -75,8 +105,6 @@ func TestLatercomerNodeEventuallyGetsAllMsgs(t *testing.T) {
 		t.Errorf("peerNode2 didn't receive peerNode1's msgs")
 	}
 }
-
-
 func TestPeer1ReceivesMsgFromPeer2(t *testing.T) {
 
 	const peerNode1_port = "50001"
@@ -99,7 +127,6 @@ func TestPeer1ReceivesMsgFromPeer2(t *testing.T) {
 	}
 
 }
-
 func TestPeer1CanConnectToPeer2(t *testing.T) {
 
 	const peerNode1_port = "50003"
