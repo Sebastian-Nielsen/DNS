@@ -1,6 +1,7 @@
 package main
 
 import (
+	. "DNO/handin/Account"
 	. "DNO/handin/Helper"
 	"fmt"
 	"math"
@@ -23,9 +24,11 @@ type PeerNode struct {
 	OpenConnections     SafeSet_Conn
 	PeersInArrivalOrder SafeArray_string
 	MessagesSent        SafeSet_string
-	Listener                 net.Listener
-	Ipc                      IPC
-	TestMock                 Mock
+	Listener            net.Listener
+	Ipc                 IPC
+	TestMock            Mock
+	LocalLedger         *Ledger
+	TransactionsSeen   SafeArray_Transaction
 }
 
 func (p *PeerNode) createSocket(remotePort string) Socket {
@@ -144,7 +147,12 @@ func (p *PeerNode) handleIncomming(packet Packet, connPacketWasReceivedOn net.Co
 		p.debugPrintln("Received packet: [Type: BROADCAST_MSG][Msg: never_seen_before_msg] ... Broadcasting it")
 		p.BroadcastMessage(packet)
 	case PacketType.PULL:
-		packet = Packet{Type: PacketType.PULL_REPLY, MessagesSent: p.MessagesSent.Values, PeersInArrivalOrderValues: p.PeersInArrivalOrder.Values()}
+		packet = Packet{
+			Type: PacketType.PULL_REPLY,
+			MessagesSent: p.MessagesSent.Values,
+			PeersInArrivalOrderValues: p.PeersInArrivalOrder.Values(),
+			TransactionsSeen: p.TransactionsSeen.Values(),
+		}
 		p.debugPrintln("Received packet: [Type: PULL] ... Sending back: \n\tpacket{peersInArrivalOrder:", packet.PeersInArrivalOrderValues, "}")
 		p.Ipc.Send(packet, connPacketWasReceivedOn)
 	case PacketType.PULL_REPLY:
@@ -156,7 +164,7 @@ func (p *PeerNode) handleIncomming(packet Packet, connPacketWasReceivedOn net.Co
 		p.debugPrintln("Received packet: [Type: LISTENER_PORT] ... Adding its port:", listenerPort, "peersInArrivalOrder is now:\n\t", p.PeersInArrivalOrder.Values())
 	case PacketType.BROADCAST_LISTENER_PORT:
 		listenerPort := packet.Msg
-		p.debugPrintln("Received packet: [Type: BROADCAST_LISTENER_PORT] ... ", listenerPort)
+		p.debugPrintln("received packet: [Type: BROADCAST_LISTENER_PORT] ... ", listenerPort)
 		if !p.PeersInArrivalOrder.Contains(listenerPort) {
 			p.PeersInArrivalOrder.Append(listenerPort)
 			p.debugPrintln("[PacketType: BROADCASTED_LISTENER_PORT] Adding port:", listenerPort, "peersInArrivalOrder is now:\n\t", p.PeersInArrivalOrder.Values())
@@ -175,6 +183,28 @@ func (p *PeerNode) handleIncomming(packet Packet, connPacketWasReceivedOn net.Co
 		p.PeersInArrivalOrder.Append(listenerPort)
 		p.debugPrintln("[PacketType: BROADCASTED_KNOWN_LISTENER_PORT] Adding port", listenerPort, "peersInArrivalOrder is now:\n\t", p.PeersInArrivalOrder.Values())
 		p.Broadcast(packet)
+	case PacketType.BROADCAST_TRANSACTION:
+		p.debugPrintln("received packet: [PacketType: BROADCASTED_TRANSACTION]", packet.Transaction)
+		transaction := packet.Transaction
+
+		transactionIsNotSeen := !p.TransactionsSeen.Contains(transaction)
+		if transactionIsNotSeen {
+			p.TransactionsSeen.Append(transaction)
+			p.LocalLedger.Transaction(&transaction)
+		}
+
+		packet.Type = PacketType.BROADCAST_KNOWN_TRANSACTION
+		p.Broadcast(packet)
+	case PacketType.BROADCAST_KNOWN_TRANSACTION:
+		p.debugPrintln("[PacketType: BROADCASTED__KNOWN_TRANSACTION]", packet.Transaction)
+		transaction := packet.Transaction
+
+		transactionIsNotSeen := !p.TransactionsSeen.Contains(transaction)
+		if transactionIsNotSeen {
+			p.TransactionsSeen.Append(transaction)
+			p.LocalLedger.Transaction(&transaction)
+			p.Broadcast(packet)
+		}
 	}
 }
 func (p *PeerNode) HandlePullReplyPacket(packet Packet) {
@@ -183,6 +213,16 @@ func (p *PeerNode) HandlePullReplyPacket(packet Packet) {
 
 	// Add all peer ports contained in the PULL-REPLY packet to our list of ports
 	p.extendPeersInArrivalOrder(packet.PeersInArrivalOrderValues)
+
+	// Apply all transactions contained in the PULL-REPLY packet on our local ledger
+	p.applyAllTransactions(packet.TransactionsSeen)
+}
+func (p *PeerNode) applyAllTransactions(transactions []Transaction) {
+	p.debugPrintln("Applying all transactions:", transactions)
+	for _, transaction := range transactions {
+		p.LocalLedger.Transaction(&transaction)
+		p.TransactionsSeen.Append(transaction)
+	}
 }
 func (p *PeerNode) extendPeersInArrivalOrder(peers []string) {
 	// no contains method i golang, so simple O(n*m) solution
@@ -251,7 +291,7 @@ func (p *PeerNode) startServer(port string) {
 
 	go p.ListenForNewConns()
 }
-func (p* PeerNode) send() {
+func (p *PeerNode) send() {
 	/* Continously prompt the user for messages to send */
 	//p.debugPrintln("[PeerNode:send] Awaiting input to send ... ")
 	//p.println("[PeerNode:send] > Type 'm' to view MessagesSent ")
@@ -273,6 +313,31 @@ func (p* PeerNode) send() {
 		p.HandleOutgoing(Packet{Type: PacketType.BROADCAST_MSG, Msg: msg})
 	}
 }
+
+
+/*
+	Transaction related methods
+ */
+func (p *PeerNode) CreateAccountInLedger(id string, initialAmount int) {
+	//p.LocalLedger.CreateAccount(id, initialAmount)
+	p.LocalLedger.Accounts[id] = initialAmount
+}
+func (p *PeerNode) MakeAndBroadcastTransaction(amount int, id string, from string, to string) {
+	transaction := Transaction{ID: id, From: from, To: to, Amount: amount}
+
+	p.debugPrintln("Applying transaction:", transaction, ". Accounts before:", p.LocalLedger.Accounts)
+	p.LocalLedger.Transaction(&transaction)
+	p.TransactionsSeen.Append(transaction)
+	p.debugPrintln("Applying transaction:", transaction, ". Accounts after:", p.LocalLedger.Accounts)
+
+	p.Broadcast(
+		Packet{
+			Type: PacketType.BROADCAST_TRANSACTION,
+			Transaction: transaction,
+		},
+	)
+}
+
 /*
 	atPort: port at which the PeerNode should listen at.
 	remotePort: port of remote PeerNode to connect to initially.
@@ -280,8 +345,8 @@ func (p* PeerNode) send() {
 				user for a port.
  */
 func (p *PeerNode) Start(atPort, remotePort string) {
-	p.startServer(atPort)       // <-------
-      // peernode 1
+	p.startServer(atPort)
+
 	p.DialNetwork(p.createSocket(remotePort))
 
 	go p.PullFromNeighbors() // Occassionally send pull-requests to neighbors, asking for their messagesSent set
@@ -332,7 +397,9 @@ func input(p *PeerNode) string {
 
 
 
-
+/*
+	Printer helper methods
+ */
 func (p *PeerNode) debugPrintf(text string, args ...interface{}) {
 	if DEBUG_MODE {
 		fmt.Printf("<" + PortOf(p.Listener.Addr()) + "> " + text, args...)

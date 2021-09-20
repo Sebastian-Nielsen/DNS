@@ -1,6 +1,7 @@
 package main
 
 import (
+	. "DNO/handin/Account"
 	. "DNO/handin/Helper"
 	"net"
 	"reflect"
@@ -17,11 +18,107 @@ func createPeerNode( shouldMockInput bool) PeerNode {
 		OpenConnections:     SafeSet_Conn{   Values: make(map[net.Conn]bool) },
 		PeersInArrivalOrder: SafeArray_string{},
 		MessagesSent:        SafeSet_string{ Values: make(map[string  ]bool) },
+		LocalLedger:         MakeLedger(),
 		TestMock:            Mock{ ShouldMockInput: shouldMockInput },
 	}
 }
 
 
+func TestNewcomerNodeReceivesAllTransactionsAppliedBeforeItEnteredNetwork(t *testing.T) {
+	var peerNode1_port = AvailablePorts.Next()
+	var peerNode2_port = AvailablePorts.Next()
+	var peerNode3_port = AvailablePorts.Next()
+	var peerNode4_port = AvailablePorts.Next()
+
+	peerNode1 := createPeerNode(true)
+	peerNode2 := createPeerNode(true)
+	peerNode3 := createPeerNode(true)
+	peerNode4 := createPeerNode(true)
+
+	goStart(&peerNode1, peerNode1_port, "no_port")
+	goStart(&peerNode2, peerNode2_port, peerNode1_port)
+	goStart(&peerNode3, peerNode3_port, peerNode2_port)
+
+	IDs 	:= []string{"acc1", "acc2", "acc3"}
+	amounts := []int{      100,      0, 40}
+	makeAccounts(&peerNode1, IDs, amounts)
+	makeAccounts(&peerNode2, IDs, amounts)
+	makeAccounts(&peerNode3, IDs, amounts)
+
+	time.Sleep(4 * time.Second)
+
+	peerNode1.MakeAndBroadcastTransaction(42, "tran1", IDs[0], IDs[1])
+
+	time.Sleep(5 * time.Second)
+
+	peerNode2.MakeAndBroadcastTransaction(5, "tran2", IDs[1], IDs[2])
+
+	time.Sleep(5 * time.Second)
+
+	makeAccounts(&peerNode4, IDs, amounts)
+	goStart(&peerNode4, peerNode4_port, peerNode2_port)
+
+	time.Sleep(5 * time.Second)
+
+	if peerNode4.LocalLedger.Accounts[IDs[0]] != amounts[0]-42{
+		t.Error("Transaction 'tran1' from 'acc1' to 'acc2' on peerNode1 didn't apply to 'acc1' on latecomer peerNode4.",
+			"\npeerNode4 Accounts:", peerNode4.LocalLedger.Accounts, "\n")
+	}
+	if peerNode4.LocalLedger.Accounts[IDs[1]] != (amounts[1]+42) - 5 {
+		t.Error("Transaction 'tran1' and 'tran2' from 'acc1' to 'acc2' and 'acc2' to 'acc3' on peerNode1 didn't apply to 'acc2' on latecomer peerNode4.",
+			"\npeerNode4 Accounts:", peerNode4.LocalLedger.Accounts, "\n")
+	}
+	if peerNode4.LocalLedger.Accounts[IDs[2]] != amounts[2]+5 {
+		t.Error("Transaction 'tran3' from 'acc2' to 'acc3' on peerNode1 didn't apply to 'acc3' on latecomer peerNode4.",
+			"\npeerNode4 Accounts:", peerNode4.LocalLedger.Accounts, "\n")
+	}
+	if len(peerNode4.TransactionsSeen.Values()) != 2 {
+		t.Error("Not all transactions was seen by latecomer peerNode4",
+			"\npeerNode4 Accounts:", peerNode4.TransactionsSeen.Values(), "\n")
+	}
+}
+func TestTransactionsAreBroadcastedAndAppliedOnAllPeerNodes(t *testing.T) {
+	var peerNode1_port = AvailablePorts.Next()
+	var peerNode2_port = AvailablePorts.Next()
+	var peerNode3_port = AvailablePorts.Next()
+
+	peerNode1 := createPeerNode(true)
+	peerNode2 := createPeerNode(true)
+	peerNode3 := createPeerNode(true)
+
+	goStart(&peerNode1, peerNode1_port, "no_port")
+	goStart(&peerNode2, peerNode2_port, peerNode1_port)
+	goStart(&peerNode3, peerNode3_port, peerNode2_port)
+
+	IDs 	:= []string{"acc1", "acc2", "acc3"}
+	amounts := []int{      100,      0,     40}
+	makeAccounts(&peerNode1, IDs, amounts)
+	makeAccounts(&peerNode2, IDs, amounts)
+	makeAccounts(&peerNode3, IDs, amounts)
+
+	time.Sleep(4 * time.Second)
+
+	peerNode1.MakeAndBroadcastTransaction(20, "tran1", IDs[0], IDs[1])
+
+	time.Sleep(5 * time.Second)
+
+	if peerNode1.LocalLedger.Accounts[IDs[0]] != amounts[0]-20 {
+		t.Error("Transaction 'tran1' from 'acc1' to 'acc2' on peerNode1 didn't apply to acc1' on peerNode1.",
+			"\nnpeerNode1 Accounts:", peerNode1.LocalLedger.Accounts, "\n")
+	}
+	if peerNode1.LocalLedger.Accounts[IDs[1]] != amounts[1]+20 {
+		t.Error("Transaction 'tran1' from 'acc1' to 'acc2' on peerNode1 didn't apply to 'acc2' on peerNode1.",
+			"\nnpeerNode1 Accounts:", peerNode1.LocalLedger.Accounts, "\n")
+	}
+	if peerNode3.LocalLedger.Accounts[IDs[0]] != amounts[0]-20 {
+		t.Error("Transaction 'tran1' from 'acc1' to 'acc2' on peerNode1 didn't apply to 'acc1' on peerNode3.",
+			"\nnpeerNode1 Accounts:", peerNode3.LocalLedger.Accounts, "\n")
+	}
+	if peerNode3.LocalLedger.Accounts[IDs[1]] != amounts[1]+20 {
+		t.Error("Transaction 'tran1' from 'acc1' to 'acc2' on peerNode1 didn't apply to 'acc2' on peerNode3.",
+			"\nnpeerNode1 Accounts:", peerNode3.LocalLedger.Accounts, "\n")
+	}
+}
 func TestNodeConnectsToThreeOthersWhenEnteringNetwork(t *testing.T) {
 	t.Parallel()
 
@@ -60,7 +157,6 @@ func TestNodeConnectsToThreeOthersWhenEnteringNetwork(t *testing.T) {
 	time.Sleep(2 * time.Second)
 
 }
-
 func TestNodeConnectsToTenOthersWhenEnteringNetwork(t *testing.T) {
 	t.Parallel()
 
@@ -121,8 +217,6 @@ func TestNodeConnectsToTenOthersWhenEnteringNetwork(t *testing.T) {
 	time.Sleep(1 * time.Second)
 
 }
-
-
 func TestPeerNodeConnectsToAllNodesWhenEnteringNetwork(t *testing.T) {
 	//t.Parallel()
 
@@ -273,8 +367,8 @@ func TestPeer1CanConnectToPeer2(t *testing.T) {
 
 
 
-func simulateInputFor(node *PeerNode, text string) {
-	node.TestMock.SimulatedInputString = text
+func simulateInputFor(peerNode *PeerNode, text string) {
+	peerNode.TestMock.SimulatedInputString = text
 	time.Sleep(4 * time.Second)
 }
 func goStart(peerNode *PeerNode, atPort string, remotePort string) {
@@ -282,4 +376,9 @@ func goStart(peerNode *PeerNode, atPort string, remotePort string) {
 	time.Sleep(4 * time.Second)
 }
 
+func makeAccounts(peerNode *PeerNode, IDs []string, startAmounts []int){
+	for i, id := range IDs {
+		peerNode.CreateAccountInLedger(id, startAmounts[i])
+	}
+}
 

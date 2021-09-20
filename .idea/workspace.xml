@@ -4,15 +4,8 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a473623c-3760-4b60-9758-0b085a2e5373" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handin/AvailablePorts.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/AvailablePorts.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handin/Helper/SafeSet.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Helper/SafeSet.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handin/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handin/main_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/main_test.go" afterDir="false" />
-    </list>
+    <list default="true" id="a473623c-3760-4b60-9758-0b085a2e5373" name="Changes" comment="" />
     <list id="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" name="Changes by Andreas 🌚" comment="">
-      <change beforePath="$PROJECT_DIR$/handin/Helper/IPC.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Helper/IPC.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/handin/main_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/main_test.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -57,35 +50,6 @@
     <other-services-enabled>true</other-services-enabled>
     <auto-save>true</auto-save>
   </component>
-  <component name="LineStatusTrackerManager">
-    <file path="$PROJECT_DIR$/handin/main_test.go">
-      <ranges>
-        <range start1="34" end1="34" start2="34" end2="35" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="37" end1="38" start2="38" end2="39" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="39" end1="40" start2="40" end2="41" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="41" end1="45" start2="42" end2="53" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="47" end1="57" start2="55" end2="58" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="91" end1="98" start2="92" end2="93" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="99" end1="105" start2="94" end2="106" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="107" end1="107" start2="108" end2="109" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="111" end1="112" start2="113" end2="114" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="118" end1="119" start2="120" end2="121" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="141" end1="142" start2="143" end2="144" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="143" end1="144" start2="145" end2="146" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="149" end1="150" start2="151" end2="152" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="213" end1="214" start2="215" end2="216" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="221" end1="222" start2="223" end2="224" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="241" end1="242" start2="243" end2="244" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="251" end1="252" start2="253" end2="254" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="259" end1="260" start2="261" end2="262" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="262" end1="263" start2="264" end2="265" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="265" end1="266" start2="267" end2="268" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="268" end1="269" start2="270" end2="271" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="276" end1="277" start2="278" end2="279" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="280" end1="281" start2="282" end2="283" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-      </ranges>
-    </file>
-  </component>
   <component name="ProjectId" id="1xa6g8MFaY4TTx5CaUxQYpW33h5" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
@@ -119,8 +83,8 @@
       <recent name="C:\Users\sebas\GolandProjects\Distribuerede_systemer_og_sikkerhed\exercise2-2" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\sebas\GolandProjects\Distribuerede_systemer_og_sikkerhed\handin" />
       <recent name="C:\Users\sebas\GolandProjects\Distribuerede_systemer_og_sikkerhed\handin\test" />
+      <recent name="C:\Users\sebas\GolandProjects\Distribuerede_systemer_og_sikkerhed\handin" />
       <recent name="C:\Users\sebas\GolandProjects\Distribuerede_systemer_og_sikkerhed\handin\Account" />
       <recent name="C:\Users\sebas\GolandProjects\Distribuerede_systemer_og_sikkerhed\exercise2-2" />
       <recent name="C:\Users\sebas\GolandProjects\Distribuerede_systemer_og_sikkerhed\handin_1\Helper" />
@@ -135,7 +99,7 @@
       <filePath value="$PROJECT_DIR$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestMessageIsSentFromNode1To3Via2 in DNO/handin (1)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestNewcomerNodeReceivesAllTransactionsAppliedBeforeItEnteredTheNetwork in DNO/handin" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="DNO" />
       <working_directory value="$PROJECT_DIR$/handin" />
       <root_directory value="$PROJECT_DIR$" />
@@ -144,31 +108,19 @@
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <pattern value="^\QTestMessageIsSentFromNode1To3Via2\E$" />
+      <pattern value="^\QTestNewcomerNodeReceivesAllTransactionsAppliedBeforeItEnteredTheNetwork\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestNodeConnectsToTenOthersWhenEnteringNetwork in DNO/handin" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestPeer1CanConnectToPeer2 in DNO/handin" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="DNO" />
       <working_directory value="$PROJECT_DIR$/handin" />
       <root_directory value="$PROJECT_DIR$" />
       <kind value="PACKAGE" />
       <package value="DNO/handin" />
       <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/handin/main_test.go" />
       <framework value="gotest" />
-      <pattern value="^\QTestNodeConnectsToTenOthersWhenEnteringNetwork\E$" />
-      <method v="2" />
-    </configuration>
-    <configuration name="TestNodeConnectsToThreeOthersWhenEnteringNetwork in DNO/handin" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="DNO" />
-      <working_directory value="$PROJECT_DIR$/handin" />
-      <root_directory value="$PROJECT_DIR$" />
-      <kind value="PACKAGE" />
-      <package value="DNO/handin" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <framework value="gotest" />
-      <pattern value="^\QTestNodeConnectsToThreeOthersWhenEnteringNetwork\E$" />
+      <pattern value="^\QTestPeer1CanConnectToPeer2\E$" />
       <method v="2" />
     </configuration>
     <configuration name="TestPeerNodeConnectsToAllNodesWhenEnteringNetwork in DNO/handin" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -181,6 +133,18 @@
       <filePath value="$PROJECT_DIR$/handin/main_test.go" />
       <framework value="gotest" />
       <pattern value="^\QTestPeerNodeConnectsToAllNodesWhenEnteringNetwork\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestTransactionsAppliesToAllLedger in DNO/handin" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="DNO" />
+      <working_directory value="$PROJECT_DIR$/handin" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="DNO/handin" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestTransactionsAppliesToAllLedger\E$" />
       <method v="2" />
     </configuration>
     <configuration default="true" type="GoTestRunConfiguration" factoryName="Go Test">
@@ -205,10 +169,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="Go Test.main_test.go" />
+        <item itemvalue="Go Test.TestNewcomerNodeReceivesAllTransactionsAppliedBeforeItEnteredTheNetwork in DNO/handin" />
+        <item itemvalue="Go Test.TestTransactionsAppliesToAllLedger in DNO/handin" />
+        <item itemvalue="Go Test.TestPeer1CanConnectToPeer2 in DNO/handin" />
         <item itemvalue="Go Test.TestPeerNodeConnectsToAllNodesWhenEnteringNetwork in DNO/handin" />
-        <item itemvalue="Go Test.TestNodeConnectsToTenOthersWhenEnteringNetwork in DNO/handin" />
-        <item itemvalue="Go Test.TestNodeConnectsToThreeOthersWhenEnteringNetwork in DNO/handin" />
-        <item itemvalue="Go Test.TestMessageIsSentFromNode1To3Via2 in DNO/handin (1)" />
       </list>
     </recent_temporary>
   </component>

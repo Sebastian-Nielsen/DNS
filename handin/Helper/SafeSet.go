@@ -69,3 +69,54 @@ func (s *SafeSet_string) Contains(str string) bool {
 	defer s.mu.Unlock()
 	return s.Values[str]
 }
+
+///*
+//	SafeSet
+//	A set that avoids race-conditions
+//*/
+//type SafeSet_Transaction struct {
+//	mu     sync.Mutex
+//	Values map[Transaction]bool
+//}
+//
+//func (s *SafeSet_Transaction) Add(transaction Transaction) {
+//	s.mu.Lock()
+//	defer s.mu.Unlock()
+//	s.Values[transaction] = true
+//}
+//func (s *SafeSet_Transaction) delete(transaction Transaction) {
+//	s.mu.Lock()
+//	defer s.mu.Unlock()
+//	delete(s.Values, transaction)
+//}
+//func (s *SafeSet_Transaction) Contains(transaction Transaction) bool {
+//	s.mu.Lock()
+//	defer s.mu.Unlock()
+//	return s.Values[transaction]
+//}
+
+
+///*
+//	SafeSet
+//	A set that avoids race-conditions
+//*/
+//type SafeSet_int struct {
+//	mu     sync.Mutex
+//	Values map[int]bool
+//}
+//
+//func (s *SafeSet_int) Add(val int) {
+//	s.mu.Lock()
+//	defer s.mu.Unlock()
+//	s.Values[val] = true
+//}
+//func (s *SafeSet_int) delete(val int) {
+//	s.mu.Lock()
+//	defer s.mu.Unlock()
+//	delete(s.Values, val)
+//}
+//func (s *SafeSet_int) Contains(val int) bool {
+//	s.mu.Lock()
+//	defer s.mu.Unlock()
+//	return s.Values[val]
+//}
