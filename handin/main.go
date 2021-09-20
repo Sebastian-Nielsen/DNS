@@ -71,11 +71,20 @@ func (p *PeerNode) DialNetwork(remoteSocket Socket) {
 			if packet.Type == PacketType.PULL_REPLY {break}
 			p.debugPrintf("[Dial] Received wrong packet type:", packet.Type)
 		}
-		p.debugPrintln("Dialed packet:", packet.PeersInArrivalOrderValues, packet.MessagesSent)
+		p.debugPrintln("[Dial] Received Pull-Reply packet:", packet.PeersInArrivalOrderValues, packet.MessagesSent)
 
 		p.HandlePullReplyPacket(packet)
 
 		peers := packet.PeersInArrivalOrderValues
+
+		//p.OpenConnections.ContainsAConnWith(port)
+		//for i, port := peers {
+		//	if port ==  conn.RemoteAddr().String() {
+		//		p
+		//	}
+		//}
+
+
 		p.connectToPeers(peers)
 
 		p.Broadcast(
@@ -87,13 +96,18 @@ func (p *PeerNode) DialNetwork(remoteSocket Socket) {
 func (p *PeerNode) connectToPeers(portsOfPeers []string) {
 	upTo := int(math.Min(11, float64(len(portsOfPeers)))-1)
 
-	p.debugPrintln("Connecting to all peers in received list:", portsOfPeers[:upTo])
+	p.debugPrintln("Connecting to all peers in received list:\n\t", portsOfPeers[:upTo])
 
 	if upTo < 0 {
 		p.println("Error: Received empty list from connection")
 		return
 	}
-	for _, port := range portsOfPeers[:upTo] {
+	for _, port := range portsOfPeers[:upTo] {       // portsOfPeers = ["50001", "50002", ...]
+		alreadyHaveAConnectionToThisPort := p.OpenConnections.ContainsAConnWith(port)
+		if alreadyHaveAConnectionToThisPort {
+			p.debugPrintln("Don't connect to this, we already have a connection to port:", port)
+			continue
+		}
 		conn := p.dial(Socket{Ip: "127.0.0.1", Port: port})
 		p.OpenConnections.Add(conn)
 	}
@@ -138,14 +152,14 @@ func (p *PeerNode) handleIncomming(packet Packet, connPacketWasReceivedOn net.Co
 		p.HandlePullReplyPacket(packet)
 	case PacketType.LISTENER_PORT:
 		listenerPort := packet.Msg
-		p.debugPrintln("Received packet: [Type: LISTENER_PORT] ... Adding port:", listenerPort)
 		p.PeersInArrivalOrder.Append(listenerPort)
+		p.debugPrintln("Received packet: [Type: LISTENER_PORT] ... Adding its port:", listenerPort, "peersInArrivalOrder is now:\n\t", p.PeersInArrivalOrder.Values())
 	case PacketType.BROADCAST_LISTENER_PORT:
 		listenerPort := packet.Msg
 		p.debugPrintln("Received packet: [Type: BROADCAST_LISTENER_PORT] ... ", listenerPort)
 		if !p.PeersInArrivalOrder.Contains(listenerPort) {
-			p.debugPrintln("[PacketType: BROADCASTED_LISTENER_PORT] Adding port:", listenerPort)
 			p.PeersInArrivalOrder.Append(listenerPort)
+			p.debugPrintln("[PacketType: BROADCASTED_LISTENER_PORT] Adding port:", listenerPort, "peersInArrivalOrder is now:\n\t", p.PeersInArrivalOrder.Values())
 		} else {
 			packet.Type = PacketType.BROADCASTED_KNOWN_LISTENER_PORT
 		}
@@ -158,8 +172,8 @@ func (p *PeerNode) handleIncomming(packet Packet, connPacketWasReceivedOn net.Co
 			p.debugPrintf("Received listenerPort we already have: %s\n", packet.Msg)
 			return // Ignore the packet
 		}
-		p.debugPrintln("[PacketType: BROADCASTED_KNOWN_LISTENER_PORT] Adding port", listenerPort)
 		p.PeersInArrivalOrder.Append(listenerPort)
+		p.debugPrintln("[PacketType: BROADCASTED_KNOWN_LISTENER_PORT] Adding port", listenerPort, "peersInArrivalOrder is now:\n\t", p.PeersInArrivalOrder.Values())
 		p.Broadcast(packet)
 	}
 }
@@ -172,9 +186,10 @@ func (p *PeerNode) HandlePullReplyPacket(packet Packet) {
 }
 func (p *PeerNode) extendPeersInArrivalOrder(peers []string) {
 	// no contains method i golang, so simple O(n*m) solution
+	p.debugPrintln("Extending PeersInArrivalOrder")
 	for _, receivedPeer := range peers {
 		if !p.PeersInArrivalOrder.Contains(receivedPeer) {
-			p.debugPrintln("Adding:", receivedPeer, "to PeersInArrivalOrder")
+			p.debugPrint("\tAdding:", receivedPeer, "to PeersInArrivalOrder")
 			p.PeersInArrivalOrder.Append(receivedPeer)
 		}
 	}
@@ -212,7 +227,7 @@ func (p *PeerNode) BroadcastMessage(packet Packet) {
 	p.Broadcast(packet)
 }
 func (p *PeerNode) Broadcast(packet Packet) {
-	p.debugPrintf("[peerNode %d clients.\n\t%s\n", len(p.OpenConnections.Values), p.OpenConnections.ToString())
+	p.debugPrintf("[There's now %d openConnections:\n\t%s\n", len(p.OpenConnections.Values), p.OpenConnections.ToString())
 	for openConn := range p.OpenConnections.Values {
 		p.println("Sending msg to openConn:", openConn.RemoteAddr())
 		p.Ipc.Send(packet, openConn)
@@ -321,6 +336,11 @@ func input(p *PeerNode) string {
 func (p *PeerNode) debugPrintf(text string, args ...interface{}) {
 	if DEBUG_MODE {
 		fmt.Printf("<" + PortOf(p.Listener.Addr()) + "> " + text, args...)
+	}
+}
+func (p *PeerNode) debugPrint(args ...interface{}) {
+	if DEBUG_MODE {
+		fmt.Print( "\t", args, "\n")
 	}
 }
 func (p *PeerNode) debugPrintln(args ...interface{}) {

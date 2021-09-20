@@ -31,7 +31,7 @@ func (ipc* IPC) Send(packet Packet, conn net.Conn) bool {
 	}
 
 	// A thread can only send a message every 0.5 seconds
-	time.Sleep(500 * time.Millisecond)
+	time.Sleep(40 * time.Millisecond)
 	return ok
 }
 func (ipc* IPC) Receive(conn net.Conn) (Packet, bool) {

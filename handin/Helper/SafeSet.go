@@ -29,10 +29,18 @@ func (s *SafeSet_Conn) Contains(conn net.Conn) bool {
 	defer s.mu.Unlock()
 	return s.Values[conn]
 }
+func (s *SafeSet_Conn) ContainsAConnWith(remotePort string) bool {
+	for conn := range s.Values {
+		if PortOf(conn.RemoteAddr()) == remotePort {
+			return true
+		}
+	}
+	return false
+}
 func (s *SafeSet_Conn) ToString() string {
 	returnVal := "["
 	for conn := range s.Values {
-		returnVal += PortOf(conn.LocalAddr()) + ","
+		returnVal += PortOf(conn.RemoteAddr()) + ","
 	}
 	return returnVal + "]"
 }
