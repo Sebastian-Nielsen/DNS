@@ -11,3 +11,4 @@ func MakeLedger() *Ledger {
 	ledger.Accounts = make(map[string]int)
 	return ledger
 }
+

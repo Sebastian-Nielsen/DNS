@@ -24,6 +24,18 @@ func (s *SafeSet_Conn) Delete(conn net.Conn) {
 	defer s.mu.Unlock()
 	delete(s.Values, conn)
 }
+func (s *SafeSet_Conn) Contains(conn net.Conn) bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.Values[conn]
+}
+func (s *SafeSet_Conn) ToString() string {
+	returnVal := "["
+	for conn := range s.Values {
+		returnVal += PortOf(conn.LocalAddr()) + ","
+	}
+	return returnVal + "]"
+}
 
 /*
 	SafeSet

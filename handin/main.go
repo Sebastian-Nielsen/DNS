@@ -3,6 +3,7 @@ package main
 import (
 	. "DNO/handin/Helper"
 	"fmt"
+	"math"
 	"net"
 	"strings"
 	"time"
@@ -19,9 +20,9 @@ import (
 	- Occassionally send a pull request to a neighbor (taking turns)
 */
 type PeerNode struct {
-	OpenConnections          SafeSet_Conn
-	PeersInArrivalOrder		 Array_string
-	MessagesSent             SafeSet_string
+	OpenConnections     SafeSet_Conn
+	PeersInArrivalOrder SafeArray_string
+	MessagesSent        SafeSet_string
 	Listener                 net.Listener
 	Ipc                      IPC
 	TestMock                 Mock
@@ -33,30 +34,84 @@ func (p *PeerNode) createSocket(remotePort string) Socket {
 	}
 	return PromptForRemoteSocket(p)
 }
-func (p *PeerNode) Dial(remoteSocket Socket) {
+func (p *PeerNode) DialNetwork(remoteSocket Socket) {
 	conn, err := net.Dial("tcp", remoteSocket.ToString())
 
 	dialIsSuccess := err == nil
 	if !dialIsSuccess {
-		fmt.Println("Dial failed")
+		p.debugPrintln("--------------")
+		p.println("DialNetwork failed")
+		p.debugPrintln("--------------")
+		p.debugPrintln("Adding local port to list")
+		p.PeersInArrivalOrder.Append(PortOf(p.Listener.Addr()))
 		return
 	} else {
-		println("--------------")
-		println("Our Ip:", conn.LocalAddr())
-		println("--------------")
-
-		fmt.Println("Dial successful")
+		p.debugPrintln("--------------")
+		p.debugPrintln("Local  Addr:", conn.LocalAddr())
+		p.debugPrintln("Remote Addr:", conn.RemoteAddr())
+		p.debugPrintln("--------------")
 		p.OpenConnections.Add(conn)
-		go p.Listen(conn)
+
+		p.debugPrintln("[dial] Sending Listener port to dialed connection (" + PortOf(conn.RemoteAddr()) + ")")
+
+		//establishConnectionToNetwork()
+		//setup
+
+		p.Ipc.Send(
+			Packet{Type: PacketType.LISTENER_PORT, Msg: PortOf(p.Listener.Addr()) },
+			conn,
+		)
+
+		p.debugPrintln("Sending initial pull-request to neighbor:", conn.RemoteAddr().String())
+
+		p.Ipc.Send(Packet{Type: PacketType.PULL}, conn)
+		var packet Packet
+		for {
+			packet, _ = p.Ipc.Receive(conn)
+			if packet.Type == PacketType.PULL_REPLY {break}
+			p.debugPrintf("[Dial] Received wrong packet type:", packet.Type)
+		}
+		p.debugPrintln("Dialed packet:", packet.PeersInArrivalOrderValues, packet.MessagesSent)
+
+		p.HandlePullReplyPacket(packet)
+
+		peers := packet.PeersInArrivalOrderValues
+		p.connectToPeers(peers)
+
+		p.Broadcast(
+			Packet{ Type: PacketType.BROADCAST_LISTENER_PORT , Msg: PortOf(p.Listener.Addr()) },
+		)
+
+		go p.Listen(conn)}
+}
+func (p *PeerNode) connectToPeers(portsOfPeers []string) {
+	upTo := int(math.Min(11, float64(len(portsOfPeers)))-1)
+
+	p.debugPrintln("Connecting to all peers in received list:", portsOfPeers[:upTo])
+
+	if upTo < 0 {
+		p.println("Error: Received empty list from connection")
+		return
 	}
+	for _, port := range portsOfPeers[:upTo] {
+		conn := p.dial(Socket{Ip: "127.0.0.1", Port: port})
+		p.OpenConnections.Add(conn)
+	}
+}
+func (p *PeerNode) dial(socket Socket) net.Conn {
+	conn, err := net.Dial("tcp", socket.ToString())
+	if err != nil {
+		p.println(err)
+	}
+	return conn
 }
 func (p *PeerNode) ListenForNewConns() {
 	// Continously listen for new connection requests
-	println("Listening for new connections ...")
+	p.debugPrintln("Listening for new connections ...")
 	for {
 		newConn, _ := p.Listener.Accept()
 		p.OpenConnections.Add(newConn)
-		println("Got a new connection ...")
+		p.debugPrintln("Got a new connection ...", newConn.LocalAddr(), "->", newConn.RemoteAddr())
 		go p.Listen(newConn)
 	}
 }
@@ -64,86 +119,128 @@ func (p *PeerNode) Listen(conn net.Conn) {
 	defer conn.Close()
 	for {
 		packet, ok := p.Ipc.Receive(conn)
-		if !ok { return }
+		if !ok { p.debugPrintln("Receive error") }
 		go p.handleIncomming(packet, conn)
 	}
 }
 func (p *PeerNode) handleIncomming(packet Packet, connPacketWasReceivedOn net.Conn) {
 
 	switch packet.Type {
-	case PacketType.UPDATE:
-		if p.MessagesSent.Contains(packet.Msg) {
-			printf("Received msg we already have: %s", packet.Msg)
-			return // Ignore the packet
-		}
-		println("Received packet: [Type: UPDATE][Msg: never_seen_before_msg] ... Broadcasting it")
-		p.Broadcast(packet)
+	case PacketType.BROADCAST_MSG:
+		p.debugPrintln("Received packet: [Type: BROADCAST_MSG][Msg: never_seen_before_msg] ... Broadcasting it")
+		p.BroadcastMessage(packet)
 	case PacketType.PULL:
-		println("Received packet: [Type: PULL] ... Sending entire messagesSent-set back to sender")
-		packet = Packet{Type: PacketType.PULL_REPLY, MessagesSent: p.MessagesSent.Values}
+		packet = Packet{Type: PacketType.PULL_REPLY, MessagesSent: p.MessagesSent.Values, PeersInArrivalOrderValues: p.PeersInArrivalOrder.Values()}
+		p.debugPrintln("Received packet: [Type: PULL] ... Sending back: \n\tpacket{peersInArrivalOrder:", packet.PeersInArrivalOrderValues, "}")
 		p.Ipc.Send(packet, connPacketWasReceivedOn)
 	case PacketType.PULL_REPLY:
-		println("Received packet: [Type: PULL-REPLY] ... Extending our messagesSent set with the messages in the packet")
+		p.debugPrintln("Received packet: [Type: PULL-REPLY] ... Extending our messagesSent set with the messages in the packet")
 		p.HandlePullReplyPacket(packet)
+	case PacketType.LISTENER_PORT:
+		listenerPort := packet.Msg
+		p.debugPrintln("Received packet: [Type: LISTENER_PORT] ... Adding port:", listenerPort)
+		p.PeersInArrivalOrder.Append(listenerPort)
+	case PacketType.BROADCAST_LISTENER_PORT:
+		listenerPort := packet.Msg
+		p.debugPrintln("Received packet: [Type: BROADCAST_LISTENER_PORT] ... ", listenerPort)
+		if !p.PeersInArrivalOrder.Contains(listenerPort) {
+			p.debugPrintln("[PacketType: BROADCASTED_LISTENER_PORT] Adding port:", listenerPort)
+			p.PeersInArrivalOrder.Append(listenerPort)
+		} else {
+			packet.Type = PacketType.BROADCASTED_KNOWN_LISTENER_PORT
+		}
+		p.Broadcast(packet)
+	case PacketType.BROADCASTED_KNOWN_LISTENER_PORT:
+		listenerPort := packet.Msg
+		p.debugPrintln("Received packet: [Type: BROADCASTED_KNOWN_LISTENER_PORT] ... ", listenerPort)
+
+		if p.PeersInArrivalOrder.Contains(listenerPort) {
+			p.debugPrintf("Received listenerPort we already have: %s\n", packet.Msg)
+			return // Ignore the packet
+		}
+		p.debugPrintln("[PacketType: BROADCASTED_KNOWN_LISTENER_PORT] Adding port", listenerPort)
+		p.PeersInArrivalOrder.Append(listenerPort)
+		p.Broadcast(packet)
 	}
 }
 func (p *PeerNode) HandlePullReplyPacket(packet Packet) {
 	// Add all messages contained in the PULL-REPLY packet to our set of messages
-	if len(packet.MessagesSent) != 0 {
-		fmt.Println("Adding messages:")
+	p.extendMessagesSentSet(packet.MessagesSent)
+
+	// Add all peer ports contained in the PULL-REPLY packet to our list of ports
+	p.extendPeersInArrivalOrder(packet.PeersInArrivalOrderValues)
+}
+func (p *PeerNode) extendPeersInArrivalOrder(peers []string) {
+	// no contains method i golang, so simple O(n*m) solution
+	for _, receivedPeer := range peers {
+		if !p.PeersInArrivalOrder.Contains(receivedPeer) {
+			p.debugPrintln("Adding:", receivedPeer, "to PeersInArrivalOrder")
+			p.PeersInArrivalOrder.Append(receivedPeer)
+		}
 	}
-	for msg := range packet.MessagesSent {
-		fmt.Printf("\t'%s'", msg)
+	p.debugPrintln("PeersInArrivalOrder is now:", p.PeersInArrivalOrder.Values())
+}
+func (p *PeerNode) extendMessagesSentSet(messages map[string]bool) {
+	if len(messages) == 0 { return }
+
+	p.debugPrintln("Adding messages:")
+	for msg := range messages {
+		p.println("\t", msg)
 		p.MessagesSent.Add(msg)
 	}
-
 }
 func (p *PeerNode) HandleOutgoing(packet Packet) {
-
 	switch packet.Type {
-	case PacketType.UPDATE:
+	case PacketType.BROADCAST_MSG:
 		if p.MessagesSent.Contains(packet.Msg) {
-			printf("Cancelling the sending of msg: '%s' (reason: already in messagesSent)", packet.Msg)
+			p.debugPrintf("Cancelling the sending of msg: '%s' (reason: already in messagesSent)", packet.Msg)
 			return // Ignore packet
 		}
+		p.MessagesSent.Add(packet.Msg)
 		p.Broadcast(packet)
 	default:
-		fmt.Errorf("[HandleOutgoing] Got an unknown packet.Type: %s", packet.Type)
+		fmt.Printf("[HandleOutgoing] Got an unknown packet.Type: %s", packet.Type)
 	}
 }
-func (p *PeerNode) Broadcast(packet Packet) {
-	fmt.Printf("Adding msg: '%s'\n", packet.Msg)
+func (p *PeerNode) BroadcastMessage(packet Packet) {
+	if p.MessagesSent.Contains(packet.Msg) {
+		p.debugPrintf("Received msg we already have: %s", packet.Msg)
+		return // Ignore the packet
+	}
+	p.println("Adding and broadcasting msg: '" + packet.Msg + "'")
 	p.MessagesSent.Add(packet.Msg)
-
-	fmt.Printf("Broadcasting msg: '%s'\n", packet.Msg)
-	printf("[Broadcasting] to %d clients\n", len(p.OpenConnections.Values))
+	p.Broadcast(packet)
+}
+func (p *PeerNode) Broadcast(packet Packet) {
+	p.debugPrintf("[peerNode %d clients.\n\t%s\n", len(p.OpenConnections.Values), p.OpenConnections.ToString())
 	for openConn := range p.OpenConnections.Values {
-		println("Sending msg to openConn:", openConn.RemoteAddr())
+		p.println("Sending msg to openConn:", openConn.RemoteAddr())
 		p.Ipc.Send(packet, openConn)
 	}
 }
 func (p *PeerNode) PullFromNeighbors() {
 	// Requests the full messagesSent set from each neighbor in turn, wait inbetween each request
+	time.Sleep(300 * time.Second)
 	packet := Packet{Type: PacketType.PULL}
 	for {
 		for openConn := range p.OpenConnections.Values {
-			println("Sending pull-request to neighbor:", openConn.RemoteAddr().String())
+			p.println("Sending pull-request to neighbor:", openConn.RemoteAddr().String())
 			p.Ipc.Send(packet, openConn)
 			time.Sleep(30 * time.Second)
 		}
-
 	}
 }
 func (p *PeerNode) startServer(port string) {
 	p.Listener, _ = net.Listen("tcp", ":" + port)
-	printPort(p.Listener)
+	p.printPort(p.Listener)
+
 	go p.ListenForNewConns()
 }
 func (p* PeerNode) send() {
 	/* Continously prompt the user for messages to send */
-	fmt.Println("[PeerNode:send] Awaiting input to send ... ")
-	//fmt.Println("[PeerNode:send] > Type 'm' to view MessagesSent ")
-	//fmt.Println("[PeerNode:send] > Type 'c' to view OpenConnections ")
+	//p.debugPrintln("[PeerNode:send] Awaiting input to send ... ")
+	//p.println("[PeerNode:send] > Type 'm' to view MessagesSent ")
+	//p.println("[PeerNode:send] > Type 'c' to view OpenConnections ")
 	for {
 		msg := strings.TrimSpace(input(p))
 		if msg == "m" {
@@ -154,7 +251,11 @@ func (p* PeerNode) send() {
 			println(p.OpenConnections.Values)
 			continue
 		}
-		p.HandleOutgoing(Packet{Type: PacketType.UPDATE, Msg: msg})
+		if msg == "a" {
+			println(p.PeersInArrivalOrder.Values())
+			continue
+		}
+		p.HandleOutgoing(Packet{Type: PacketType.BROADCAST_MSG, Msg: msg})
 	}
 }
 /*
@@ -164,23 +265,23 @@ func (p* PeerNode) send() {
 				user for a port.
  */
 func (p *PeerNode) Start(atPort, remotePort string) {
-	p.Dial(p.createSocket(remotePort))
-
-	go p.startServer(atPort)
+	p.startServer(atPort)       // <-------
+      // peernode 1
+	p.DialNetwork(p.createSocket(remotePort))
 
 	go p.PullFromNeighbors() // Occassionally send pull-requests to neighbors, asking for their messagesSent set
 
 	p.send() // Continously prompt the user msgs for the peerNode to broadcast
 }
 
-const DEBUG_MODE = false
+const DEBUG_MODE = true
 func main() {
 	var peerNode = PeerNode{
-		OpenConnections: 		  SafeSet_Conn{ Values: make(map[net.Conn]bool) },
-		PeersInArrivalOrder:	  Array_string{},
-		MessagesSent:             SafeSet_string{ Values: make(map[string  ]bool) },
-		Ipc:                      IPC{},
-		TestMock:                 Mock{ ShouldMockInput: false },
+		OpenConnections:     SafeSet_Conn{ Values: make(map[net.Conn]bool) },
+		PeersInArrivalOrder: SafeArray_string{},
+		MessagesSent:        SafeSet_string{ Values: make(map[string  ]bool) },
+		Ipc:                 IPC{},
+		TestMock:            Mock{ ShouldMockInput: false },
 	}
 
 	peerNode.Start("", "")
@@ -194,9 +295,9 @@ func PromptForRemoteSocket(p *PeerNode) Socket {
 
 	fmt.Print("Connect to port: ")
 	port := strings.TrimSpace(input(p))
-	printf("You wrote port: '%s'\n", port)
+	p.debugPrintf("You wrote port: '%s'\n", port)
 
-	return Socket{ip, port}
+	return Socket{Ip: ip, Port: port}
 }
 func input(p *PeerNode) string {
 	if !p.TestMock.ShouldMockInput {
@@ -214,18 +315,24 @@ func input(p *PeerNode) string {
 
 }
 
-func printf(text string, args ...interface{}) {
+
+
+
+func (p *PeerNode) debugPrintf(text string, args ...interface{}) {
 	if DEBUG_MODE {
-		fmt.Printf(text, args...)
+		fmt.Printf("<" + PortOf(p.Listener.Addr()) + "> " + text, args...)
 	}
 }
-func println(args ...interface{}) {
+func (p *PeerNode) debugPrintln(args ...interface{}) {
 	if DEBUG_MODE {
-		fmt.Println(args...)
+		fmt.Println("<" + PortOf(p.Listener.Addr()) + ">", args)
 	}
 }
-func printPort(listener net.Listener) {
-	connAddr := listener.Addr().String()
-	portIndex := strings.LastIndex(connAddr, ":")
-	fmt.Println("Running on port: " + connAddr[portIndex+1:])
+func (p *PeerNode) println(args ...interface{}) {
+	fmt.Println("<" + PortOf(p.Listener.Addr()) + ">", args)
 }
+func (p *PeerNode) printPort(listener net.Listener) {
+	_, port, _ := net.SplitHostPort(listener.Addr().String())
+	p.println("Running on port: " + port)
+}
+

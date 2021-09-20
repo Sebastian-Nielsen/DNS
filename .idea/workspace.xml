@@ -5,43 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a473623c-3760-4b60-9758-0b085a2e5373" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/handin/Account/Ledger.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/handin/Account/Transaction.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/handin/AvailablePorts.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/golang/account.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/golang/askgoogle.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/golang/channels.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/golang/concurrentmap.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/golang/concurrentmap2.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/golang/dao.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/golang/gobclient.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/golang/gobserver.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/golang/gobyexam.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/golang/googleip.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/golang/myipaddress.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/golang/myipaddress2.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/golang/rpcclient.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/golang/rpcclienta.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/golang/rpcserver.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/golang/rpcservermain.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/golang/setting-up-go.tex" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/golang/src/account/Ledger.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/golang/src/account/SignedTransaction.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/golang/src/account/Transaction.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/golang/tcpclient.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/golang/tcpserver.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/golang/tcpservermulti.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/golang/udpclient.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/golang/udpserver.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/golang/useaccount.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/golang/usesignedtrans.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/golang/xclient.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/golang/xserver.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handin/Helper/Array.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/handin/Helper/IPC.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Helper/IPC.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handin/Helper/Packet.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Helper/Packet.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handin/Helper/SafeArray.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Helper/SafeArray.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handin/Helper/SafeSet.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Helper/SafeSet.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handin/Helper/Socket.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Helper/Socket.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/handin/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/handin/main_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/main_test.go" afterDir="false" />
     </list>
     <list id="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" name="Changes by Andreas 🌚" comment="">
-      <change beforePath="$PROJECT_DIR$/handin/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handin/Account/Ledger.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Account/Ledger.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/handin/main_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/main_test.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -87,28 +64,31 @@
     <auto-save>true</auto-save>
   </component>
   <component name="LineStatusTrackerManager">
-    <file path="$PROJECT_DIR$/handin/main.go">
-      <ranges>
-        <range start1="25" end1="26" start2="25" end2="25" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="29" end1="47" start2="28" end2="31" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="48" end1="48" start2="32" end2="33" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="49" end1="49" start2="34" end2="51" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="138" end1="140" start2="140" end2="166" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="154" end1="155" start2="180" end2="180" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="158" end1="159" start2="183" end2="184" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="163" end1="181" start2="188" end2="188" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-      </ranges>
-    </file>
     <file path="$PROJECT_DIR$/handin/main_test.go">
       <ranges>
-        <range start1="21" end1="23" start2="21" end2="21" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="33" end1="39" start2="31" end2="32" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="40" end1="41" start2="33" end2="34" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="42" end1="43" start2="35" end2="36" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="64" end1="69" start2="57" end2="58" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="78" end1="79" start2="67" end2="68" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="98" end1="103" start2="87" end2="89" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="124" end1="129" start2="110" end2="112" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
+        <range start1="11" end1="12" start2="11" end2="12" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="16" end1="20" start2="16" end2="20" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="24" end1="24" start2="24" end2="111" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="25" end1="25" start2="112" end2="113" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="26" end1="30" start2="114" end2="118" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="36" end1="44" start2="124" end2="130" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="46" end1="47" start2="132" end2="133" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="49" end1="51" start2="135" end2="138" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="56" end1="56" start2="143" end2="144" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="57" end1="60" start2="145" end2="148" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="65" end1="71" start2="153" end2="157" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="72" end1="74" start2="158" end2="160" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="80" end1="80" start2="166" end2="167" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="81" end1="83" start2="168" end2="170" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="90" end1="96" start2="177" end2="181" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="99" end1="100" start2="184" end2="185" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="108" end1="108" start2="193" end2="194" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="109" end1="111" start2="195" end2="197" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="120" end1="123" start2="206" end2="207" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="130" end1="130" start2="214" end2="215" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="131" end1="133" start2="216" end2="218" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="152" end1="157" start2="237" end2="245" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="158" end1="158" start2="246" end2="247" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
       </ranges>
     </file>
   </component>
@@ -145,24 +125,20 @@
       <recent name="C:\Users\sebas\GolandProjects\Distribuerede_systemer_og_sikkerhed\exercise2-2" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\sebas\GolandProjects\Distribuerede_systemer_og_sikkerhed\handin" />
+      <recent name="C:\Users\sebas\GolandProjects\Distribuerede_systemer_og_sikkerhed\handin\test" />
       <recent name="C:\Users\sebas\GolandProjects\Distribuerede_systemer_og_sikkerhed\handin\Account" />
       <recent name="C:\Users\sebas\GolandProjects\Distribuerede_systemer_og_sikkerhed\exercise2-2" />
       <recent name="C:\Users\sebas\GolandProjects\Distribuerede_systemer_og_sikkerhed\handin_1\Helper" />
-      <recent name="C:\Users\sebas\GolandProjects\Distribuerede_systemer_og_sikkerhed\handin_1" />
-      <recent name="C:\Users\sebastian\GolandProjects\DNO" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Test.main_test.go">
-    <configuration name="TestLatercomerNodeEventuallyGetsAllMsgs in DNO/handin" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Go Test.TestNodeConnectsToTenOthersWhenEnteringNetwork in DNO/handin">
+    <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
       <module name="DNO" />
-      <working_directory value="$PROJECT_DIR$/handin" />
-      <root_directory value="$PROJECT_DIR$" />
-      <kind value="PACKAGE" />
-      <package value="DNO/handin" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="FILE" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
-      <framework value="gotest" />
-      <pattern value="^\QTestLatercomerNodeEventuallyGetsAllMsgs\E$" />
       <method v="2" />
     </configuration>
     <configuration name="TestMessageIsSentFromNode1To3Via2 in DNO/handin (1)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -189,7 +165,40 @@
       <pattern value="^\QTestMessageIsSentFromNode1To3Via2\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="main_test.go (3)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestNodeConnectsToTenOthersWhenEnteringNetwork in DNO/handin" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="DNO" />
+      <working_directory value="$PROJECT_DIR$/handin" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="DNO/handin" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestNodeConnectsToTenOthersWhenEnteringNetwork\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestReceivedPeerListWhenJoining in DNO/handin" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="DNO" />
+      <working_directory value="$PROJECT_DIR$/handin" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="DNO/handin" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestReceivedPeerListWhenJoining\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="GoTestRunConfiguration" factoryName="Go Test">
+      <module name="DNO" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="DIRECTORY" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <method v="2" />
+    </configuration>
+    <configuration name="main_test.go (1)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="DNO" />
       <working_directory value="$PROJECT_DIR$/handin" />
       <root_directory value="$PROJECT_DIR$" />
@@ -200,23 +209,13 @@
       <framework value="gotest" />
       <method v="2" />
     </configuration>
-    <configuration name="main_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="DNO" />
-      <working_directory value="$PROJECT_DIR$/handin" />
-      <root_directory value="$PROJECT_DIR$" />
-      <kind value="FILE" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/handin/main_test.go" />
-      <framework value="gotest" />
-      <method v="2" />
-    </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Go Test.main_test.go" />
-        <item itemvalue="Go Test.TestLatercomerNodeEventuallyGetsAllMsgs in DNO/handin" />
+        <item itemvalue="Go Test.TestNodeConnectsToTenOthersWhenEnteringNetwork in DNO/handin" />
         <item itemvalue="Go Test.TestMessageIsSentFromNode1To3Via2 in DNO/handin (1)" />
-        <item itemvalue="Go Test.main_test.go (3)" />
+        <item itemvalue="Go Test.main_test.go (1)" />
         <item itemvalue="Go Test.TestMessageIsSentFromNode1To3Via2 in DNO/handin" />
+        <item itemvalue="Go Test.TestReceivedPeerListWhenJoining in DNO/handin" />
       </list>
     </recent_temporary>
   </component>
