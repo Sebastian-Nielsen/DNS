@@ -5,9 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a473623c-3760-4b60-9758-0b085a2e5373" name="Changes" comment="" />
-    <list id="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" name="Changes by Andreas 🌚" comment="">
-      <change beforePath="$PROJECT_DIR$/handin/main_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/main_test.go" afterDir="false" />
-    </list>
+    <list id="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" name="Changes by Andreas 🌚" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -83,20 +81,30 @@
       <recent name="C:\Users\sebas\GolandProjects\Distribuerede_systemer_og_sikkerhed\exercise2-2" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\sebas\GolandProjects\Distribuerede_systemer_og_sikkerhed" />
       <recent name="C:\Users\sebas\GolandProjects\Distribuerede_systemer_og_sikkerhed\handin\test" />
       <recent name="C:\Users\sebas\GolandProjects\Distribuerede_systemer_og_sikkerhed\handin" />
       <recent name="C:\Users\sebas\GolandProjects\Distribuerede_systemer_og_sikkerhed\handin\Account" />
       <recent name="C:\Users\sebas\GolandProjects\Distribuerede_systemer_og_sikkerhed\exercise2-2" />
-      <recent name="C:\Users\sebas\GolandProjects\Distribuerede_systemer_og_sikkerhed\handin_1\Helper" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Test.main_test.go">
-    <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
+  <component name="RunManager" selected="Go Build.go build DNO/cryptography">
+    <configuration name="go build DNO/cryptography" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="DNO" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="DNO/cryptography" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/cryptography/RSA.go" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go build RSA.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="DNO" />
       <working_directory value="$PROJECT_DIR$" />
       <kind value="FILE" />
+      <package value="DNO" />
       <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/handin/cryptography/RSA.go" />
       <method v="2" />
     </configuration>
     <configuration name="TestNewcomerNodeReceivesAllTransactionsAppliedBeforeItEnteredTheNetwork in DNO/handin" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -111,30 +119,6 @@
       <pattern value="^\QTestNewcomerNodeReceivesAllTransactionsAppliedBeforeItEnteredTheNetwork\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestPeer1CanConnectToPeer2 in DNO/handin" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="DNO" />
-      <working_directory value="$PROJECT_DIR$/handin" />
-      <root_directory value="$PROJECT_DIR$" />
-      <kind value="PACKAGE" />
-      <package value="DNO/handin" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/handin/main_test.go" />
-      <framework value="gotest" />
-      <pattern value="^\QTestPeer1CanConnectToPeer2\E$" />
-      <method v="2" />
-    </configuration>
-    <configuration name="TestPeerNodeConnectsToAllNodesWhenEnteringNetwork in DNO/handin" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="DNO" />
-      <working_directory value="$PROJECT_DIR$/handin" />
-      <root_directory value="$PROJECT_DIR$" />
-      <kind value="PACKAGE" />
-      <package value="DNO/handin" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/handin/main_test.go" />
-      <framework value="gotest" />
-      <pattern value="^\QTestPeerNodeConnectsToAllNodesWhenEnteringNetwork\E$" />
-      <method v="2" />
-    </configuration>
     <configuration name="TestTransactionsAppliesToAllLedger in DNO/handin" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="DNO" />
       <working_directory value="$PROJECT_DIR$/handin" />
@@ -145,15 +129,6 @@
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
       <pattern value="^\QTestTransactionsAppliesToAllLedger\E$" />
-      <method v="2" />
-    </configuration>
-    <configuration default="true" type="GoTestRunConfiguration" factoryName="Go Test">
-      <module name="DNO" />
-      <working_directory value="$PROJECT_DIR$" />
-      <kind value="DIRECTORY" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <framework value="gotest" />
       <method v="2" />
     </configuration>
     <configuration name="main_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -168,11 +143,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Build.go build DNO/cryptography" />
+        <item itemvalue="Go Build.go build RSA.go" />
         <item itemvalue="Go Test.main_test.go" />
         <item itemvalue="Go Test.TestNewcomerNodeReceivesAllTransactionsAppliedBeforeItEnteredTheNetwork in DNO/handin" />
         <item itemvalue="Go Test.TestTransactionsAppliesToAllLedger in DNO/handin" />
-        <item itemvalue="Go Test.TestPeer1CanConnectToPeer2 in DNO/handin" />
-        <item itemvalue="Go Test.TestPeerNodeConnectsToAllNodesWhenEnteringNetwork in DNO/handin" />
       </list>
     </recent_temporary>
   </component>
