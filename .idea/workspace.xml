@@ -4,13 +4,7 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a473623c-3760-4b60-9758-0b085a2e5373" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/cryptography/task2.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test1" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cryptography/RSA.go" beforeDir="false" afterPath="$PROJECT_DIR$/cryptography/RSA.go" afterDir="false" />
-    </list>
+    <list default="true" id="a473623c-3760-4b60-9758-0b085a2e5373" name="Changes" comment="" />
     <list id="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" name="Changes by Andreas 🌚" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

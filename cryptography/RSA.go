@@ -82,7 +82,7 @@ func compute_d(p, q *big.Int) *big.Int {
 	)
 	fmt.Println()
 	fmt.Println("q-1 =", qMin1)
-	fmt.Println("q-1 =", pMin1)
+	fmt.Println("p-1 =", pMin1)
 	fmt.Println("d = 3^(-1) mod (p-1)(q-1) = d,   len(d)=",d.BitLen())
 	fmt.Println()
 	return d

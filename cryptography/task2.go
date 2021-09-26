@@ -23,8 +23,6 @@ func main() {
 	cbc.EncryptToFile(filename, msg)
 	plaintext := cbc.DecryptFromFile(filename)
 	fmt.Printf("en- and decrypted: %s\nEqual: %t", plaintext, msg==plaintext)
-
-	
 }
 
 func (c *CBC) EncryptToFile(name, plaintext string) {
@@ -55,7 +53,6 @@ func (c *CBC) CBCDecrypter(ciphertext []byte) []byte {
 	}
 	iv := ciphertext[:aes.BlockSize]
 	ciphertext = ciphertext[aes.BlockSize:]
-
 
 	// CBC mode always works in whole blocks.
 	if len(ciphertext)%aes.BlockSize != 0 {
