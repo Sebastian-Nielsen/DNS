@@ -33,7 +33,7 @@ func TestEncryptionAndDecryptionWithRSAandAES(t *testing.T) {
 	msg := big.NewInt( 123456 )   // kan ikke klare beskeder med længde > 6 ?!?
 	RSAmsg := Encrypt(msg, secretKey)
 	cbc := CBC{Iv: "6368616e676520746869732070617373"}
-	filename := "cryptography/RSAandAEStest"
+	filename := "Cryptography/RSAandAEStest"
 	cbc.EncryptToFile(filename, RSAmsg.String())
 	RSAmsgFromFile := cbc.DecryptFromFile(filename)
 	bigInt := new(big.Int)

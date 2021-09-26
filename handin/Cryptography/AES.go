@@ -1,4 +1,4 @@
-package cryptography
+package Cryptography
 
 import (
 	"bytes"
