@@ -79,14 +79,6 @@ func (p *PeerNode) DialNetwork(remoteSocket Socket) {
 
 		peers := packet.PeersInArrivalOrderValues
 
-		//p.OpenConnections.ContainsAConnWith(port)
-		//for i, port := peers {
-		//	if port ==  conn.RemoteAddr().String() {
-		//		p
-		//	}
-		//}
-
-
 		p.connectToPeers(peers)
 
 		p.Broadcast(

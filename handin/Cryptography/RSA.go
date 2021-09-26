@@ -14,55 +14,64 @@ type SecretKey struct {
 	N *big.Int
 	D *big.Int
 }
-// greatest common divisor (GCD) via Euclidean algorithm
-func GCD(a, b int) int {  // source: https://play.golang.org/p/SmzvkDjYlb
-	for b != 0 {
-		t := b
-		b = a % b
-		a = t
-	}
-	return a
-}
 
-// func main() {
-// 	//fmt.Println("Result:", Encrypt(2, SecretKey{2, 2}))
-// 	n, d := KeyGen(20)
-// 	publicKey := PublicKey{N:n, E:big.NewInt(3)}
-// 	secretKey := SecretKey{N:n, D:d}
-// 	m := big.NewInt( 123456 )   // kan ikke klare beskeder med længde > 6 ?!?
-// 	fmt.Println("original:", m)
-// 	fmt.Println("encrypted:", Encrypt(m, secretKey))
-// 	fmt.Println("decrypted m:", Decrypt(Encrypt(m, secretKey), publicKey))
-// 	fmt.Println("original m:", m)
-// }
+
+func Test2() {
+	//fmt.Println("Result:", Encrypt(2, SecretKey{2, 2}))
+	n, d := KeyGen(20)
+	publicKey := PublicKey{N:n, E:big.NewInt(3)}
+	secretKey := SecretKey{N:n, D:d}
+	m := big.NewInt( 123456 )   // kan ikke klare beskeder med længde > 6 ?!?
+	fmt.Println("original:", m)
+	fmt.Println("encrypted:", Encrypt(m, publicKey))
+	decrypted_m := Decrypt(Encrypt(m, publicKey), secretKey)
+	//decrypted_m := Encrypt(Decrypt(m, publicKey), secretKey)
+	fmt.Println("---------------------")
+	fmt.Println("Success?   ", decrypted_m.Cmp(m) == 0)
+	fmt.Println("decrypted m:", decrypted_m)
+	fmt.Println("original m:", m)
+	fmt.Println("---------------------")
+}
 
 func KeyGen(k int) (*big.Int, *big.Int) {
 	n, p, q := compute_n(k)
 	d := compute_d(p, q)
+
+	qMin1 := big.NewInt(0).Sub(q, big.NewInt(1))
+	pMin1 := big.NewInt(0).Sub(p, big.NewInt(1))
+	result := big.NewInt(0).Mod(
+		big.NewInt(0).Mul(d, big.NewInt(3)),
+		big.NewInt(0).Mul(qMin1, pMin1),
+	)
+	fmt.Println("########################")
+	fmt.Println(result)
+	if big.NewInt(1).Cmp(result) != 0 {
+		panic("nope")
+	}
+	fmt.Println("########################")
 
 	if !( n.BitLen() == k ) {
 		fmt.Println( "ERROR 8231")
 	}
 	return n, d
 }
-func Encrypt(m *big.Int, key SecretKey) *big.Int { // Compute the signature of m
-	n := key.N
-	d := key.D
-
-	fmt.Println("m:", m)
-	fmt.Println("d:", d)
-	dRaisedToM := big.NewInt(0).Exp(m, d, nil)
-	fmt.Println("d and m:", d, m)
-	// fmt.Println("debug d^m ", dRaisedToM)
-	c := big.NewInt(0).Mod(dRaisedToM, n)     // m^d % n
-	return c
-}
-func Decrypt(c *big.Int, key PublicKey) *big.Int {
+func Encrypt(m *big.Int, key PublicKey) *big.Int { // Compute the signature of m
 	n := key.N
 	e := key.E
 
-	eRaisedToC := big.NewInt(0).Exp(c, e, nil)
-	m := big.NewInt(0).Mod(eRaisedToC, n)     // m^e % n
+	fmt.Println("m:", m)
+	fmt.Println("e:", e)
+	dRaisedToM := big.NewInt(0).Exp(m, e, nil)
+	// fmt.Println("debug d^m ", dRaisedToM)
+	c := big.NewInt(0).Mod(dRaisedToM, n)     // m^e % n
+	return c
+}
+func Decrypt(c *big.Int, key SecretKey) *big.Int {
+	n := key.N
+	d := key.D
+
+	dRaisedToC := big.NewInt(0).Exp(c, d, nil)
+	m := big.NewInt(0).Mod(dRaisedToC, n)     // c^d % n
 	return m
 }
 func compute_d(p, q *big.Int) *big.Int {
@@ -75,7 +84,7 @@ func compute_d(p, q *big.Int) *big.Int {
 	//big.NewInt(int64(math.Pow(3, 1))),
 	//https://youtu.be/Qgow8pVNjr0?t=561
 	// d=e^(-1) mod (p-1)(q-1)    equivalent to   de=1 mod (p-1)(q-1)
-	// e^(-1) is not as in the usual integer sense in the above
+	// e^(-1) is not as in the usual integer sense in the above          3^(-1)  mod (q-1)(p-1)
 	d := big.NewInt(0).ModInverse(
 		big.NewInt(3),
 		big.NewInt(0).Mul(qMin1, pMin1),  // (p-1)(q-1)
@@ -83,7 +92,9 @@ func compute_d(p, q *big.Int) *big.Int {
 	fmt.Println()
 	fmt.Println("q-1 =", qMin1)
 	fmt.Println("p-1 =", pMin1)
+	fmt.Println("(p-1)(q-1) =", big.NewInt(0).Mul(pMin1, qMin1))
 	fmt.Println("d = 3^(-1) mod (p-1)(q-1) = d,   len(d)=",d.BitLen())
+	fmt.Println("d = 3^(-1) mod (p-1)(q-1) =", d)
 	fmt.Println()
 	return d
 }
@@ -99,18 +110,18 @@ func compute_n(k int) (*big.Int, *big.Int, *big.Int) {
 		fmt.Println("n:", n)
 		fmt.Println("length of p:", p.BitLen())
 		fmt.Println("length of q:", q.BitLen())
-		fmt.Println("length of q:", n.BitLen())
+		fmt.Println("length of n:", n.BitLen())
 		qMin1 := big.NewInt(0).Sub(q, big.NewInt(1))
 		pMin1 := big.NewInt(0).Sub(p, big.NewInt(1))
 		gcd3AndPMin1 := big.NewInt(0).GCD(nil, nil, big.NewInt(3), pMin1)
 		gcd3AndQMin1 := big.NewInt(0).GCD(nil, nil, big.NewInt(3), qMin1)
-		gcd3AndPMin1Min1 :=  big.NewInt(0).Sub(gcd3AndPMin1, big.NewInt(1))
 		if gcd3AndPMin1.Cmp(gcd3AndQMin1) == 0 &&
-			gcd3AndPMin1Min1.Cmp(big.NewInt(0)) == 0  {
+			gcd3AndPMin1.Cmp(big.NewInt(1)) == 0 &&
+			p.Cmp(q) != 0 {
 			fmt.Println("p and q does satisfy: gcd(3,p-1) = gcd(3,q-1) = 1\n-------------------------")
 			return n, p, q
 		} else {
-			fmt.Println("p and q does not satisfy: gcd(3,p-1) = gcd(3,q-1) = 1\n")
+			fmt.Println("p and q does not satisfy: gcd(3,p-1) = gcd(3,q-1) = 1\n ")
 		}
 	}
 }

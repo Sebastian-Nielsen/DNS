@@ -26,23 +26,25 @@ func createPeerNode( shouldMockInput bool) PeerNode {
 	}
 }
 
-// In the exercise, it says that we should AES_encrypt the secret key from RSA and then RSA_decrypt the message with it
-// but this doesn't really make sense, since RSA decrypts using the public key... and AES_encrypting the RSA public key
-// doesn't really make sense either, as it is, well, public...
-// So instead we double encryp the message, first with
+func Test1(t *testing.T) {
+	Test2()
+}
+
+
+
 func TestEncryptionAndDecryptionWithRSAandAES(t *testing.T) {
 	n, d := KeyGen(20)
 	publicKey := PublicKey{N:n, E:big.NewInt(3)}
 	secretKey := SecretKey{N:n, D:d}
-	msg := big.NewInt( 123456 )   // kan ikke klare beskeder med længde > 6 ?!?
-	RSAmsg := Encrypt(msg, secretKey)
+	msg := big.NewInt( 53467 )   // kan ikke klare beskeder med længde > 6 ?!?
+	RSAmsg := Encrypt(msg, publicKey)
 	cbc := CBC{Iv: "6368616e676520746869732070617373"}
 	filename := "Cryptography/RSAandAEStest"
 	cbc.EncryptToFile(filename, RSAmsg.String())
 	RSAmsgFromFile := cbc.DecryptFromFile(filename)
 	bigInt := new(big.Int)
 	strRSAmsgFromFile, _ := bigInt.SetString(RSAmsgFromFile, 10)
-	decrMsg := Decrypt(strRSAmsgFromFile, publicKey)
+	decrMsg := Decrypt(strRSAmsgFromFile, secretKey)
 	
 	if decrMsg.String() != msg.String() {
 		t.Error("Original message '" + msg.String() + "' different from decrypted message'" + decrMsg.String() + "'")
