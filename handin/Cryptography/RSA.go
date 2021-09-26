@@ -16,39 +16,26 @@ type SecretKey struct {
 }
 
 
-func Test2() {
-	//fmt.Println("Result:", Encrypt(2, SecretKey{2, 2}))
-	n, d := KeyGen(20)
-	publicKey := PublicKey{N:n, E:big.NewInt(3)}
-	secretKey := SecretKey{N:n, D:d}
-	m := big.NewInt( 123456 )   // kan ikke klare beskeder med længde > 6 ?!?
-	fmt.Println("original:", m)
-	fmt.Println("encrypted:", Encrypt(m, publicKey))
-	decrypted_m := Decrypt(Encrypt(m, publicKey), secretKey)
-	//decrypted_m := Encrypt(Decrypt(m, publicKey), secretKey)
-	fmt.Println("---------------------")
-	fmt.Println("Success?   ", decrypted_m.Cmp(m) == 0)
-	fmt.Println("decrypted m:", decrypted_m)
-	fmt.Println("original m:", m)
-	fmt.Println("---------------------")
-}
+//func Test2() {
+//	//fmt.Println("Result:", Encrypt(2, SecretKey{2, 2}))
+//	n, d := KeyGen(18)
+//	publicKey := PublicKey{N:n, E:big.NewInt(3)}
+//	secretKey := SecretKey{N:n, D:d}
+//	m := big.NewInt( 111116 )   // kan ikke klare beskeder med længde > 6 ?!?
+//	fmt.Println("original:", m)
+//	fmt.Println("encrypted:", Encrypt(m, publicKey))
+//	decryptedM := Decrypt(Encrypt(m, publicKey), secretKey)
+//	//decrypted_m := Encrypt(Decrypt(m, publicKey), secretKey)
+//	fmt.Println("---------------------")
+//	fmt.Println("Success?   ", decryptedM.Cmp(m) == 0)
+//	fmt.Println("decrypted m:", decryptedM)
+//	fmt.Println("original m:", m)
+//	fmt.Println("---------------------")
+//}
 
 func KeyGen(k int) (*big.Int, *big.Int) {
 	n, p, q := compute_n(k)
 	d := compute_d(p, q)
-
-	qMin1 := big.NewInt(0).Sub(q, big.NewInt(1))
-	pMin1 := big.NewInt(0).Sub(p, big.NewInt(1))
-	result := big.NewInt(0).Mod(
-		big.NewInt(0).Mul(d, big.NewInt(3)),
-		big.NewInt(0).Mul(qMin1, pMin1),
-	)
-	fmt.Println("########################")
-	fmt.Println(result)
-	if big.NewInt(1).Cmp(result) != 0 {
-		panic("nope")
-	}
-	fmt.Println("########################")
 
 	if !( n.BitLen() == k ) {
 		fmt.Println( "ERROR 8231")
@@ -59,8 +46,8 @@ func Encrypt(m *big.Int, key PublicKey) *big.Int { // Compute the signature of m
 	n := key.N
 	e := key.E
 
-	fmt.Println("m:", m)
-	fmt.Println("e:", e)
+	//fmt.Println("m:", m)
+	//fmt.Println("e:", e)
 	dRaisedToM := big.NewInt(0).Exp(m, e, nil)
 	// fmt.Println("debug d^m ", dRaisedToM)
 	c := big.NewInt(0).Mod(dRaisedToM, n)     // m^e % n
@@ -89,13 +76,13 @@ func compute_d(p, q *big.Int) *big.Int {
 		big.NewInt(3),
 		big.NewInt(0).Mul(qMin1, pMin1),  // (p-1)(q-1)
 	)
-	fmt.Println()
-	fmt.Println("q-1 =", qMin1)
-	fmt.Println("p-1 =", pMin1)
-	fmt.Println("(p-1)(q-1) =", big.NewInt(0).Mul(pMin1, qMin1))
-	fmt.Println("d = 3^(-1) mod (p-1)(q-1) = d,   len(d)=",d.BitLen())
-	fmt.Println("d = 3^(-1) mod (p-1)(q-1) =", d)
-	fmt.Println()
+	//fmt.Println()
+	//fmt.Println("q-1 =", qMin1)
+	//fmt.Println("p-1 =", pMin1)
+	//fmt.Println("(p-1)(q-1) =", big.NewInt(0).Mul(pMin1, qMin1))
+	//fmt.Println("d = 3^(-1) mod (p-1)(q-1) = d,   len(d)=",d.BitLen())
+	//fmt.Println("d = 3^(-1) mod (p-1)(q-1) =", d)
+	//fmt.Println()
 	return d
 }
 
@@ -106,11 +93,11 @@ func compute_n(k int) (*big.Int, *big.Int, *big.Int) {
 		q, err2 := rand.Prime(rand.Reader, k/2)
 		if err2 != nil {fmt.Println("2", err2)}
 		n := big.NewInt(0).Mul(p, q)
-		fmt.Println("p:", p, "q:", q)
-		fmt.Println("n:", n)
-		fmt.Println("length of p:", p.BitLen())
-		fmt.Println("length of q:", q.BitLen())
-		fmt.Println("length of n:", n.BitLen())
+		//fmt.Println("p:", p, "q:", q)
+		//fmt.Println("n:", n)
+		//fmt.Println("length of p:", p.BitLen())
+		//fmt.Println("length of q:", q.BitLen())
+		//fmt.Println("length of n:", n.BitLen())
 		qMin1 := big.NewInt(0).Sub(q, big.NewInt(1))
 		pMin1 := big.NewInt(0).Sub(p, big.NewInt(1))
 		gcd3AndPMin1 := big.NewInt(0).GCD(nil, nil, big.NewInt(3), pMin1)
@@ -118,10 +105,10 @@ func compute_n(k int) (*big.Int, *big.Int, *big.Int) {
 		if gcd3AndPMin1.Cmp(gcd3AndQMin1) == 0 &&
 			gcd3AndPMin1.Cmp(big.NewInt(1)) == 0 &&
 			p.Cmp(q) != 0 {
-			fmt.Println("p and q does satisfy: gcd(3,p-1) = gcd(3,q-1) = 1\n-------------------------")
+			//fmt.Println("p and q does satisfy: gcd(3,p-1) = gcd(3,q-1) = 1\n-------------------------")
 			return n, p, q
 		} else {
-			fmt.Println("p and q does not satisfy: gcd(3,p-1) = gcd(3,q-1) = 1\n ")
+			//fmt.Println("p and q does not satisfy: gcd(3,p-1) = gcd(3,q-1) = 1\n ")
 		}
 	}
 }

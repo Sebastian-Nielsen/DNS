@@ -7,6 +7,7 @@ import (
 	"math/big"
 	"net"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 )
@@ -26,31 +27,39 @@ func createPeerNode( shouldMockInput bool) PeerNode {
 	}
 }
 
-func Test1(t *testing.T) {
-	Test2()
-}
-
-
 
 func TestEncryptionAndDecryptionWithRSAandAES(t *testing.T) {
+	// RSA decrypt
 	n, d := KeyGen(20)
 	publicKey := PublicKey{N:n, E:big.NewInt(3)}
 	secretKey := SecretKey{N:n, D:d}
-	msg := big.NewInt( 53467 )   // kan ikke klare beskeder med længde > 6 ?!?
+	msg := big.NewInt( 578355 )
 	RSAmsg := Encrypt(msg, publicKey)
+
+	// AES encrypt the secret key
 	cbc := CBC{Iv: "6368616e676520746869732070617373"}
 	filename := "Cryptography/RSAandAEStest"
-	cbc.EncryptToFile(filename, RSAmsg.String())
-	RSAmsgFromFile := cbc.DecryptFromFile(filename)
-	bigInt := new(big.Int)
-	strRSAmsgFromFile, _ := bigInt.SetString(RSAmsgFromFile, 10)
-	decrMsg := Decrypt(strRSAmsgFromFile, secretKey)
-	
-	if decrMsg.String() != msg.String() {
-		t.Error("Original message '" + msg.String() + "' different from decrypted message'" + decrMsg.String() + "'")
+	secretKeyString := secretKey.N.String() + ":" + secretKey.D.String()
+	cbc.EncryptToFile(filename, secretKeyString)
+
+	// AES decrypt the secret key
+	decryptionFromFile := cbc.DecryptFromFile(filename)
+
+	// Create secret key from AES decryption of the file
+	splitPos := strings.Index(decryptionFromFile, ":")
+	decrN := new(big.Int)
+	decrN.SetString(decryptionFromFile[:splitPos], 10)
+	decrD := new(big.Int)
+	decrD.SetString(decryptionFromFile[splitPos+1:], 10)
+	decryptedSecretKey := SecretKey{N:decrN, D:decrD}
+
+	// RSA decrypt with the new secret key
+	decryptedMsg := Decrypt(RSAmsg, decryptedSecretKey)
+
+	if decryptedMsg.String() != msg.String() {
+		t.Error("Original message '" + msg.String() + "' different from decrypted message'" + decryptedMsg.String() + "'")
 	}
 }
-
 func TestNewcomerNodeReceivesAllTransactionsAppliedBeforeItEnteredNetwork(t *testing.T) {
 	t.Parallel()
 
@@ -74,20 +83,20 @@ func TestNewcomerNodeReceivesAllTransactionsAppliedBeforeItEnteredNetwork(t *tes
 	makeAccounts(&peerNode2, IDs, amounts)
 	makeAccounts(&peerNode3, IDs, amounts)
 
-	time.Sleep(4 * time.Second)
+	//time.Sleep(4 * time.Second)
 
 	peerNode1.MakeAndBroadcastTransaction(42, "tran1", IDs[0], IDs[1])
 
-	time.Sleep(5 * time.Second)
+	time.Sleep(1 * time.Second)
 
 	peerNode2.MakeAndBroadcastTransaction(5, "tran2", IDs[1], IDs[2])
 
-	time.Sleep(5 * time.Second)
+	time.Sleep(1 * time.Second)
 
 	makeAccounts(&peerNode4, IDs, amounts)
 	goStart(&peerNode4, peerNode4_port, peerNode2_port)
 
-	time.Sleep(5 * time.Second)
+	time.Sleep(1 * time.Second)
 
 	if peerNode4.LocalLedger.Accounts[IDs[0]] != amounts[0]-42{
 		t.Error("Transaction 'tran1' from 'acc1' to 'acc2' on peerNode1 didn't apply to 'acc1' on latecomer peerNode4.",
@@ -127,11 +136,11 @@ func TestTransactionsAreBroadcastedAndAppliedOnAllPeerNodes(t *testing.T) {
 	makeAccounts(&peerNode2, IDs, amounts)
 	makeAccounts(&peerNode3, IDs, amounts)
 
-	time.Sleep(4 * time.Second)
+	time.Sleep(1 * time.Second)
 
 	peerNode1.MakeAndBroadcastTransaction(20, "tran1", IDs[0], IDs[1])
 
-	time.Sleep(5 * time.Second)
+	time.Sleep(1 * time.Second)
 
 	if peerNode1.LocalLedger.Accounts[IDs[0]] != amounts[0]-20 {
 		t.Error("Transaction 'tran1' from 'acc1' to 'acc2' on peerNode1 didn't apply to acc1' on peerNode1.",
@@ -166,7 +175,7 @@ func TestNodeConnectsToThreeOthersWhenEnteringNetwork(t *testing.T) {
 	peer4Port := AvailablePorts.Next()
 	goStart(&peerNode4, peer4Port, peer1Port)
 
-	time.Sleep(5 * time.Second)
+	time.Sleep(1 * time.Second)
 
 	if len(peerNode1.OpenConnections.Values) != 3 {
 		t.Error("PeerNode1 doesn't have exactly 3 connections")
@@ -186,9 +195,6 @@ func TestNodeConnectsToThreeOthersWhenEnteringNetwork(t *testing.T) {
 		t.Error("peerNode4 (the last one connected to the network) isn't the last node in PeersInArrivalOrder:", 
 			peerNode4.PeersInArrivalOrder.Values())
 	}
-
-	time.Sleep(2 * time.Second)
-
 }
 func TestNodeConnectsToTenOthersWhenEnteringNetwork(t *testing.T) {
 	t.Parallel()
@@ -219,7 +225,7 @@ func TestNodeConnectsToTenOthersWhenEnteringNetwork(t *testing.T) {
 	goStart(&peerNode10, AvailablePorts.Next(), peer1Port)
 	goStart(&peerNode11, AvailablePorts.Next(), peer1Port)
 
-	time.Sleep(5 * time.Second)
+	time.Sleep(1 * time.Second)
 
 	// By now, all nodefs should have 10 openConnections, just test that 4 of them have it
 	if len(peerNode1.OpenConnections.Values) != 10 {
@@ -240,15 +246,12 @@ func TestNodeConnectsToTenOthersWhenEnteringNetwork(t *testing.T) {
 	peerNode12 := createPeerNode(true)
 	goStart(&peerNode12, p12Port, peer1Port)
 
-	time.Sleep(10 * time.Second)
+	time.Sleep(1 * time.Second)
 
 	if !peerNode11.PeersInArrivalOrder.Contains(p12Port) {
 		t.Error("peerNode11 doesn't have the port of peerNode12 (" + p12Port + ") after peerNode1 broadcast it.\n" +
 			"PeerNode11's portList:", peerNode11.PeersInArrivalOrder.Values())
 	}
-
-	time.Sleep(1 * time.Second)
-
 }
 func TestPeerNodeConnectsToAllNodesWhenEnteringNetwork(t *testing.T) {
 	t.Parallel()
@@ -338,17 +341,13 @@ func TestLatercomerNodeEventuallyGetsAllMsgs(t *testing.T) {
 	peerNode1 := createPeerNode(true)
 	peerNode2 := createPeerNode(true)
 
-	go peerNode1.Start(peerNode1_port, "no_port")
-
-	time.Sleep(4 * time.Second)
+	goStart(&peerNode1, peerNode1_port, "no_port")
 
 	simulateInputFor(&peerNode1, "some_msg_1")
 	simulateInputFor(&peerNode1, "some_msg_2")
 	simulateInputFor(&peerNode1, "some_msg_3")
 
-	go peerNode2.Start(peerNode2_port, peerNode1_port)
-
-	time.Sleep(4 * time.Second)
+	goStart(&peerNode2, peerNode2_port, peerNode1_port)
 
 	if  !peerNode2.MessagesSent.Contains("some_msg_1") ||
 		!peerNode2.MessagesSent.Contains("some_msg_2") ||
@@ -402,11 +401,11 @@ func TestPeer1CanConnectToPeer2(t *testing.T) {
 
 func simulateInputFor(peerNode *PeerNode, text string) {
 	peerNode.TestMock.SimulatedInputString = text
-	time.Sleep(4 * time.Second)
+	time.Sleep(1 * time.Second)
 }
 func goStart(peerNode *PeerNode, atPort string, remotePort string) {
 	go peerNode.Start(atPort, remotePort)
-	time.Sleep(4 * time.Second)
+	time.Sleep(250 * time.Millisecond)
 }
 
 func makeAccounts(peerNode *PeerNode, IDs []string, startAmounts []int){

@@ -6,7 +6,6 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"encoding/hex"
-	"fmt"
 	"io"
 	"os"
 )
@@ -27,7 +26,7 @@ type CBC struct {
 
 func (c *CBC) EncryptToFile(name, plaintext string) {
 	ciphertextBytes := c.CBCEncrypter(plaintext)
-	fmt.Println("cipherText (as bytes): ", ciphertextBytes)
+	//fmt.Println("cipherText (as bytes): ", ciphertextBytes)
 	err := os.WriteFile(name, ciphertextBytes, 0644)
 	check(err)
 }
@@ -65,15 +64,9 @@ func (c *CBC) CBCDecrypter(ciphertext []byte) []byte {
 	mode.CryptBlocks(ciphertext, ciphertext)
 
 	// Remove padding
-	// fmt.Println(ciphertext)
 	paddedBytes := int(ciphertext[len(ciphertext)-1])
-	// fmt.Println(paddedBytes)
 	ciphertext = ciphertext[:len(ciphertext)-paddedBytes]
-	// fmt.Println(ciphertext)
 
-	// fmt.Println("Ciphertext 3495:", ciphertext[:])
-	// fmt.Println("Ciphertext 3495:", string(ciphertext))
-	// fmt.Println("Ciphertext 3495:", []byte(string(ciphertext)))
 
 
 	// If the original plaintext lengths are not a multiple of the block
@@ -91,11 +84,6 @@ func (c *CBC) CBCDecrypter(ciphertext []byte) []byte {
 
 func (c *CBC) CBCEncrypter(plaintext string) []byte {
 	plaintextBytes := []byte(plaintext)
-	// fmt.Println("Bytes:")
-	// fmt.Println(plaintextBytes)
-	// fmt.Println("")
-
-
 
 	// CBC mode works on blocks so plaintexts may need to be padded to the
 	// next whole block. For an example of such padding, see https://tools.ietf.org/html/rfc5246#section-6.2.3.2
@@ -104,27 +92,9 @@ func (c *CBC) CBCEncrypter(plaintext string) []byte {
 	// "plaintext is not a multiple of the block size"
 	// We need to pad it so that it is
 	bytesToPad := aes.BlockSize - remainder
-
-	// newPlaintextBytes := make([]byte, bytesToPad)
-	// fmt.Println(append(newPlaintextBytes, plaintextBytes...))
-	// copy(plaintextBytes, append(newPlaintextBytes, plaintextBytes...))
-	// plaintextBytes = append(newPlaintextBytes, plaintextBytes...)
-
-
-	// newPlaintextBytes := make([]byte, len(plaintextBytes)+bytesToPad)
-	// copy(newPlaintextBytes, plaintextBytes)
-	// fmt.Println(plaintextBytes)
-	// fmt.Println(newPlaintextBytes)
-	// copy(newPlaintextBytes[len(plaintextBytes):], bytes.Repeat([]byte{byte(bytesToPad)}, bytesToPad) )
-	// plaintextBytes = newPlaintextBytes
-
 	paddingBytes := bytes.Repeat([]byte{byte(bytesToPad)}, bytesToPad)
 	plaintextBytes = append(plaintextBytes, paddingBytes...)
-	// fmt.Println(plaintextBytes)
 
-	// fmt.Println("Bytes padded:")
-	// fmt.Println(plaintextBytes)
-	// fmt.Println("")
 
 	key, _ := hex.DecodeString(c.Iv)
 	block, err := aes.NewCipher(key)
@@ -141,7 +111,7 @@ func (c *CBC) CBCEncrypter(plaintext string) []byte {
 	mode := cipher.NewCBCEncrypter(block, iv)
 	mode.CryptBlocks(ciphertext[aes.BlockSize:], plaintextBytes)
 
-	fmt.Printf("Encrypted ciphertext: '%x'\n", ciphertext)
+	//fmt.Printf("Encrypted ciphertext: '%x'\n", ciphertext)
 	return ciphertext
 }
 
