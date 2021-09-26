@@ -4,8 +4,6 @@ import (
 	"encoding/gob"
 	"fmt"
 	"net"
-	"sync"
-	"time"
 )
 
 /*
@@ -14,16 +12,29 @@ import (
 	Handles serialization/deserialization and sending of data, as well as error handling
 */
 type IPC struct {
-	mu     sync.Mutex
+	ConnToEncDecPair map[net.Conn]EncoderDecoderPair
+}
+type EncoderDecoderPair struct {
+	Encoder *gob.Encoder
+	Decoder *gob.Decoder
 }
 
-func (ipc* IPC) Send(packet Packet, conn net.Conn) bool {
-	ipc.mu.Lock()
-	defer ipc.mu.Unlock()
-
+func (ipc *IPC) Send(packet Packet, conn net.Conn) bool {
 	ok := true
 	//fmt.Println("\t[IPC:Send]    before encoding:", packet)
-	enc := gob.NewEncoder(conn)
+
+	//fmt.Println("debug1", ipc.ConnToEncDecPair)
+	connHasAnEncoderDecoderPair := ipc.ConnToEncDecPair[conn] != (EncoderDecoderPair{})
+	//fmt.Println("debug2", connHasAnEncoderDecoderPair)
+	if !connHasAnEncoderDecoderPair {
+		ipc.ConnToEncDecPair[conn] = EncoderDecoderPair{
+			Encoder: gob.NewEncoder(conn),
+			Decoder: gob.NewDecoder(conn),
+		}
+	}
+	//fmt.Println("debug3", ipc.ConnToEncDecPair)
+
+	enc := ipc.ConnToEncDecPair[conn].Encoder
 	err := enc.Encode( packet )
 	if err != nil {
 		fmt.Println("Ipc Send err:", err)
@@ -31,13 +42,22 @@ func (ipc* IPC) Send(packet Packet, conn net.Conn) bool {
 	}
 
 	// A thread can only send a message every 0.5 seconds
-	time.Sleep(100 * time.Millisecond)
+	//time.Sleep(100 * time.Millisecond)
 	return ok
 }
-func (ipc* IPC) Receive(conn net.Conn) (Packet, bool) {
+func (ipc *IPC) Receive(conn net.Conn) (Packet, bool) {
 	var packet Packet
 	ok := true
-	dec := gob.NewDecoder(conn)
+
+	connHasAnEncoderDecoderPair := ipc.ConnToEncDecPair[conn] != (EncoderDecoderPair{})
+	if !connHasAnEncoderDecoderPair {
+		ipc.ConnToEncDecPair[conn] = EncoderDecoderPair{
+			Encoder: gob.NewEncoder(conn),
+			Decoder: gob.NewDecoder(conn),
+		}
+	}
+
+	dec := ipc.ConnToEncDecPair[conn].Decoder
 	err := dec.Decode(&packet)
 	//fmt.Println("\t[IPC:Receive] Decoded packet:", packet)
 	if err != nil {

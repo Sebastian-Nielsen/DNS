@@ -14,6 +14,18 @@ type CBC struct {
 	Iv string
 }
 
+func main() {
+	m := make(map[int]CBC)
+	m[2] = CBC{Iv: "test2"}
+	m[4] = CBC{Iv: "test4"}
+	fmt.Println(m[2], m[4])
+	fmt.Println(m[3])
+	if m[3] == (CBC{Iv: "not empty string"}) {
+		fmt.Println("Yes")
+	}
+	fmt.Println("No")
+}
+
 //func main() {
 //	cbc := CBC{Iv: "6368616e676520746869732070617373"}
 //	filename := "test1"
@@ -60,7 +72,19 @@ func (c *CBC) CBCDecrypter(ciphertext []byte) []byte {
 
 	// CryptBlocks can work in-place if the two arguments are the same.
 	mode.CryptBlocks(ciphertext, ciphertext)
-	fmt.Println("Ciphertext 3495:", string(ciphertext[:]))
+	fmt.Println("Ciphertext 3495:", string(ciphertext[:]), ciphertext, "len(ciphertext)=", len(ciphertext))
+	oldCiphertext := ciphertext[:]
+	for i, _ := range oldCiphertext {
+		reversedIndex := len(ciphertext)-1-i
+		fmt.Println("tst", ciphertext[reversedIndex], string(ciphertext[reversedIndex]), "inex:", reversedIndex) // Suggestion: do `last := len(s)-1` before the loop
+		if oldCiphertext[reversedIndex] == byte(0) {
+			fmt.Println("removing index:", reversedIndex)
+			fmt.Println(string(ciphertext[:]))
+			ciphertext = RemoveIndex(ciphertext, reversedIndex)
+		}
+	}
+	fmt.Println("asdf")
+	fmt.Println("result:", string(ciphertext[:]))
 
 	// If the original plaintext lengths are not a multiple of the block
 	// size, padding would have to be added when encrypting, which would be
@@ -73,6 +97,12 @@ func (c *CBC) CBCDecrypter(ciphertext []byte) []byte {
 	fmt.Printf("%s\n", ciphertext)
 	// Output: exampleplaintext
 	return ciphertext
+}
+func RemoveIndex(s []byte, index int) []byte {
+	if len(s) == index+1 {
+		return s[:index]
+	}
+	return append(s[:index], s[index+1:]...)
 }
 
 func (c *CBC) CBCEncrypter(plaintext string) []byte {
@@ -88,7 +118,7 @@ func (c *CBC) CBCEncrypter(plaintext string) []byte {
 
 		newPlaintextBytes := make([]byte, len(plaintextBytes)+bytesToPad)
 		copy(newPlaintextBytes, plaintextBytes)
-		copy(newPlaintextBytes[len(plaintextBytes):], bytes.Repeat([]byte{byte(bytesToPad)}, bytesToPad) )
+		copy(newPlaintextBytes[len(plaintextBytes):], bytes.Repeat([]byte{byte(0)}, bytesToPad) )
 		plaintextBytes = newPlaintextBytes
 	}
 

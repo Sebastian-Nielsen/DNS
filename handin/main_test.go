@@ -18,6 +18,7 @@ func createPeerNode( shouldMockInput bool) PeerNode {
 		OpenConnections:     SafeSet_Conn{   Values: make(map[net.Conn]bool) },
 		PeersInArrivalOrder: SafeArray_string{},
 		MessagesSent:        SafeSet_string{ Values: make(map[string  ]bool) },
+		Ipc:                 IPC{ ConnToEncDecPair: make(map[net.Conn]EncoderDecoderPair) },
 		LocalLedger:         MakeLedger(),
 		TestMock:            Mock{ ShouldMockInput: shouldMockInput },
 	}
@@ -25,6 +26,8 @@ func createPeerNode( shouldMockInput bool) PeerNode {
 
 
 func TestNewcomerNodeReceivesAllTransactionsAppliedBeforeItEnteredNetwork(t *testing.T) {
+	//t.parallel()()
+
 	var peerNode1_port = AvailablePorts.Next()
 	var peerNode2_port = AvailablePorts.Next()
 	var peerNode3_port = AvailablePorts.Next()
@@ -78,6 +81,8 @@ func TestNewcomerNodeReceivesAllTransactionsAppliedBeforeItEnteredNetwork(t *tes
 	}
 }
 func TestTransactionsAreBroadcastedAndAppliedOnAllPeerNodes(t *testing.T) {
+	//t.parallel()()
+
 	var peerNode1_port = AvailablePorts.Next()
 	var peerNode2_port = AvailablePorts.Next()
 	var peerNode3_port = AvailablePorts.Next()
@@ -120,7 +125,7 @@ func TestTransactionsAreBroadcastedAndAppliedOnAllPeerNodes(t *testing.T) {
 	}
 }
 func TestNodeConnectsToThreeOthersWhenEnteringNetwork(t *testing.T) {
-	t.Parallel()
+	//t.parallel()()
 
 	peerNode1 := createPeerNode(true)
 	peer1Port := AvailablePorts.Next()
@@ -158,7 +163,7 @@ func TestNodeConnectsToThreeOthersWhenEnteringNetwork(t *testing.T) {
 
 }
 func TestNodeConnectsToTenOthersWhenEnteringNetwork(t *testing.T) {
-	t.Parallel()
+	//t.parallel()()
 
 	peerNode1 := createPeerNode(true)
 	peer1Port := AvailablePorts.Next()
@@ -218,7 +223,7 @@ func TestNodeConnectsToTenOthersWhenEnteringNetwork(t *testing.T) {
 
 }
 func TestPeerNodeConnectsToAllNodesWhenEnteringNetwork(t *testing.T) {
-	//t.Parallel()
+	//t.parallel()()
 
 	var peerNode1_port = AvailablePorts.Next()
 	var peerNode2_port = AvailablePorts.Next()
@@ -243,7 +248,7 @@ func TestPeerNodeConnectsToAllNodesWhenEnteringNetwork(t *testing.T) {
 	}
 }
 func TestReceivedPeerListWhenJoining(t *testing.T) {
-	t.Parallel()
+	//t.parallel()()
 
 	var peerNode1_port = AvailablePorts.Next()
 	var peerNode2_port = AvailablePorts.Next()
@@ -274,7 +279,7 @@ func TestReceivedPeerListWhenJoining(t *testing.T) {
 
 }
 func TestMessageIsSentFromNode1To3Via2(t *testing.T) {
-	//t.Parallel()
+	//t.parallel()()
 
 	var peerNode1_port = AvailablePorts.Next()
 	var peerNode2_port = AvailablePorts.Next()
@@ -297,7 +302,7 @@ func TestMessageIsSentFromNode1To3Via2(t *testing.T) {
 	}
 }
 func TestLatercomerNodeEventuallyGetsAllMsgs(t *testing.T) {
-	//t.Parallel()
+	//t.parallel()()
 
 	var peerNode1_port = AvailablePorts.Next()
 	var peerNode2_port = AvailablePorts.Next()
@@ -324,7 +329,7 @@ func TestLatercomerNodeEventuallyGetsAllMsgs(t *testing.T) {
 	}
 }
 func TestPeer1ReceivesMsgFromPeer2(t *testing.T) {
-	//t.Parallel()
+	//t.parallel()()
 
 	var peerNode1_port = AvailablePorts.Next()
 	var peerNode2_port = AvailablePorts.Next()
@@ -345,7 +350,7 @@ func TestPeer1ReceivesMsgFromPeer2(t *testing.T) {
 
 }
 func TestPeer1CanConnectToPeer2(t *testing.T) {
-	t.Parallel()
+	//t.parallel()()
 
 
 	peerNode1 := createPeerNode(true)
