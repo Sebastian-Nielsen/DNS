@@ -1,4 +1,4 @@
-package main
+package cryptography
 
 import (
 	"bytes"
@@ -15,15 +15,15 @@ type CBC struct {
 }
 
 
-func main() {
-	cbc := CBC{Iv: "6368616e676520746869732070617373"}
-	filename := "test1"
-	msg := "plaintexstMsg"
-	fmt.Printf("msg: %s\n", msg)
-	cbc.EncryptToFile(filename, msg)
-	plaintext := cbc.DecryptFromFile(filename)
-	fmt.Printf("en- and decrypted: %s\nEqual: %t", plaintext, msg==plaintext)
-}
+// func main() {
+// 	cbc := CBC{Iv: "6368616e676520746869732070617373"}
+// 	filename := "test1"
+// 	msg := "plaintexstMsg"
+// 	fmt.Printf("msg: %s\n", msg)
+// 	cbc.EncryptToFile(filename, msg)
+// 	plaintext := cbc.DecryptFromFile(filename)
+// 	fmt.Printf("en- and decrypted: %s\nEqual: %t", plaintext, msg==plaintext)
+// }
 
 func (c *CBC) EncryptToFile(name, plaintext string) {
 	ciphertextBytes := c.CBCEncrypter(plaintext)

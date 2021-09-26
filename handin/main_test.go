@@ -3,10 +3,12 @@ package main
 import (
 	. "DNO/handin/Account"
 	. "DNO/handin/Helper"
+	. "DNO/handin/Cryptography"
 	"net"
 	"reflect"
 	"testing"
 	"time"
+	"math/big"
 )
 
 /*
@@ -23,6 +25,25 @@ func createPeerNode( shouldMockInput bool) PeerNode {
 	}
 }
 
+
+func TestEncryptionAndDecryptionWithRSAandAES(t *testing.T) {
+	n, d := KeyGen(20)
+	publicKey := PublicKey{N:n, E:big.NewInt(3)}
+	secretKey := SecretKey{N:n, D:d}
+	msg := big.NewInt( 123456 )   // kan ikke klare beskeder med længde > 6 ?!?
+	RSAmsg := Encrypt(msg, secretKey)
+	cbc := CBC{Iv: "6368616e676520746869732070617373"}
+	filename := "cryptography/RSAandAEStest"
+	cbc.EncryptToFile(filename, RSAmsg.String())
+	RSAmsgFromFile := cbc.DecryptFromFile(filename)
+	bigInt := new(big.Int)
+	strRSAmsgFromFile, _ := bigInt.SetString(RSAmsgFromFile, 10)
+	decrMsg := Decrypt(strRSAmsgFromFile, publicKey)
+	
+	if decrMsg.String() != msg.String() {
+		t.Error("Original message '" + msg.String() + "' different from decrypted message'" + decrMsg.String() + "'")
+	}
+}
 
 func TestNewcomerNodeReceivesAllTransactionsAppliedBeforeItEnteredNetwork(t *testing.T) {
 	var peerNode1_port = AvailablePorts.Next()

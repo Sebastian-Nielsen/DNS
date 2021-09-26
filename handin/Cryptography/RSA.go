@@ -1,4 +1,4 @@
-package main
+package cryptography
 
 import (
 	"crypto/rand"
@@ -24,17 +24,17 @@ func GCD(a, b int) int {  // source: https://play.golang.org/p/SmzvkDjYlb
 	return a
 }
 
-func main() {
-	//fmt.Println("Result:", Encrypt(2, SecretKey{2, 2}))
-	n, d := KeyGen(20)
-	publicKey := PublicKey{N:n, E:big.NewInt(3)}
-	secretKey := SecretKey{N:n, D:d}
-	m := big.NewInt( 123456 )   // kan ikke klare beskeder med længde > 6 ?!?
-	fmt.Println("original:", m)
-	fmt.Println("encrypted:", Encrypt(m, secretKey))
-	fmt.Println("decrypted m:", Decrypt(Encrypt(m, secretKey), publicKey))
-	fmt.Println("original m:", m)
-}
+// func main() {
+// 	//fmt.Println("Result:", Encrypt(2, SecretKey{2, 2}))
+// 	n, d := KeyGen(20)
+// 	publicKey := PublicKey{N:n, E:big.NewInt(3)}
+// 	secretKey := SecretKey{N:n, D:d}
+// 	m := big.NewInt( 123456 )   // kan ikke klare beskeder med længde > 6 ?!?
+// 	fmt.Println("original:", m)
+// 	fmt.Println("encrypted:", Encrypt(m, secretKey))
+// 	fmt.Println("decrypted m:", Decrypt(Encrypt(m, secretKey), publicKey))
+// 	fmt.Println("original m:", m)
+// }
 
 func KeyGen(k int) (*big.Int, *big.Int) {
 	n, p, q := compute_n(k)
@@ -53,7 +53,7 @@ func Encrypt(m *big.Int, key SecretKey) *big.Int { // Compute the signature of m
 	fmt.Println("d:", d)
 	dRaisedToM := big.NewInt(0).Exp(m, d, nil)
 	fmt.Println("d and m:", d, m)
-	fmt.Println("debug d^m ", dRaisedToM)
+	// fmt.Println("debug d^m ", dRaisedToM)
 	c := big.NewInt(0).Mod(dRaisedToM, n)     // m^d % n
 	return c
 }
