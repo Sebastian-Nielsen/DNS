@@ -4,7 +4,6 @@ import (
 	. "DNO/handin/Account"
 	. "DNO/handin/Helper"
 	"fmt"
-	"math"
 	"net"
 	"strings"
 	"time"
@@ -96,23 +95,41 @@ func (p *PeerNode) DialNetwork(remoteSocket Socket) {
 
 		go p.Listen(conn)}
 }
+func Assert(condition bool) {
+	if !condition {
+		panic("assert failed")
+	}
+}
 func (p *PeerNode) connectToPeers(portsOfPeers []string) {
-	upTo := int(math.Min(11, float64(len(portsOfPeers)))-1)
+	Assert(p.Listener != nil)
+	//upTo := int(math.Min(11, float64(len(portsOfPeers)))-1)
 
-	p.debugPrintln("Connecting to all peers in received list:\n\t", portsOfPeers[:upTo])
+	p.debugPrintln("Connecting to up to 10 peers in received list:\n\t", portsOfPeers)
 
-	if upTo < 0 {
+	if len(portsOfPeers) == 0 {
 		p.println("Error: Received empty list from connection")
 		return
 	}
-	for _, port := range portsOfPeers[:upTo] {       // portsOfPeers = ["50001", "50002", ...]
+	newConnections := 0
+	for _, port := range portsOfPeers {       // portsOfPeers = ["50001", "50002", ...]
 		alreadyHaveAConnectionToThisPort := p.OpenConnections.ContainsAConnWith(port)
 		if alreadyHaveAConnectionToThisPort {
 			p.debugPrintln("Don't connect to this, we already have a connection to port:", port)
 			continue
 		}
+		isPortOurRemotePort := port == PortOf(p.Listener.Addr())
+		if isPortOurRemotePort {
+			p.debugPrintln("Don't connect to this, it is ourselves *insert spiderman pointing meme*:", port)
+			continue
+		}
+
 		conn := p.dial(Socket{Ip: "127.0.0.1", Port: port})
 		p.OpenConnections.Add(conn)
+		newConnections += 1
+		p.debugPrint("\tConnecting to peer:", port)
+		if newConnections == 10 {
+			break
+		}
 	}
 }
 func (p *PeerNode) dial(socket Socket) net.Conn {

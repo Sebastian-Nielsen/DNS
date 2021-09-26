@@ -23,16 +23,13 @@ func (ipc *IPC) Send(packet Packet, conn net.Conn) bool {
 	ok := true
 	//fmt.Println("\t[IPC:Send]    before encoding:", packet)
 
-	//fmt.Println("debug1", ipc.ConnToEncDecPair)
 	connHasAnEncoderDecoderPair := ipc.ConnToEncDecPair[conn] != (EncoderDecoderPair{})
-	//fmt.Println("debug2", connHasAnEncoderDecoderPair)
 	if !connHasAnEncoderDecoderPair {
 		ipc.ConnToEncDecPair[conn] = EncoderDecoderPair{
 			Encoder: gob.NewEncoder(conn),
 			Decoder: gob.NewDecoder(conn),
 		}
 	}
-	//fmt.Println("debug3", ipc.ConnToEncDecPair)
 
 	enc := ipc.ConnToEncDecPair[conn].Encoder
 	err := enc.Encode( packet )

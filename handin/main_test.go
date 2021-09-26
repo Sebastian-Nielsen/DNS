@@ -26,7 +26,10 @@ func createPeerNode( shouldMockInput bool) PeerNode {
 	}
 }
 
-
+// In the exercise, it says that we should AES_encrypt the secret key from RSA and then RSA_decrypt the message with it
+// but this doesn't really make sense, since RSA decrypts using the public key... and AES_encrypting the RSA public key
+// doesn't really make sense either, as it is, well, public...
+// So instead we double encryp the message, first with
 func TestEncryptionAndDecryptionWithRSAandAES(t *testing.T) {
 	n, d := KeyGen(20)
 	publicKey := PublicKey{N:n, E:big.NewInt(3)}
@@ -47,7 +50,7 @@ func TestEncryptionAndDecryptionWithRSAandAES(t *testing.T) {
 }
 
 func TestNewcomerNodeReceivesAllTransactionsAppliedBeforeItEnteredNetwork(t *testing.T) {
-	//t.parallel()()
+	t.Parallel()
 
 	var peerNode1_port = AvailablePorts.Next()
 	var peerNode2_port = AvailablePorts.Next()
@@ -102,7 +105,7 @@ func TestNewcomerNodeReceivesAllTransactionsAppliedBeforeItEnteredNetwork(t *tes
 	}
 }
 func TestTransactionsAreBroadcastedAndAppliedOnAllPeerNodes(t *testing.T) {
-	//t.parallel()()
+	t.Parallel()
 
 	var peerNode1_port = AvailablePorts.Next()
 	var peerNode2_port = AvailablePorts.Next()
@@ -146,7 +149,7 @@ func TestTransactionsAreBroadcastedAndAppliedOnAllPeerNodes(t *testing.T) {
 	}
 }
 func TestNodeConnectsToThreeOthersWhenEnteringNetwork(t *testing.T) {
-	//t.parallel()()
+	t.Parallel()
 
 	peerNode1 := createPeerNode(true)
 	peer1Port := AvailablePorts.Next()
@@ -155,10 +158,10 @@ func TestNodeConnectsToThreeOthersWhenEnteringNetwork(t *testing.T) {
 	var peerNode2 = createPeerNode(true)
 	var peerNode3 = createPeerNode(true)
 	var peerNode4 = createPeerNode(true)
-	peer4Port := AvailablePorts.Next()
-
+	
 	goStart(&peerNode2, AvailablePorts.Next(), peer1Port)
 	goStart(&peerNode3, AvailablePorts.Next(), peer1Port)
+	peer4Port := AvailablePorts.Next()
 	goStart(&peerNode4, peer4Port, peer1Port)
 
 	time.Sleep(5 * time.Second)
@@ -167,7 +170,8 @@ func TestNodeConnectsToThreeOthersWhenEnteringNetwork(t *testing.T) {
 		t.Error("PeerNode1 doesn't have exactly 3 connections")
 	}
 	if len(peerNode2.OpenConnections.Values) != 3 {
-		t.Error("PeerNode2 doesn't have exactly 3 connections")
+		t.Error("PeerNode2 doesn't have exactly 3 connections.\npeerNode2 openConnections:",
+			peerNode2.OpenConnections.ToString())
 	}
 	if len(peerNode3.OpenConnections.Values) != 3 {
 		t.Error("PeerNode3 doesn't have exactly 3 connections")
@@ -177,14 +181,15 @@ func TestNodeConnectsToThreeOthersWhenEnteringNetwork(t *testing.T) {
 	}
 
 	if !peerNode4.PeersInArrivalOrder.Contains(peer4Port) {
-		t.Error("peerNode4 (the last one connected to the network) isn't the last node in PeersInArrivalOrder:", peerNode4.PeersInArrivalOrder.Values())
+		t.Error("peerNode4 (the last one connected to the network) isn't the last node in PeersInArrivalOrder:", 
+			peerNode4.PeersInArrivalOrder.Values())
 	}
 
 	time.Sleep(2 * time.Second)
 
 }
 func TestNodeConnectsToTenOthersWhenEnteringNetwork(t *testing.T) {
-	//t.parallel()()
+	t.Parallel()
 
 	peerNode1 := createPeerNode(true)
 	peer1Port := AvailablePorts.Next()
@@ -244,7 +249,7 @@ func TestNodeConnectsToTenOthersWhenEnteringNetwork(t *testing.T) {
 
 }
 func TestPeerNodeConnectsToAllNodesWhenEnteringNetwork(t *testing.T) {
-	//t.parallel()()
+	t.Parallel()
 
 	var peerNode1_port = AvailablePorts.Next()
 	var peerNode2_port = AvailablePorts.Next()
@@ -269,7 +274,7 @@ func TestPeerNodeConnectsToAllNodesWhenEnteringNetwork(t *testing.T) {
 	}
 }
 func TestReceivedPeerListWhenJoining(t *testing.T) {
-	//t.parallel()()
+	t.Parallel()
 
 	var peerNode1_port = AvailablePorts.Next()
 	var peerNode2_port = AvailablePorts.Next()
@@ -300,7 +305,7 @@ func TestReceivedPeerListWhenJoining(t *testing.T) {
 
 }
 func TestMessageIsSentFromNode1To3Via2(t *testing.T) {
-	//t.parallel()()
+	t.Parallel()
 
 	var peerNode1_port = AvailablePorts.Next()
 	var peerNode2_port = AvailablePorts.Next()
@@ -323,7 +328,7 @@ func TestMessageIsSentFromNode1To3Via2(t *testing.T) {
 	}
 }
 func TestLatercomerNodeEventuallyGetsAllMsgs(t *testing.T) {
-	//t.parallel()()
+	t.Parallel()
 
 	var peerNode1_port = AvailablePorts.Next()
 	var peerNode2_port = AvailablePorts.Next()
@@ -350,7 +355,7 @@ func TestLatercomerNodeEventuallyGetsAllMsgs(t *testing.T) {
 	}
 }
 func TestPeer1ReceivesMsgFromPeer2(t *testing.T) {
-	//t.parallel()()
+	t.Parallel()
 
 	var peerNode1_port = AvailablePorts.Next()
 	var peerNode2_port = AvailablePorts.Next()
@@ -371,7 +376,7 @@ func TestPeer1ReceivesMsgFromPeer2(t *testing.T) {
 
 }
 func TestPeer1CanConnectToPeer2(t *testing.T) {
-	//t.parallel()()
+	t.Parallel()
 
 
 	peerNode1 := createPeerNode(true)
