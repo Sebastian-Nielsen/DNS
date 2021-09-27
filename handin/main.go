@@ -370,7 +370,7 @@ func main() {
 		PeersInArrivalOrder: SafeArray_string{},
 		MessagesSent:        SafeSet_string{ Values: make(map[string  ]bool) },
 		Ipc:                 IPC{ ConnToEncDecPair: make(map[net.Conn]EncoderDecoderPair) },
-		TestMock:            Mock{ ShouldMockInput: false },
+		TestMock:            Mock{ ShouldMockInput: false, ShouldPrintDebug: true },
 	}
 
 	peerNode.Start("", "")
@@ -410,17 +410,17 @@ func input(p *PeerNode) string {
 	Printer helper methods
  */
 func (p *PeerNode) debugPrintf(text string, args ...interface{}) {
-	if DEBUG_MODE {
+	if p.TestMock.ShouldPrintDebug {
 		fmt.Printf("<" + PortOf(p.Listener.Addr()) + "> " + text, args...)
 	}
 }
 func (p *PeerNode) debugPrint(args ...interface{}) {
-	if DEBUG_MODE {
+	if p.TestMock.ShouldPrintDebug {
 		fmt.Print( "\t", args, "\n")
 	}
 }
 func (p *PeerNode) debugPrintln(args ...interface{}) {
-	if DEBUG_MODE {
+	if p.TestMock.ShouldPrintDebug {
 		fmt.Println("<" + PortOf(p.Listener.Addr()) + ">", args)
 	}
 }

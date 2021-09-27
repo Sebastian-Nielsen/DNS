@@ -16,14 +16,15 @@ import (
 	sometimes debug_mode has to be set to false for tests to pass for some mystical reason
  */
 
-func createPeerNode( shouldMockInput bool) PeerNode {
+func createPeerNode( shouldMockInput bool, shouldPrintDebug bool ) PeerNode {
 	return PeerNode{
 		OpenConnections:     SafeSet_Conn{   Values: make(map[net.Conn]bool) },
 		PeersInArrivalOrder: SafeArray_string{},
 		MessagesSent:        SafeSet_string{ Values: make(map[string  ]bool) },
 		Ipc:                 IPC{ ConnToEncDecPair: make(map[net.Conn]EncoderDecoderPair) },
 		LocalLedger:         MakeLedger(),
-		TestMock:            Mock{ ShouldMockInput: shouldMockInput },
+		TestMock:            Mock{ ShouldMockInput: shouldMockInput, 
+								   ShouldPrintDebug: shouldPrintDebug },
 	}
 }
 
@@ -68,10 +69,10 @@ func TestNewcomerNodeReceivesAllTransactionsAppliedBeforeItEnteredNetwork(t *tes
 	var peerNode3_port = AvailablePorts.Next()
 	var peerNode4_port = AvailablePorts.Next()
 
-	peerNode1 := createPeerNode(true)
-	peerNode2 := createPeerNode(true)
-	peerNode3 := createPeerNode(true)
-	peerNode4 := createPeerNode(true)
+	peerNode1 := createPeerNode(true, true)
+	peerNode2 := createPeerNode(true, true)
+	peerNode3 := createPeerNode(true, true)
+	peerNode4 := createPeerNode(true, true)
 
 	goStart(&peerNode1, peerNode1_port, "no_port")
 	goStart(&peerNode2, peerNode2_port, peerNode1_port)
@@ -122,9 +123,9 @@ func TestTransactionsAreBroadcastedAndAppliedOnAllPeerNodes(t *testing.T) {
 	var peerNode2_port = AvailablePorts.Next()
 	var peerNode3_port = AvailablePorts.Next()
 
-	peerNode1 := createPeerNode(true)
-	peerNode2 := createPeerNode(true)
-	peerNode3 := createPeerNode(true)
+	peerNode1 := createPeerNode(true, true)
+	peerNode2 := createPeerNode(true, true)
+	peerNode3 := createPeerNode(true, true)
 
 	goStart(&peerNode1, peerNode1_port, "no_port")
 	goStart(&peerNode2, peerNode2_port, peerNode1_port)
@@ -162,13 +163,13 @@ func TestTransactionsAreBroadcastedAndAppliedOnAllPeerNodes(t *testing.T) {
 func TestNodeConnectsToThreeOthersWhenEnteringNetwork(t *testing.T) {
 	t.Parallel()
 
-	peerNode1 := createPeerNode(true)
+	peerNode1 := createPeerNode(true, true)
 	peer1Port := AvailablePorts.Next()
 	goStart(&peerNode1, peer1Port, "no_port")
 
-	var peerNode2 = createPeerNode(true)
-	var peerNode3 = createPeerNode(true)
-	var peerNode4 = createPeerNode(true)
+	var peerNode2 = createPeerNode(true, true)
+	var peerNode3 = createPeerNode(true, true)
+	var peerNode4 = createPeerNode(true, true)
 	
 	goStart(&peerNode2, AvailablePorts.Next(), peer1Port)
 	goStart(&peerNode3, AvailablePorts.Next(), peer1Port)
@@ -199,20 +200,20 @@ func TestNodeConnectsToThreeOthersWhenEnteringNetwork(t *testing.T) {
 func TestNodeConnectsToTenOthersWhenEnteringNetwork(t *testing.T) {
 	t.Parallel()
 
-	peerNode1 := createPeerNode(true)
+	peerNode1 := createPeerNode(true, true)
 	peer1Port := AvailablePorts.Next()
 	goStart(&peerNode1, peer1Port, "no_port")
 
-	var peerNode2 = createPeerNode(true)
-	var peerNode3 = createPeerNode(true)
-	var peerNode4 = createPeerNode(true)
-	var peerNode5 = createPeerNode(true)
-	var peerNode6 = createPeerNode(true)
-	var peerNode7 = createPeerNode(true)
-	var peerNode8 = createPeerNode(true)
-	var peerNode9 = createPeerNode(true)
-	var peerNode10 = createPeerNode(true)
-	var peerNode11 = createPeerNode(true)
+	var peerNode2 = createPeerNode(true, true)
+	var peerNode3 = createPeerNode(true, true)
+	var peerNode4 = createPeerNode(true, true)
+	var peerNode5 = createPeerNode(true, true)
+	var peerNode6 = createPeerNode(true, true)
+	var peerNode7 = createPeerNode(true, true)
+	var peerNode8 = createPeerNode(true, true)
+	var peerNode9 = createPeerNode(true, true)
+	var peerNode10 = createPeerNode(true, true)
+	var peerNode11 = createPeerNode(true, true)
 
 	goStart(&peerNode2, AvailablePorts.Next(), peer1Port)
 	goStart(&peerNode3, AvailablePorts.Next(), peer1Port)
@@ -243,7 +244,7 @@ func TestNodeConnectsToTenOthersWhenEnteringNetwork(t *testing.T) {
 
 	// A new node (peerNode12) joins the network
 	p12Port := AvailablePorts.Next()
-	peerNode12 := createPeerNode(true)
+	peerNode12 := createPeerNode(true, true)
 	goStart(&peerNode12, p12Port, peer1Port)
 
 	time.Sleep(1 * time.Second)
@@ -261,10 +262,10 @@ func TestPeerNodeConnectsToAllNodesWhenEnteringNetwork(t *testing.T) {
 	var peerNode3_port = AvailablePorts.Next()
 	var peerNode4_port = AvailablePorts.Next()
 
-	peerNode1 := createPeerNode(true)
-	peerNode2 := createPeerNode(true)
-	peerNode3 := createPeerNode(true)
-	peerNode4 := createPeerNode(true)
+	peerNode1 := createPeerNode(true, true)
+	peerNode2 := createPeerNode(true, true)
+	peerNode3 := createPeerNode(true, true)
+	peerNode4 := createPeerNode(true, true)
 
 	goStart(&peerNode1, peerNode1_port, "no_port")
 	goStart(&peerNode2, peerNode2_port, peerNode1_port)
@@ -286,10 +287,10 @@ func TestReceivedPeerListWhenJoining(t *testing.T) {
 	var peerNode3_port = AvailablePorts.Next()
 	var peerNode4_port = AvailablePorts.Next()
 
-	peerNode1 := createPeerNode(true)
-	peerNode2 := createPeerNode(true)
-	peerNode3 := createPeerNode(true)
-	peerNode4 := createPeerNode(true)
+	peerNode1 := createPeerNode(true, true)
+	peerNode2 := createPeerNode(true, true)
+	peerNode3 := createPeerNode(true, true)
+	peerNode4 := createPeerNode(true, true)
 
 	goStart(&peerNode1, peerNode1_port, "no_port")
 	goStart(&peerNode2, peerNode2_port, peerNode1_port)
@@ -316,9 +317,9 @@ func TestMessageIsSentFromNode1To3Via2(t *testing.T) {
 	var peerNode2_port = AvailablePorts.Next()
 	var peerNode3_port = AvailablePorts.Next()
 
-	peerNode1 := createPeerNode(true)
-	peerNode2 := createPeerNode(true)
-	peerNode3 := createPeerNode(true)
+	peerNode1 := createPeerNode(true, true)
+	peerNode2 := createPeerNode(true, true)
+	peerNode3 := createPeerNode(true, true)
 
 
 	goStart(&peerNode1, peerNode1_port, "no_port")
@@ -338,8 +339,8 @@ func TestLatercomerNodeEventuallyGetsAllMsgs(t *testing.T) {
 	var peerNode1_port = AvailablePorts.Next()
 	var peerNode2_port = AvailablePorts.Next()
 
-	peerNode1 := createPeerNode(true)
-	peerNode2 := createPeerNode(true)
+	peerNode1 := createPeerNode(true, true)
+	peerNode2 := createPeerNode(true, true)
 
 	goStart(&peerNode1, peerNode1_port, "no_port")
 
@@ -361,8 +362,8 @@ func TestPeer1ReceivesMsgFromPeer2(t *testing.T) {
 	var peerNode1_port = AvailablePorts.Next()
 	var peerNode2_port = AvailablePorts.Next()
 
-	peerNode1 := createPeerNode(true)
-	peerNode2 := createPeerNode(true)
+	peerNode1 := createPeerNode(true, true)
+	peerNode2 := createPeerNode(true, true)
 
 	go peerNode1.Start(peerNode1_port, "no_port")
 	go peerNode2.Start(peerNode2_port, peerNode1_port)
@@ -380,8 +381,8 @@ func TestPeer1CanConnectToPeer2(t *testing.T) {
 	t.Parallel()
 
 
-	peerNode1 := createPeerNode(true)
-	peerNode2 := createPeerNode(true)
+	peerNode1 := createPeerNode(true, true)
+	peerNode2 := createPeerNode(true, true)
 
 	var peerNode1_port = AvailablePorts.Next()
 	var peerNode2_port = AvailablePorts.Next()
