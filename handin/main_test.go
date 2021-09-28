@@ -4,6 +4,7 @@ import (
 	. "DNO/handin/Account"
 	. "DNO/handin/Cryptography"
 	. "DNO/handin/Helper"
+	"fmt"
 	"math/big"
 	"net"
 	"reflect"
@@ -14,7 +15,7 @@ import (
 
 /*
 	sometimes debug_mode has to be set to false for tests to pass for some mystical reason
- */
+*/
 
 func createPeerNode( shouldMockInput bool, shouldPrintDebug bool ) PeerNode {
 	return PeerNode{
@@ -29,12 +30,37 @@ func createPeerNode( shouldMockInput bool, shouldPrintDebug bool ) PeerNode {
 }
 
 
-func TestEncryptionAndDecryptionWithRSAandAES(t *testing.T) {
-	// RSA decrypt
+
+func TestRSAsigning(t *testing.T) {
 	n, d := KeyGen(20)
 	publicKey := PublicKey{N:n, E:big.NewInt(3)}
 	secretKey := SecretKey{N:n, D:d}
-	msg := big.NewInt( 578355 )
+	msg := big.NewInt( 4 )
+	hash := GetHash(msg)
+	fmt.Println(hash)
+	fmt.Printf("%x\n\n", hash)
+	hashedMsg := new(big.Int)
+	hashedMsg.SetBytes(hash)
+	// fmt.Printf("%s\n", hashedMsg.String())
+
+
+	// Sign the hashed message
+	signedMsg := Decrypt(hashedMsg, secretKey)
+
+	// Verify the signed message
+	if !Verify(signedMsg, hashedMsg, publicKey){
+		// t.Error("Hash from signed message '" + Encrypt(signedMsg, publicKey).String() + "' was not verified for original hash: " + hashedMsg.String())
+		t.Error("Hash from signed message was not verified for original hash: " + hashedMsg.String())
+	}
+}
+
+
+func TestEncryptionAndDecryptionWithRSAandAES(t *testing.T) {
+	// RSA decrypt
+	n, d := KeyGen(26)
+	publicKey := PublicKey{N:n, E:big.NewInt(3)}
+	secretKey := SecretKey{N:n, D:d}
+	msg := big.NewInt( 5 )
 	RSAmsg := Encrypt(msg, publicKey)
 
 	// AES encrypt the secret key

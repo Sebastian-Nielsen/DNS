@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"fmt"
 	"math/big"
+	"crypto/sha256"
 )
 
 type PublicKey struct {
@@ -108,7 +109,23 @@ func compute_n(k int) (*big.Int, *big.Int, *big.Int) {
 			//fmt.Println("p and q does satisfy: gcd(3,p-1) = gcd(3,q-1) = 1\n-------------------------")
 			return n, p, q
 		} else {
-			//fmt.Println("p and q does not satisfy: gcd(3,p-1) = gcd(3,q-1) = 1\n ")
+			// fmt.Println("p and q does not satisfy: gcd(3,p-1) = gcd(3,q-1) = 1\n ")
 		}
 	}
 }
+
+func Verify(s *big.Int, msg *big.Int, pk PublicKey) bool {
+	unsignedMsg := Encrypt(s, pk)
+	fmt.Println(unsignedMsg)
+	return msg.Cmp(unsignedMsg) == 0
+}
+
+
+func GetHash(msg *big.Int) []byte {
+	sha := sha256.New()
+	sha.Write([]byte(msg.String()))
+	return (sha.Sum(nil))
+}
+
+
+
