@@ -77,13 +77,13 @@ func TestEncryptionAndDecryptionWithRSAandAES(t *testing.T) {
 	RSAmsg := Encrypt(msg, publicKey)
 
 	// AES encrypt the secret key
-	cbc := CTR{SecretKey: GenerateNewRndmIV(32)}
+	ctr := CTR{SecretKey: GenerateNewRndmString(32)}
 	filename := "Cryptography/RSAandAEStest"
 	secretKeyString := secretKey.N.String() + ":" + secretKey.D.String()
-	cbc.EncryptToFile(filename, secretKeyString)
+	ctr.EncryptToFile(filename, secretKeyString)
 
 	// AES decrypt the secret key
-	decryptionFromFile := cbc.DecryptFromFile(filename)
+	decryptionFromFile := ctr.DecryptFromFile(filename)
 
 	// Create secret key from AES decryption of the file
 	splitPos := strings.Index(decryptionFromFile, ":")

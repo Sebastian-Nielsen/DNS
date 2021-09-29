@@ -87,7 +87,7 @@ func (c *CTR) Decrypt(inputBytes []byte) []byte {
 
 	return outputBytes
 }
-func GenerateNewRndmIV(size int) string {
+func GenerateNewRndmString(size int) string {
 	iv := make([]byte, size)
 	_, err := io.ReadFull(rand.Reader, iv)
 	check(err)
