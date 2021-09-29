@@ -4,7 +4,7 @@ import (
 	. "DNO/handin/Account"
 	. "DNO/handin/Cryptography"
 	. "DNO/handin/Helper"
-	// "fmt"
+	"fmt"
 	"math/big"
 	"net"
 	"reflect"
@@ -31,21 +31,39 @@ func createPeerNode( shouldMockInput bool, shouldPrintDebug bool ) PeerNode {
 
 
 
+
+
+func TestUseThisToDebug(t *testing.T) {
+	c := CTR{
+		SecretKey: "6368616e676520746869732070617373",
+	}
+
+	bytesToBeEncrypted := []byte("hello there")
+
+	encryptedBytes := c.Encrypt(bytesToBeEncrypted)
+	decryptedBytes := c.Decrypt(encryptedBytes)
+
+	fmt.Println(bytesToBeEncrypted)
+	fmt.Println([]byte(string(decryptedBytes)))
+}
+
 func TestRSAsigning(t *testing.T) {
 	n, d := KeyGen(2000)
 	publicKey := PublicKey{N:n, E:big.NewInt(3)}
 	secretKey := SecretKey{N:n, D:d}
 	msg := big.NewInt( 25632212678324 )
 
-	// Hash the message
+	// Sign the message with the secret key
+	signedMsg := Sign(msg, secretKey)
+	
+	// Hash the message to use when verifying 
 	hashedMsg := new(big.Int)
 	hashedMsg.SetBytes(GetHash(msg))
 
-	// Sign the hashed message (by "decrypting" with secret key)
-	signedMsg := Decrypt(hashedMsg, secretKey)
+	// Verify the signed message against the hash using the public key
+	verified := Verify(signedMsg, hashedMsg, publicKey)
 
-	// Verify the signed message using the public key
-	if !Verify(signedMsg, hashedMsg, publicKey){
+	if !verified {
 		t.Error("Hash from signed message '" + Encrypt(signedMsg, publicKey).String() + "' was not verified for original hash: " + hashedMsg.String())
 	}
 }
@@ -55,11 +73,11 @@ func TestEncryptionAndDecryptionWithRSAandAES(t *testing.T) {
 	n, d := KeyGen(2000)
 	publicKey := PublicKey{N:n, E:big.NewInt(3)}
 	secretKey := SecretKey{N:n, D:d}
-	msg := big.NewInt( 879537853248793834 )
+	msg := big.NewInt( 8795378532487390 )
 	RSAmsg := Encrypt(msg, publicKey)
 
 	// AES encrypt the secret key
-	cbc := CTR{Iv: "6368616e676520746869732070617373"}
+	cbc := CTR{SecretKey: GenerateNewRndmIV(32)}
 	filename := "Cryptography/RSAandAEStest"
 	secretKeyString := secretKey.N.String() + ":" + secretKey.D.String()
 	cbc.EncryptToFile(filename, secretKeyString)

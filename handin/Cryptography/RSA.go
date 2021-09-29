@@ -1,4 +1,4 @@
-package main
+package Cryptography
 
 import (
 	"crypto/rand"
@@ -118,12 +118,16 @@ func Verify(s *big.Int, msg *big.Int, pk PublicKey) bool {
 	return msg.Cmp(unsignedMsg) == 0
 }
 
-
 func GetHash(msg *big.Int) []byte {
 	sha := sha256.New()
 	sha.Write([]byte(msg.String()))
 	return (sha.Sum(nil))
 }
 
+func Sign(msg *big.Int, sk SecretKey) *big.Int {
+	hashedMsg := new(big.Int)
+	hashedMsg.SetBytes(GetHash(msg))
+	return Decrypt(hashedMsg, sk)
+}
 
 
