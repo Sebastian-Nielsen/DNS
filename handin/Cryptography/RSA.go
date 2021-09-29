@@ -49,21 +49,19 @@ func Encrypt(m *big.Int, key PublicKey) *big.Int { // Compute the signature of m
 
 	//fmt.Println("m:", m)
 	//fmt.Println("e:", e)
-	dRaisedToM := big.NewInt(0).Exp(m, e, nil)
-	// fmt.Println("debug d^m ", dRaisedToM)
-	c := big.NewInt(0).Mod(dRaisedToM, n)     // m^e % n
+	c := big.NewInt(0).Exp(m, e, n)
+	// fmt.Println("Debug m^e % n =", c)
 	return c
 }
 func Decrypt(c *big.Int, key SecretKey) *big.Int {
 	n := key.N
 	d := key.D
 
-	dRaisedToC := big.NewInt(0).Exp(c, d, nil)
-	m := big.NewInt(0).Mod(dRaisedToC, n)     // c^d % n
+	m := big.NewInt(0).Exp(c, d, n)
+	// fmt.Println("Debug2 c^d % n =", m)
 	return m
 }
 func compute_d(p, q *big.Int) *big.Int {
-
 	qMin1 := big.NewInt(0).Sub(q, big.NewInt(1))
 	pMin1 := big.NewInt(0).Sub(p, big.NewInt(1))
 
@@ -116,7 +114,7 @@ func compute_n(k int) (*big.Int, *big.Int, *big.Int) {
 
 func Verify(s *big.Int, msg *big.Int, pk PublicKey) bool {
 	unsignedMsg := Encrypt(s, pk)
-	fmt.Println(unsignedMsg)
+	// fmt.Println(unsignedMsg)
 	return msg.Cmp(unsignedMsg) == 0
 }
 
