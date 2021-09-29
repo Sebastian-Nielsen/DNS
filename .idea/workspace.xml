@@ -8,14 +8,9 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/handin/Cryptography/AES.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Cryptography/AES.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/handin/Cryptography/RSA.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Cryptography/RSA.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handin/Cryptography/RSAandAEStest" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Cryptography/RSAandAEStest" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/handin/main_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/main_test.go" afterDir="false" />
     </list>
-    <list id="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" name="Changes by Andreas 🌚" comment="">
-      <change beforePath="$PROJECT_DIR$/handin/Cryptography/AES.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Cryptography/AES.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handin/Cryptography/RSA.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Cryptography/RSA.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handin/main_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/main_test.go" afterDir="false" />
-    </list>
+    <list id="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" name="Changes by Andreas 🌚" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -58,60 +53,6 @@
     <other-services-enabled>true</other-services-enabled>
     <auto-save>true</auto-save>
   </component>
-  <component name="LineStatusTrackerManager">
-    <file path="$PROJECT_DIR$/handin/Cryptography/RSA.go">
-      <ranges>
-        <range start1="18" end1="34" start2="18" end2="34" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="38" end1="51" start2="38" end2="38" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="61" end1="63" start2="48" end2="50" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="91" end1="98" start2="78" end2="85" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="108" end1="113" start2="95" end2="100" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="120" end1="121" start2="107" end2="108" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="123" end1="124" start2="110" end2="111" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-      </ranges>
-    </file>
-    <file path="$PROJECT_DIR$/handin/main_test.go">
-      <ranges>
-        <range start1="9" end1="9" start2="9" end2="10" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="27" end1="32" start2="28" end2="28" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="35" end1="35" start2="31" end2="32" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="38" end1="39" start2="35" end2="36" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="40" end1="40" start2="37" end2="39" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="42" end1="50" start2="41" end2="60" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="52" end1="53" start2="62" end2="62" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="76" end1="77" start2="85" end2="86" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="80" end1="81" start2="89" end2="90" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="84" end1="85" start2="93" end2="94" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="89" end1="90" start2="98" end2="99" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="129" end1="130" start2="138" end2="139" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="133" end1="134" start2="142" end2="143" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="168" end1="169" start2="177" end2="178" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="188" end1="191" start2="197" end2="197" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="221" end1="222" start2="227" end2="228" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="242" end1="243" start2="248" end2="249" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="248" end1="251" start2="254" end2="254" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="340" end1="343" start2="343" end2="344" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="348" end1="351" start2="349" end2="350" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="404" end1="405" start2="403" end2="404" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="408" end1="409" start2="407" end2="408" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-      </ranges>
-    </file>
-    <file path="$PROJECT_DIR$/handin/Cryptography/AES.go">
-      <ranges>
-        <range start1="8" end1="9" start2="8" end2="8" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="29" end1="30" start2="28" end2="29" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="67" end1="68" start2="66" end2="66" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="69" end1="70" start2="67" end2="67" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="71" end1="72" start2="68" end2="68" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="73" end1="76" start2="69" end2="69" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="93" end1="98" start2="86" end2="86" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="106" end1="120" start2="94" end2="94" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="122" end1="123" start2="96" end2="96" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="124" end1="127" start2="97" end2="97" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-        <range start1="143" end1="144" start2="113" end2="114" changelist="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" />
-      </ranges>
-    </file>
-  </component>
   <component name="ProjectId" id="1xa6g8MFaY4TTx5CaUxQYpW33h5" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
@@ -152,17 +93,14 @@
       <recent name="C:\Users\sebas\GolandProjects\Distribuerede_systemer_og_sikkerhed\exercise2-2" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Test.TestNodeConnectsToTenOthersWhenEnteringNetwork in DNO/handin">
-    <configuration name="TestEncryptionAndDecryptionWithRSAandAES in DNO/handin" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Go Build.go build DNO/handin/Cryptography">
+    <configuration name="go build DNO/handin/Cryptography" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="DNO" />
-      <working_directory value="$PROJECT_DIR$/handin" />
-      <root_directory value="$PROJECT_DIR$" />
+      <working_directory value="$PROJECT_DIR$" />
       <kind value="PACKAGE" />
-      <package value="DNO/handin" />
+      <package value="DNO/handin/Cryptography" />
       <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <framework value="gotest" />
-      <pattern value="^\QTestEncryptionAndDecryptionWithRSAandAES\E$" />
+      <filePath value="$PROJECT_DIR$/handin/Cryptography/AES.go" />
       <method v="2" />
     </configuration>
     <configuration name="TestNewcomerNodeReceivesAllTransactionsAppliedBeforeItEnteredNetwork in DNO/handin" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -214,11 +152,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Build.go build DNO/handin/Cryptography" />
         <item itemvalue="Go Test.TestNodeConnectsToTenOthersWhenEnteringNetwork in DNO/handin" />
         <item itemvalue="Go Test.main_test.go (1)" />
         <item itemvalue="Go Test.TestTransactionsAreBroadcastedAndAppliedOnAllPeerNodes in DNO/handin" />
         <item itemvalue="Go Test.TestNewcomerNodeReceivesAllTransactionsAppliedBeforeItEnteredNetwork in DNO/handin" />
-        <item itemvalue="Go Test.TestEncryptionAndDecryptionWithRSAandAES in DNO/handin" />
       </list>
     </recent_temporary>
   </component>

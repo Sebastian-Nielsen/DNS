@@ -59,7 +59,7 @@ func TestEncryptionAndDecryptionWithRSAandAES(t *testing.T) {
 	RSAmsg := Encrypt(msg, publicKey)
 
 	// AES encrypt the secret key
-	cbc := CBC{Iv: "6368616e676520746869732070617373"}
+	cbc := CTR{Iv: "6368616e676520746869732070617373"}
 	filename := "Cryptography/RSAandAEStest"
 	secretKeyString := secretKey.N.String() + ":" + secretKey.D.String()
 	cbc.EncryptToFile(filename, secretKeyString)
