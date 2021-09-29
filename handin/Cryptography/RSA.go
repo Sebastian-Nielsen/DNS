@@ -106,7 +106,7 @@ func compute_n(k int) (*big.Int, *big.Int, *big.Int) {
 			p.Cmp(q) != 0 {
 			//fmt.Println("p and q does satisfy: gcd(3,p-1) = gcd(3,q-1) = 1\n-------------------------")
 			return n, p, q
-		} else {
+		// } else {
 			// fmt.Println("p and q does not satisfy: gcd(3,p-1) = gcd(3,q-1) = 1\n ")
 		}
 	}
