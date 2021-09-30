@@ -112,21 +112,22 @@ func compute_n(k int) (*big.Int, *big.Int, *big.Int) {
 	}
 }
 
-func Verify(s *big.Int, msg *big.Int, pk PublicKey) bool {
-	unsignedMsg := Encrypt(s, pk)
-	// fmt.Println(unsignedMsg)
-	return msg.Cmp(unsignedMsg) == 0
+func Verify(signature *big.Int, msg *big.Int, pk PublicKey) bool {
+	hashedMsg := new(big.Int)
+	hashedMsg.SetBytes(Hash(msg))
+	unsignedMsg := Encrypt(signature, pk)
+	return hashedMsg.Cmp(unsignedMsg) == 0
 }
 
-func GetHash(msg *big.Int) []byte {
+func Hash(msg *big.Int) []byte {
 	sha := sha256.New()
 	sha.Write([]byte(msg.String()))
-	return (sha.Sum(nil))
+	return sha.Sum(nil)
 }
 
 func Sign(msg *big.Int, sk SecretKey) *big.Int {
 	hashedMsg := new(big.Int)
-	hashedMsg.SetBytes(GetHash(msg))
+	hashedMsg.SetBytes(Hash(msg))
 	return Decrypt(hashedMsg, sk)
 }
 

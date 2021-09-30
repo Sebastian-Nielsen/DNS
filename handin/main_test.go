@@ -6,6 +6,7 @@ import (
 	. "DNO/handin/Helper"
 	"fmt"
 	"math/big"
+	"math/rand"
 	"net"
 	"reflect"
 	"strings"
@@ -33,19 +34,58 @@ func createPeerNode( shouldMockInput bool, shouldPrintDebug bool ) PeerNode {
 
 
 
-func TestUseThisToDebug(t *testing.T) {
-	c := CTR{
-		SecretKey: "6368616e676520746869732070617373",
-	}
+//func TestUseThisToDebug(t *testing.T) {
+//	c := CTR{
+//		SecretKey: "6368616e676520746869732070617373",
+//	}
+//
+//	bytesToBeEncrypted := []byte("hello there")
+//
+//	encryptedBytes := c.Encrypt(bytesToBeEncrypted)
+//	decryptedBytes := c.Decrypt(encryptedBytes)
+//
+//	fmt.Println(bytesToBeEncrypted)
+//	fmt.Println([]byte(string(decryptedBytes)))
+//}
 
-	bytesToBeEncrypted := []byte("hello there")
 
-	encryptedBytes := c.Encrypt(bytesToBeEncrypted)
-	decryptedBytes := c.Decrypt(encryptedBytes)
 
-	fmt.Println(bytesToBeEncrypted)
-	fmt.Println([]byte(string(decryptedBytes)))
+func TestRSAsigningTime(t *testing.T) {
+	n, d := KeyGen(2000)
+	secretKey := SecretKey{N:n, D:d}
+	msg := big.NewInt( 25632212678324 )
+	fmt.Println("d:", d.BitLen())
+
+	hashedMsg := new(big.Int)
+	hashedMsg.SetBytes(Hash(msg))
+
+	// Time the signing of a hash. Since our signing function computes the hash
+	// we just manually compute the hash and the time just the signing (which is the
+	// same as what our Decrypt function does)
+	startTime := time.Now()
+	Decrypt(hashedMsg, secretKey)
+	timeElapsed := time.Since(startTime)
+
+	bitsPerSec := float64(hashedMsg.BitLen() + 1) / timeElapsed.Seconds()
+	fmt.Printf("It took %s to sign a hashed message of size 256 bits = %f bits per sec", timeElapsed.String(), bitsPerSec)
 }
+
+func TestHashingTime(t *testing.T) {
+	data := make([]byte, 10000)
+	rand.Read(data)
+	msg := new(big.Int)
+	msg.SetBytes(data)
+
+	// Time the hashing of the message
+	startTime := time.Now()
+	Hash(msg)
+	timeElapsed := time.Since(startTime)
+
+	bitsPerSec := float64(msg.BitLen()) / timeElapsed.Seconds()
+	fmt.Printf("It took %s to hash a message of size 10.000 bytes = %f bits per sec", timeElapsed.String(), bitsPerSec)
+}
+
+
 
 func TestRSAsigning(t *testing.T) {
 	n, d := KeyGen(2000)
@@ -56,15 +96,21 @@ func TestRSAsigning(t *testing.T) {
 	// Sign the message with the secret key
 	signedMsg := Sign(msg, secretKey)
 	
-	// Hash the message to use when verifying 
-	hashedMsg := new(big.Int)
-	hashedMsg.SetBytes(GetHash(msg))
-
-	// Verify the signed message against the hash using the public key
-	verified := Verify(signedMsg, hashedMsg, publicKey)
-
+	// Verify the signed message against msg using the public key
+	verified := Verify(signedMsg, msg, publicKey)
 	if !verified {
-		t.Error("Hash from signed message '" + Encrypt(signedMsg, publicKey).String() + "' was not verified for original hash: " + hashedMsg.String())
+		t.Error("Signed message '" + Encrypt(signedMsg, publicKey).String() +
+			"' was not verified for original message: " + msg.String())
+	}
+
+	// Modify the msg by adding 1
+	modifiedMsg := big.NewInt(0).Add(msg, big.NewInt(1))
+
+	// Since the signature is modified, we shouldn't get verification
+	verified = Verify(signedMsg, modifiedMsg, publicKey)
+	if verified {
+		t.Error("The modified message '" + Encrypt(modifiedMsg, publicKey).String() +
+			"' was wrongly verified for original message: " + msg.String())
 	}
 }
 
@@ -74,7 +120,7 @@ func TestEncryptionAndDecryptionWithRSAandAES(t *testing.T) {
 	publicKey := PublicKey{N:n, E:big.NewInt(3)}
 	secretKey := SecretKey{N:n, D:d}
 	msg := big.NewInt( 8795378532487390 )
-	RSAmsg := Encrypt(msg, publicKey)
+	RSAEncryptedMsg := Encrypt(msg, publicKey)
 
 	// AES encrypt the secret key
 	ctr := CTR{SecretKey: GenerateNewRndmString(32)}
@@ -94,7 +140,7 @@ func TestEncryptionAndDecryptionWithRSAandAES(t *testing.T) {
 	decryptedSecretKey := SecretKey{N:decrN, D:decrD}
 
 	// RSA decrypt with the new secret key
-	decryptedMsg := Decrypt(RSAmsg, decryptedSecretKey)
+	decryptedMsg := Decrypt(RSAEncryptedMsg, decryptedSecretKey)
 
 	if decryptedMsg.String() != msg.String() {
 		t.Error("Original message '" + msg.String() + "' different from decrypted message'" + decryptedMsg.String() + "'")

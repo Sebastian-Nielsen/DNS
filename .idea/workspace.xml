@@ -6,11 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="a473623c-3760-4b60-9758-0b085a2e5373" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handin/Cryptography/AES.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Cryptography/AES.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handin/Cryptography/RSA.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Cryptography/RSA.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/handin/main_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/main_test.go" afterDir="false" />
     </list>
-    <list id="99e1db6b-7d96-4592-b3be-32a2ac1a02e3" name="Changes by Andreas 🌚" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -93,17 +90,8 @@
       <recent name="C:\Users\sebas\GolandProjects\Distribuerede_systemer_og_sikkerhed\exercise2-2" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Build.go build DNO/handin/Cryptography">
-    <configuration name="go build DNO/handin/Cryptography" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
-      <module name="DNO" />
-      <working_directory value="$PROJECT_DIR$" />
-      <kind value="PACKAGE" />
-      <package value="DNO/handin/Cryptography" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/handin/Cryptography/AES.go" />
-      <method v="2" />
-    </configuration>
-    <configuration name="TestNewcomerNodeReceivesAllTransactionsAppliedBeforeItEnteredNetwork in DNO/handin" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Go Test.main_test.go">
+    <configuration name="TestHashingTime in DNO/handin" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="DNO" />
       <working_directory value="$PROJECT_DIR$/handin" />
       <root_directory value="$PROJECT_DIR$" />
@@ -112,10 +100,10 @@
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <pattern value="^\QTestNewcomerNodeReceivesAllTransactionsAppliedBeforeItEnteredNetwork\E$" />
+      <pattern value="^\QTestHashingTime\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestNodeConnectsToTenOthersWhenEnteringNetwork in DNO/handin" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestRSASigningTime in DNO/handin" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="DNO" />
       <working_directory value="$PROJECT_DIR$/handin" />
       <root_directory value="$PROJECT_DIR$" />
@@ -124,10 +112,10 @@
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <pattern value="^\QTestNodeConnectsToTenOthersWhenEnteringNetwork\E$" />
+      <pattern value="^\QTestRSASigningTime\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestTransactionsAreBroadcastedAndAppliedOnAllPeerNodes in DNO/handin" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestRSAsigningTime in DNO/handin (1)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="DNO" />
       <working_directory value="$PROJECT_DIR$/handin" />
       <root_directory value="$PROJECT_DIR$" />
@@ -136,10 +124,22 @@
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <pattern value="^\QTestTransactionsAreBroadcastedAndAppliedOnAllPeerNodes\E$" />
+      <pattern value="^\QTestRSAsigningTime\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="main_test.go (1)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestRSAsigningTime in DNO/handin" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="DNO" />
+      <working_directory value="$PROJECT_DIR$/handin" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="DNO/handin" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestRSAsigningTime\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="main_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="DNO" />
       <working_directory value="$PROJECT_DIR$/handin" />
       <root_directory value="$PROJECT_DIR$" />
@@ -152,11 +152,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Go Build.go build DNO/handin/Cryptography" />
-        <item itemvalue="Go Test.TestNodeConnectsToTenOthersWhenEnteringNetwork in DNO/handin" />
-        <item itemvalue="Go Test.main_test.go (1)" />
-        <item itemvalue="Go Test.TestTransactionsAreBroadcastedAndAppliedOnAllPeerNodes in DNO/handin" />
-        <item itemvalue="Go Test.TestNewcomerNodeReceivesAllTransactionsAppliedBeforeItEnteredNetwork in DNO/handin" />
+        <item itemvalue="Go Test.main_test.go" />
+        <item itemvalue="Go Test.TestRSAsigningTime in DNO/handin (1)" />
+        <item itemvalue="Go Test.TestRSAsigningTime in DNO/handin" />
+        <item itemvalue="Go Test.TestHashingTime in DNO/handin" />
+        <item itemvalue="Go Test.TestRSASigningTime in DNO/handin" />
       </list>
     </recent_temporary>
   </component>

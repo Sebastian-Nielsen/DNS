@@ -57,8 +57,6 @@ func (c *CTR) Encrypt(inputBytes []byte) []byte {
 	check(err)
 
 	stream := cipher.NewCTR(block, iv)
-	// fmt.Println(len(outputBytes[aes.BlockSize:]))
-	// fmt.Println(len(inputBytes))
 
 	stream.XORKeyStream(outputBytes[aes.BlockSize:], inputBytes)
 	// fmt.Println(len(outputBytes[aes.BlockSize:]))
