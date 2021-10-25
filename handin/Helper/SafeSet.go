@@ -76,20 +76,20 @@ func (s *SafeSet_string) Contains(str string) bool {
 //*/
 //type SafeSet_Transaction struct {
 //	mu     sync.Mutex
-//	Values map[Transaction]bool
+//	Values map[ApplyTransaction]bool
 //}
 //
-//func (s *SafeSet_Transaction) Add(transaction Transaction) {
+//func (s *SafeSet_Transaction) Add(transaction ApplyTransaction) {
 //	s.mu.Lock()
 //	defer s.mu.Unlock()
 //	s.Values[transaction] = true
 //}
-//func (s *SafeSet_Transaction) delete(transaction Transaction) {
+//func (s *SafeSet_Transaction) delete(transaction ApplyTransaction) {
 //	s.mu.Lock()
 //	defer s.mu.Unlock()
 //	delete(s.Values, transaction)
 //}
-//func (s *SafeSet_Transaction) Contains(transaction Transaction) bool {
+//func (s *SafeSet_Transaction) Contains(transaction ApplyTransaction) bool {
 //	s.mu.Lock()
 //	defer s.mu.Unlock()
 //	return s.Values[transaction]

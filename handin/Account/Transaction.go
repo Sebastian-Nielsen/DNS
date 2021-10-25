@@ -6,7 +6,7 @@ type Transaction struct {
 	To string
 	Amount int
 }
-func (l *Ledger) Transaction(t *Transaction) {
+func (l *Ledger) ApplyTransaction(t *Transaction) {
 	l.lock.Lock() ; defer l.lock.Unlock()
 	l.Accounts[t.From] -= t.Amount
 	l.Accounts[t.To] += t.Amount

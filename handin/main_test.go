@@ -4,6 +4,7 @@ import (
 	. "DNO/handin/Account"
 	. "DNO/handin/Cryptography"
 	. "DNO/handin/Helper"
+	. "DNO/handin/Peernode"
 	"fmt"
 	"math/big"
 	"math/rand"
@@ -34,27 +35,92 @@ func createPeerNode( shouldMockInput bool, shouldPrintDebug bool ) PeerNode {
 
 
 
-//func TestUseThisToDebug(t *testing.T) {
-//	c := CTR{
-//		SecretKey: "6368616e676520746869732070617373",
+func TestUseThisToDebug(t *testing.T) {
+	pk, sk := GetKeys(2000)
+	msg := "123hellothere123"
+	sign := CreateSignature(msg, sk)
+
+	fmt.Printf("Verified: %t\n", Verify(sign, msg, pk))
+}
+
+func TestReceiverPeernodeVerifiesSignatureOnReceivedSignedTransaction(t *testing.T) {
+	t.Parallel()
+
+	ledger1 := MakeLedger()
+	id_1, pk_1, sk_1 := createAccountAt(ledger1)
+
+	ledger2 := MakeLedger()
+	_, pk_2, _ := createAccountAt(ledger2)
+
+	// Account_1 at ledger_1 creates a signed transaction
+	transaction := Transaction{ID: id_1, From: pk_1.ToString(), To: pk_2.ToString(), Amount: 2}
+	signedTransaction := ledger1.MakeSignedTransaction(transaction, sk_1)
+
+	// Account_2 at ledger_2 verifies the signed transaction
+	isVerified := ledger2.Verify(signedTransaction)
+	if !isVerified {
+		t.Error("Error: the signedTransaction (" + signedTransaction.ToString() + ") should be verified")
+	}
+
+}
+
+func createAccountAt(ledger *Ledger) (string, PublicKey, SecretKey) {
+	pk, sk := GetKeys(2000)
+	id := CreateSignature(pk.ToString(), sk)
+	ledger.CreateAccount(id, 10)
+	return id, pk, sk
+}
+
+//func TestSignedTransactionsAreBroadcastedAndAppliedOnAllPeerNodes(t *testing.T) {
+//	t.Parallel()
+//
+//	var peerNode1_port = AvailablePorts.Next()
+//	var peerNode2_port = AvailablePorts.Next()
+//	var peerNode3_port = AvailablePorts.Next()
+//
+//	peerNode1 := createPeerNode(true, true)
+//	peerNode2 := createPeerNode(true, true)
+//	peerNode3 := createPeerNode(true, true)
+//
+//	goStart(&peerNode1, peerNode1_port, "no_port")
+//	goStart(&peerNode2, peerNode2_port, peerNode1_port)
+//	goStart(&peerNode3, peerNode3_port, peerNode2_port)
+//
+//	IDs 	       := []string{"acc1", "acc2", "acc3"}
+//	initialAmounts := []int{      100,      0,     40}
+//	makeAccounts(&peerNode1, IDs, initialAmounts)
+//	makeAccounts(&peerNode2, IDs, initialAmounts)
+//	makeAccounts(&peerNode3, IDs, initialAmounts)
+//
+//	time.Sleep(1 * time.Second)
+//
+//	peerNode1.MakeAndBroadcastSignedTransaction(20, "tran1", IDs[0], IDs[1])
+//
+//	time.Sleep(1 * time.Second)
+//
+//	if peerNode1.LocalLedger.Accounts[IDs[0]] != initialAmounts[0]-20 {
+//		t.Error("ApplyTransaction 'tran1' from 'acc1' to 'acc2' on peerNode1 didn't apply to acc1' on peerNode1.",
+//			"\nnpeerNode1 Accounts:", peerNode1.LocalLedger.Accounts, "\n")
 //	}
-//
-//	bytesToBeEncrypted := []byte("hello there")
-//
-//	encryptedBytes := c.Encrypt(bytesToBeEncrypted)
-//	decryptedBytes := c.Decrypt(encryptedBytes)
-//
-//	fmt.Println(bytesToBeEncrypted)
-//	fmt.Println([]byte(string(decryptedBytes)))
+//	if peerNode1.LocalLedger.Accounts[IDs[1]] != initialAmounts[1]+20 {
+//		t.Error("ApplyTransaction 'tran1' from 'acc1' to 'acc2' on peerNode1 didn't apply to 'acc2' on peerNode1.",
+//			"\nnpeerNode1 Accounts:", peerNode1.LocalLedger.Accounts, "\n")
+//	}
+//	if peerNode3.LocalLedger.Accounts[IDs[0]] != initialAmounts[0]-20 {
+//		t.Error("ApplyTransaction 'tran1' from 'acc1' to 'acc2' on peerNode1 didn't apply to 'acc1' on peerNode3.",
+//			"\nnpeerNode1 Accounts:", peerNode3.LocalLedger.Accounts, "\n")
+//	}
+//	if peerNode3.LocalLedger.Accounts[IDs[1]] != initialAmounts[1]+20 {
+//		t.Error("ApplyTransaction 'tran1' from 'acc1' to 'acc2' on peerNode1 didn't apply to 'acc2' on peerNode3.",
+//			"\nnpeerNode1 Accounts:", peerNode3.LocalLedger.Accounts, "\n")
+//	}
 //}
 
 
-
 func TestRSAsigningTime(t *testing.T) {
-	n, d := KeyGen(2000)
-	secretKey := SecretKey{N:n, D:d}
+	_, sk := GetKeys(200)
 	msg := big.NewInt( 25632212678324 )
-	fmt.Println("d:", d.BitLen())
+	fmt.Println("d:", sk.D.BitLen())
 
 	hashedMsg := new(big.Int)
 	hashedMsg.SetBytes(Hash(msg))
@@ -63,7 +129,7 @@ func TestRSAsigningTime(t *testing.T) {
 	// we just manually compute the hash and the time just the signing (which is the
 	// same as what our Decrypt function does)
 	startTime := time.Now()
-	Decrypt(hashedMsg, secretKey)
+	Decrypt(hashedMsg, sk)
 	timeElapsed := time.Since(startTime)
 
 	bitsPerSec := float64(hashedMsg.BitLen() + 1) / timeElapsed.Seconds()
@@ -88,18 +154,16 @@ func TestHashingTime(t *testing.T) {
 
 
 func TestRSAsigning(t *testing.T) {
-	n, d := KeyGen(2000)
-	publicKey := PublicKey{N:n, E:big.NewInt(3)}
-	secretKey := SecretKey{N:n, D:d}
+	pk, sk := GetKeys(2000)
 	msg := big.NewInt( 25632212678324 )
 
-	// Sign the message with the secret key
-	signedMsg := Sign(msg, secretKey)
+	// CreateSignature the message with the secret key
+	signedMsg := BigInt_createSignature(msg, sk)
 	
-	// Verify the signed message against msg using the public key
-	verified := Verify(signedMsg, msg, publicKey)
+	// BigInt_verify the signed message against msg using the public key
+	verified := BigInt_verify(signedMsg, msg, pk)
 	if !verified {
-		t.Error("Signed message '" + Encrypt(signedMsg, publicKey).String() +
+		t.Error("Signed message '" + Encrypt(signedMsg, pk).String() +
 			"' was not verified for original message: " + msg.String())
 	}
 
@@ -107,25 +171,23 @@ func TestRSAsigning(t *testing.T) {
 	modifiedMsg := big.NewInt(0).Add(msg, big.NewInt(1))
 
 	// Since the signature is modified, we shouldn't get verification
-	verified = Verify(signedMsg, modifiedMsg, publicKey)
+	verified = BigInt_verify(signedMsg, modifiedMsg, pk)
 	if verified {
-		t.Error("The modified message '" + Encrypt(modifiedMsg, publicKey).String() +
+		t.Error("The modified message '" + Encrypt(modifiedMsg, pk).String() +
 			"' was wrongly verified for original message: " + msg.String())
 	}
 }
 
 func TestEncryptionAndDecryptionWithRSAandAES(t *testing.T) {
 	// RSA decrypt
-	n, d := KeyGen(2000)
-	publicKey := PublicKey{N:n, E:big.NewInt(3)}
-	secretKey := SecretKey{N:n, D:d}
+	pk, sk := GetKeys(2000)
 	msg := big.NewInt( 8795378532487390 )
-	RSAEncryptedMsg := Encrypt(msg, publicKey)
+	RSAEncryptedMsg := Encrypt(msg, pk)
 
 	// AES encrypt the secret key
 	ctr := CTR{SecretKey: GenerateNewRndmString(32)}
 	filename := "Cryptography/RSAandAEStest"
-	secretKeyString := secretKey.N.String() + ":" + secretKey.D.String()
+	secretKeyString := sk.N.String() + ":" + sk.D.String()
 	ctr.EncryptToFile(filename, secretKeyString)
 
 	// AES decrypt the secret key
@@ -185,15 +247,15 @@ func TestNewcomerNodeReceivesAllTransactionsAppliedBeforeItEnteredNetwork(t *tes
 	time.Sleep(1 * time.Second)
 
 	if peerNode4.LocalLedger.Accounts[IDs[0]] != amounts[0]-42{
-		t.Error("Transaction 'tran1' from 'acc1' to 'acc2' on peerNode1 didn't apply to 'acc1' on latecomer peerNode4.",
+		t.Error("ApplyTransaction 'tran1' from 'acc1' to 'acc2' on peerNode1 didn't apply to 'acc1' on latecomer peerNode4.",
 			"\npeerNode4 Accounts:", peerNode4.LocalLedger.Accounts, "\n")
 	}
 	if peerNode4.LocalLedger.Accounts[IDs[1]] != (amounts[1]+42) - 5 {
-		t.Error("Transaction 'tran1' and 'tran2' from 'acc1' to 'acc2' and 'acc2' to 'acc3' on peerNode1 didn't apply to 'acc2' on latecomer peerNode4.",
+		t.Error("ApplyTransaction 'tran1' and 'tran2' from 'acc1' to 'acc2' and 'acc2' to 'acc3' on peerNode1 didn't apply to 'acc2' on latecomer peerNode4.",
 			"\npeerNode4 Accounts:", peerNode4.LocalLedger.Accounts, "\n")
 	}
 	if peerNode4.LocalLedger.Accounts[IDs[2]] != amounts[2]+5 {
-		t.Error("Transaction 'tran3' from 'acc2' to 'acc3' on peerNode1 didn't apply to 'acc3' on latecomer peerNode4.",
+		t.Error("ApplyTransaction 'tran3' from 'acc2' to 'acc3' on peerNode1 didn't apply to 'acc3' on latecomer peerNode4.",
 			"\npeerNode4 Accounts:", peerNode4.LocalLedger.Accounts, "\n")
 	}
 	if len(peerNode4.TransactionsSeen.Values()) != 2 {
@@ -229,19 +291,19 @@ func TestTransactionsAreBroadcastedAndAppliedOnAllPeerNodes(t *testing.T) {
 	time.Sleep(1 * time.Second)
 
 	if peerNode1.LocalLedger.Accounts[IDs[0]] != amounts[0]-20 {
-		t.Error("Transaction 'tran1' from 'acc1' to 'acc2' on peerNode1 didn't apply to acc1' on peerNode1.",
+		t.Error("ApplyTransaction 'tran1' from 'acc1' to 'acc2' on peerNode1 didn't apply to acc1' on peerNode1.",
 			"\nnpeerNode1 Accounts:", peerNode1.LocalLedger.Accounts, "\n")
 	}
 	if peerNode1.LocalLedger.Accounts[IDs[1]] != amounts[1]+20 {
-		t.Error("Transaction 'tran1' from 'acc1' to 'acc2' on peerNode1 didn't apply to 'acc2' on peerNode1.",
+		t.Error("ApplyTransaction 'tran1' from 'acc1' to 'acc2' on peerNode1 didn't apply to 'acc2' on peerNode1.",
 			"\nnpeerNode1 Accounts:", peerNode1.LocalLedger.Accounts, "\n")
 	}
 	if peerNode3.LocalLedger.Accounts[IDs[0]] != amounts[0]-20 {
-		t.Error("Transaction 'tran1' from 'acc1' to 'acc2' on peerNode1 didn't apply to 'acc1' on peerNode3.",
+		t.Error("ApplyTransaction 'tran1' from 'acc1' to 'acc2' on peerNode1 didn't apply to 'acc1' on peerNode3.",
 			"\nnpeerNode1 Accounts:", peerNode3.LocalLedger.Accounts, "\n")
 	}
 	if peerNode3.LocalLedger.Accounts[IDs[1]] != amounts[1]+20 {
-		t.Error("Transaction 'tran1' from 'acc1' to 'acc2' on peerNode1 didn't apply to 'acc2' on peerNode3.",
+		t.Error("ApplyTransaction 'tran1' from 'acc1' to 'acc2' on peerNode1 didn't apply to 'acc2' on peerNode3.",
 			"\nnpeerNode1 Accounts:", peerNode3.LocalLedger.Accounts, "\n")
 	}
 }

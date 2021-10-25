@@ -16,6 +16,10 @@ type SecretKey struct {
 	D *big.Int
 }
 
+func (p *PublicKey) ToString() string {
+	return p.N.String() + ":" + p.E.String()
+}
+
 
 //func Test2() {
 //	//fmt.Println("Result:", Encrypt(2, SecretKey{2, 2}))
@@ -34,7 +38,15 @@ type SecretKey struct {
 //	fmt.Println("---------------------")
 //}
 
-func KeyGen(k int) (*big.Int, *big.Int) {
+
+func GetKeys(k int) (PublicKey, SecretKey) {
+	n, d := keyGen(k)
+	pk := PublicKey{N:n, E:big.NewInt(3)}
+	sk := SecretKey{N:n, D:d}
+	return pk, sk
+}
+
+func keyGen(k int) (*big.Int, *big.Int) {
 	n, p, q := compute_n(k)
 	d := compute_d(p, q)
 
@@ -112,11 +124,23 @@ func compute_n(k int) (*big.Int, *big.Int, *big.Int) {
 	}
 }
 
-func Verify(signature *big.Int, msg *big.Int, pk PublicKey) bool {
+func BigInt_verify(signature *big.Int, msg *big.Int, pk PublicKey) bool {
 	hashedMsg := new(big.Int)
 	hashedMsg.SetBytes(Hash(msg))
 	unsignedMsg := Encrypt(signature, pk)
 	return hashedMsg.Cmp(unsignedMsg) == 0
+}
+
+func Verify(signature string, msg string, pk PublicKey) bool {
+	// convert {signature} of type string to big.Int
+	sigByteArr := []byte(signature)
+	sigBigInt := new(big.Int)
+	sigBigInt.SetBytes(sigByteArr)
+	// convert {msg} of type string to big.Int
+	msgByteArr := []byte(msg)
+	msgBigInt := new(big.Int)
+	msgBigInt.SetBytes(msgByteArr)
+	return BigInt_verify(sigBigInt, msgBigInt, pk)
 }
 
 func Hash(msg *big.Int) []byte {
@@ -125,10 +149,15 @@ func Hash(msg *big.Int) []byte {
 	return sha.Sum(nil)
 }
 
-func Sign(msg *big.Int, sk SecretKey) *big.Int {
+func BigInt_createSignature(msg *big.Int, sk SecretKey) *big.Int {
 	hashedMsg := new(big.Int)
 	hashedMsg.SetBytes(Hash(msg))
 	return Decrypt(hashedMsg, sk)
 }
 
-
+func CreateSignature(msg string, sk SecretKey) string {
+	byteArr := []byte(msg)
+	bigInt := new(big.Int)
+	bigInt.SetBytes(byteArr)
+	return BigInt_createSignature(bigInt, sk).String()
+}
