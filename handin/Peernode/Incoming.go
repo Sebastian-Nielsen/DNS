@@ -63,13 +63,35 @@ func (p *PeerNode) handleIncomming(packet Packet, connPacketWasReceivedOn net.Co
 		packet.Type = PacketType.BROADCAST_KNOWN_TRANSACTION
 		p.Broadcast(packet)
 	case PacketType.BROADCAST_KNOWN_TRANSACTION:
-		p.debugPrintln("[PacketType: BROADCASTED__KNOWN_TRANSACTION]", packet.Transaction)
+		p.debugPrintln("received packet: [PacketType: BROADCASTED__KNOWN_TRANSACTION]", packet.Transaction)
 		transaction := packet.Transaction
 
 		transactionIsNotSeen := !p.TransactionsSeen.Contains(transaction)
 		if transactionIsNotSeen {
 			p.TransactionsSeen.Append(transaction)
 			p.LocalLedger.ApplyTransaction(&transaction)
+			p.Broadcast(packet)
+		}
+	case PacketType.BROADCAST_SIGNED_TRANSACTION:
+		p.debugPrintln("received signed packet: [PacketType: BROADCAST_SIGNED_TRANSACTION]", packet.SignedTransaction.ToString())
+		signedTransaction := packet.SignedTransaction
+
+		signedTransactionIsNotSeen := !p.SignedTransactionsSeen.Contains(signedTransaction)
+		if signedTransactionIsNotSeen {
+			p.SignedTransactionsSeen.Append(signedTransaction)
+			p.LocalLedger.ApplySignedTransaction(signedTransaction)
+		}
+
+		packet.Type = PacketType.BROADCAST_KNOWN_SIGNED_TRANSACTION
+		p.Broadcast(packet)
+	case PacketType.BROADCAST_KNOWN_SIGNED_TRANSACTION:
+		p.debugPrintln("received signed packet: [PacketType: BROADCASTED_KNOWN_SIGNED_TRANSACTION]", packet.SignedTransaction.ToString())
+		signedTransaction := packet.SignedTransaction
+
+		signedTransactionIsNotSeen := !p.SignedTransactionsSeen.Contains(signedTransaction)
+		if signedTransactionIsNotSeen {
+			p.SignedTransactionsSeen.Append(signedTransaction)
+			p.LocalLedger.ApplySignedTransaction(signedTransaction)
 			p.Broadcast(packet)
 		}
 	}
@@ -83,6 +105,17 @@ func (p *PeerNode) HandlePullReplyPacket(packet Packet) {
 
 	// Apply all transactions contained in the PULL-REPLY packet on our local ledger
 	p.applyAllTransactions(packet.TransactionsSeen)
+
+	// Apply all signed transactions contained in the PULL-REPLY packet on our local ledger
+	p.applyAllSignedTransactions(packet.SignedTransactionsSeen)
+}
+func (p *PeerNode) applyAllSignedTransactions(signedTransactions []SignedTransaction) {
+	p.debugPrintln("Applying ", len(signedTransactions), " signed transactions")
+	for _, signedTransaction := range signedTransactions {
+		p.debugPrintln("Applying signed transaction: " + signedTransaction.ToString())
+		p.LocalLedger.ApplySignedTransaction(signedTransaction)
+		p.SignedTransactionsSeen.Append(signedTransaction)
+	}
 }
 func (p *PeerNode) applyAllTransactions(transactions []Transaction) {
 	p.debugPrintln("Applying all transactions:", transactions)

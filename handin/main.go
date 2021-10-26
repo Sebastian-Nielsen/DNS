@@ -14,6 +14,7 @@ func main() {
 		MessagesSent:        SafeSet_string{ Values: make(map[string  ]bool) },
 		Ipc:                 IPC{ ConnToEncDecPair: make(map[net.Conn]EncoderDecoderPair) },
 		TestMock:            Mock{ ShouldMockInput: false, ShouldPrintDebug: true },
+		Keys:         		 GetKeyPair(2000),
 	}
 
 	peerNode.Start("", "")

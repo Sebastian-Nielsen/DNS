@@ -55,3 +55,29 @@ func (a *SafeArray_Transaction) Contains(transactionToSearchFor Account.Transact
 	}
 	return false
 }
+
+
+type SafeArray_SignedTransaction struct {
+	values []Account.SignedTransaction
+	mu     sync.Mutex
+}
+func (a *SafeArray_SignedTransaction) Append(value Account.SignedTransaction) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	a.values = append(a.values, value)
+}
+func (a *SafeArray_SignedTransaction) Values() []Account.SignedTransaction {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	cpy := make([]Account.SignedTransaction, len(a.values))
+	copy(cpy, a.values)
+	return cpy
+}
+func (a *SafeArray_SignedTransaction) Contains(transactionToSearchFor Account.SignedTransaction) bool {
+	for _, val := range a.values {
+		if val == transactionToSearchFor {
+			return true
+		}
+	}
+	return false
+}

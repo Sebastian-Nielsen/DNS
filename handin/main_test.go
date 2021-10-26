@@ -28,19 +28,81 @@ func createPeerNode( shouldMockInput bool, shouldPrintDebug bool ) PeerNode {
 		LocalLedger:         MakeLedger(),
 		TestMock:            Mock{ ShouldMockInput: shouldMockInput, 
 								   ShouldPrintDebug: shouldPrintDebug },
+	    Keys:                GetKeyPair(2000),
 	}
 }
 
 
 
+func TestSignedTransactionsAreBroadcastedAndAppliedOnAllPeerNodes(t *testing.T) {
+	t.Parallel()
 
+	var peerNode1_port = AvailablePorts.Next()
+	var peerNode2_port = AvailablePorts.Next()
+	var peerNode3_port = AvailablePorts.Next()
 
-func TestUseThisToDebug(t *testing.T) {
-	pk, sk := GetKeys(2000)
-	msg := "test123123"
-	sign := CreateSignature(msg, sk)
-	fmt.Println(Verify(sign, msg, pk))
+	peerNode1 := createPeerNode(true, true)
+	peerNode2 := createPeerNode(true, true)
+	peerNode3 := createPeerNode(true, true)
 
+	goStart(&peerNode1, peerNode1_port, "no_port")
+	goStart(&peerNode2, peerNode2_port, peerNode1_port)
+	goStart(&peerNode3, peerNode3_port, peerNode2_port)
+
+	AccountNames := []string{peerNode1.Keys.Pk.ToString(),
+							 peerNode2.Keys.Pk.ToString(),
+							 peerNode3.Keys.Pk.ToString()}
+	initialAmounts := []int{100, 0, 40}
+	makeAccountsAt(&peerNode1, AccountNames, initialAmounts)
+	makeAccountsAt(&peerNode2, AccountNames, initialAmounts)
+	makeAccountsAt(&peerNode3, AccountNames, initialAmounts)
+
+	time.Sleep(1 * time.Second)
+
+	// Test all signed transactions got received and applied
+	peerNode1.MakeAndBroadcastSignedTransaction(20, "tran1", AccountNames[0], AccountNames[1])
+
+	time.Sleep(1 * time.Second)
+
+	if peerNode1.LocalLedger.Accounts[AccountNames[0]] != initialAmounts[0]-20 {
+		t.Error("ApplyTransaction 'tran1' from 'acc1' to 'acc2' on peerNode1 didn't apply to 'acc1' on peerNode1.",
+			"\nnpeerNode1 Accounts:", peerNode1.LocalLedger.Accounts, "\n")
+	}
+	if peerNode1.LocalLedger.Accounts[AccountNames[1]] != initialAmounts[1]+20 {
+		t.Error("ApplyTransaction 'tran1' from 'acc1' to 'acc2' on peerNode1 didn't apply to 'acc2' on peerNode1.",
+			"\nnpeerNode1 Accounts:", peerNode1.LocalLedger.Accounts, "\n")
+	}
+	if peerNode3.LocalLedger.Accounts[AccountNames[0]] != initialAmounts[0]-20 {
+		t.Error("ApplyTransaction 'tran1' from 'acc1' to 'acc2' on peerNode1 didn't apply to 'acc1' on peerNode3.",
+			"\nnpeerNode1 Accounts:", peerNode3.LocalLedger.Accounts, "\n")
+	}
+	if peerNode3.LocalLedger.Accounts[AccountNames[1]] != initialAmounts[1]+20 {
+		t.Error("ApplyTransaction 'tran1' from 'acc1' to 'acc2' on peerNode1 didn't apply to 'acc2' on peerNode3.",
+			"\nnpeerNode1 Accounts:", peerNode3.LocalLedger.Accounts, "\n")
+	}
+
+	// Test that transaction with negative amount is denied
+	peerNode2.MakeAndBroadcastSignedTransaction(-10, "tran2", AccountNames[1], AccountNames[2])
+
+	time.Sleep(1 * time.Second)
+
+	if peerNode1.LocalLedger.Accounts[AccountNames[2]] != initialAmounts[2] {
+		t.Error("ApplyTransaction 'tran2' from 'acc2' to 'acc3' on peerNode2 applied to 'acc3' on peerNode1 " +
+			"despite the amount being negative.",
+			"\npeerNode1 Accounts:", peerNode1.LocalLedger.Accounts, "\n")
+	}
+
+	// Test that a transaction with a wrong key is denied (peernode2 tries to make a transaction
+	// from peernode3's account)
+	peerNode2.MakeAndBroadcastSignedTransaction(10, "tran3", AccountNames[2], AccountNames[1])
+
+	time.Sleep(1 * time.Second)
+
+	if peerNode1.LocalLedger.Accounts[AccountNames[2]] != initialAmounts[2] {
+		t.Error("ApplyTransaction 'tran3' from 'acc3' to 'acc2' on peerNode2 applied to 'acc3' on peerNode1 " +
+			"despite the signed transaction having the wrong secret key.",
+			"\npeerNode1 Accounts:", peerNode1.LocalLedger.Accounts, "\n")
+	}
 }
 
 func TestReceiverPeernodeVerifiesSignatureOnReceivedSignedTransaction(t *testing.T) {
@@ -48,8 +110,6 @@ func TestReceiverPeernodeVerifiesSignatureOnReceivedSignedTransaction(t *testing
 
 	ledger1 := MakeLedger()
 	id_1, pk_1, sk_1 := createAccountAt(ledger1)
-	//fmt.Println("start\n\n\n" + pk_1.ToString())
-
 
 	ledger2 := MakeLedger()
 	_, pk_2, _ := createAccountAt(ledger2)
@@ -59,11 +119,20 @@ func TestReceiverPeernodeVerifiesSignatureOnReceivedSignedTransaction(t *testing
 	signedTransaction := ledger1.MakeSignedTransaction(transaction, sk_1)
 
 	// Account_2 at ledger_2 verifies the signed transaction
-	isVerified := ledger1.Verify(signedTransaction)
+	isVerified := ledger2.Verify(signedTransaction)
 	if !isVerified {
 		t.Error("\nError: the signedTransaction (" + signedTransaction.ToString() + "\n) should be verified")
 	}
 
+}
+func TestCreateSignatureAndVerifyFunctions(t *testing.T) {
+	pk, sk := GetKeys(2000)
+	msg := "test123123"
+	signature := CreateSignature(msg, sk)
+	isVerified := Verify(signature, msg, pk)
+	if !isVerified {
+		t.Error("Verify function on signature (" + signature[:10] + "...) was false for msg: " + msg)
+	}
 }
 func createAccountAt(ledger *Ledger) (string, PublicKey, SecretKey) {
 	pk, sk := GetKeys(2000)
@@ -71,53 +140,6 @@ func createAccountAt(ledger *Ledger) (string, PublicKey, SecretKey) {
 	ledger.CreateAccount(id, 10)
 	return id, pk, sk
 }
-
-//func TestSignedTransactionsAreBroadcastedAndAppliedOnAllPeerNodes(t *testing.T) {
-//	t.Parallel()
-//
-//	var peerNode1_port = AvailablePorts.Next()
-//	var peerNode2_port = AvailablePorts.Next()
-//	var peerNode3_port = AvailablePorts.Next()
-//
-//	peerNode1 := createPeerNode(true, true)
-//	peerNode2 := createPeerNode(true, true)
-//	peerNode3 := createPeerNode(true, true)
-//
-//	goStart(&peerNode1, peerNode1_port, "no_port")
-//	goStart(&peerNode2, peerNode2_port, peerNode1_port)
-//	goStart(&peerNode3, peerNode3_port, peerNode2_port)
-//
-//	IDs 	       := []string{"acc1", "acc2", "acc3"}
-//	initialAmounts := []int{      100,      0,     40}
-//	makeAccounts(&peerNode1, IDs, initialAmounts)
-//	makeAccounts(&peerNode2, IDs, initialAmounts)
-//	makeAccounts(&peerNode3, IDs, initialAmounts)
-//
-//	time.Sleep(1 * time.Second)
-//
-//	peerNode1.MakeAndBroadcastSignedTransaction(20, "tran1", IDs[0], IDs[1])
-//
-//	time.Sleep(1 * time.Second)
-//
-//	if peerNode1.LocalLedger.Accounts[IDs[0]] != initialAmounts[0]-20 {
-//		t.Error("ApplyTransaction 'tran1' from 'acc1' to 'acc2' on peerNode1 didn't apply to acc1' on peerNode1.",
-//			"\nnpeerNode1 Accounts:", peerNode1.LocalLedger.Accounts, "\n")
-//	}
-//	if peerNode1.LocalLedger.Accounts[IDs[1]] != initialAmounts[1]+20 {
-//		t.Error("ApplyTransaction 'tran1' from 'acc1' to 'acc2' on peerNode1 didn't apply to 'acc2' on peerNode1.",
-//			"\nnpeerNode1 Accounts:", peerNode1.LocalLedger.Accounts, "\n")
-//	}
-//	if peerNode3.LocalLedger.Accounts[IDs[0]] != initialAmounts[0]-20 {
-//		t.Error("ApplyTransaction 'tran1' from 'acc1' to 'acc2' on peerNode1 didn't apply to 'acc1' on peerNode3.",
-//			"\nnpeerNode1 Accounts:", peerNode3.LocalLedger.Accounts, "\n")
-//	}
-//	if peerNode3.LocalLedger.Accounts[IDs[1]] != initialAmounts[1]+20 {
-//		t.Error("ApplyTransaction 'tran1' from 'acc1' to 'acc2' on peerNode1 didn't apply to 'acc2' on peerNode3.",
-//			"\nnpeerNode1 Accounts:", peerNode3.LocalLedger.Accounts, "\n")
-//	}
-//}
-
-
 func TestRSAsigningTime(t *testing.T) {
 	_, sk := GetKeys(200)
 	msg := big.NewInt( 25632212678324 )
@@ -228,9 +250,9 @@ func TestNewcomerNodeReceivesAllTransactionsAppliedBeforeItEnteredNetwork(t *tes
 
 	IDs 	:= []string{"acc1", "acc2", "acc3"}
 	amounts := []int{      100,      0, 40}
-	makeAccounts(&peerNode1, IDs, amounts)
-	makeAccounts(&peerNode2, IDs, amounts)
-	makeAccounts(&peerNode3, IDs, amounts)
+	makeAccountsAt(&peerNode1, IDs, amounts)
+	makeAccountsAt(&peerNode2, IDs, amounts)
+	makeAccountsAt(&peerNode3, IDs, amounts)
 
 	//time.Sleep(4 * time.Second)
 
@@ -242,7 +264,7 @@ func TestNewcomerNodeReceivesAllTransactionsAppliedBeforeItEnteredNetwork(t *tes
 
 	time.Sleep(1 * time.Second)
 
-	makeAccounts(&peerNode4, IDs, amounts)
+	makeAccountsAt(&peerNode4, IDs, amounts)
 	goStart(&peerNode4, peerNode4_port, peerNode2_port)
 
 	time.Sleep(1 * time.Second)
@@ -281,9 +303,9 @@ func TestTransactionsAreBroadcastedAndAppliedOnAllPeerNodes(t *testing.T) {
 
 	IDs 	:= []string{"acc1", "acc2", "acc3"}
 	amounts := []int{      100,      0,     40}
-	makeAccounts(&peerNode1, IDs, amounts)
-	makeAccounts(&peerNode2, IDs, amounts)
-	makeAccounts(&peerNode3, IDs, amounts)
+	makeAccountsAt(&peerNode1, IDs, amounts)
+	makeAccountsAt(&peerNode2, IDs, amounts)
+	makeAccountsAt(&peerNode3, IDs, amounts)
 
 	time.Sleep(1 * time.Second)
 
@@ -292,7 +314,7 @@ func TestTransactionsAreBroadcastedAndAppliedOnAllPeerNodes(t *testing.T) {
 	time.Sleep(1 * time.Second)
 
 	if peerNode1.LocalLedger.Accounts[IDs[0]] != amounts[0]-20 {
-		t.Error("ApplyTransaction 'tran1' from 'acc1' to 'acc2' on peerNode1 didn't apply to acc1' on peerNode1.",
+		t.Error("ApplyTransaction 'tran1' from 'acc1' to 'acc2' on peerNode1 didn't apply to 'acc1' on peerNode1.",
 			"\nnpeerNode1 Accounts:", peerNode1.LocalLedger.Accounts, "\n")
 	}
 	if peerNode1.LocalLedger.Accounts[IDs[1]] != amounts[1]+20 {
@@ -557,7 +579,7 @@ func goStart(peerNode *PeerNode, atPort string, remotePort string) {
 	time.Sleep(250 * time.Millisecond)
 }
 
-func makeAccounts(peerNode *PeerNode, IDs []string, startAmounts []int){
+func makeAccountsAt(peerNode *PeerNode, IDs []string, startAmounts []int){
 	for i, id := range IDs {
 		peerNode.CreateAccountInLedger(id, startAmounts[i])
 	}

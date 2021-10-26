@@ -2,6 +2,7 @@ package Account
 
 import (
 	. "DNO/handin/Cryptography"
+	"fmt"
 	"math/big"
 	"strconv"
 	"strings"
@@ -17,7 +18,7 @@ type SignedTransaction struct {
 
 func (s *SignedTransaction) ToString() string {
 	return "\n" +
-			"ID:   " + s.ID[:8] + "\n" +
+			"ID:   " + s.ID + "\n" +
 			"From: " + s.From[:8] + "\n" +
 			"To:   " + s.To[:8] + "\n" +
 			"Amount: " + strconv.Itoa(s.Amount) + "\n" +
@@ -31,11 +32,17 @@ func (l *Ledger) ApplySignedTransaction(t SignedTransaction) {
 	 * the public key t.From.
 	 */
 	validSignature := l.Verify(t)
-
-	if validSignature {
-		l.Accounts[t.From] -= t.Amount
-		l.Accounts[t.To] += t.Amount
+	amountPositive := t.Amount > 0
+	if !validSignature  {
+		fmt.Printf("Signature is invalid! Transaction from (%s...) to (%s...).\n", t.From[:8], t.To[:8])
+		return
 	}
+	if !amountPositive {
+		fmt.Printf("The amount %d on the signed transaction is negative\n", t.Amount)
+		return
+	}
+	l.Accounts[t.From] -= t.Amount
+	l.Accounts[t.To] += t.Amount
 }
 
 func (l *Ledger) MakeSignedTransaction(t Transaction, sk SecretKey) SignedTransaction {

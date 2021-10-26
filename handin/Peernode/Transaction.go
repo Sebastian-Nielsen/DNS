@@ -15,16 +15,17 @@ func (p *PeerNode) CreateAccountInLedger(id string, initialAmount int) {
 
 func (p *PeerNode) MakeAndBroadcastSignedTransaction(amount int, id string, from string, to string) {
 	transaction := Transaction{ID: id, From: from, To: to, Amount: amount}
+	signedTransaction := p.LocalLedger.MakeSignedTransaction(transaction, p.Keys.Sk)
 
-	p.debugPrintln("Applying transaction:", transaction, ". Accounts before:", p.LocalLedger.Accounts)
-	p.LocalLedger.ApplyTransaction(&transaction)
-	p.TransactionsSeen.Append(transaction)
-	p.debugPrintln("Applying transaction:", transaction, ". Accounts after:", p.LocalLedger.Accounts)
+	p.debugPrintln("Applying signed-transaction:", signedTransaction.ToString())//, ". Accounts before:", p.LocalLedger.Accounts)
+	p.LocalLedger.ApplySignedTransaction(signedTransaction)
+	p.SignedTransactionsSeen.Append(signedTransaction)
+	p.debugPrintln("Applying signed-transaction:", signedTransaction.ToString())//, ". Accounts after:", p.LocalLedger.Accounts)
 
 	p.Broadcast(
 		Packet{
-			Type: PacketType.BROADCAST_TRANSACTION,
-			Transaction: transaction,
+			Type: PacketType.BROADCAST_SIGNED_TRANSACTION,
+			SignedTransaction: signedTransaction,
 		},
 	)
 }

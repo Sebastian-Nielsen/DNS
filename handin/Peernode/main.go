@@ -2,6 +2,7 @@ package Peernode
 
 import (
 	. "DNO/handin/Account"
+	. "DNO/handin/Cryptography"
 	. "DNO/handin/Helper"
 	"fmt"
 	"net"
@@ -21,14 +22,20 @@ import (
 	- Occassionally send a pull request to a neighbor (taking turns)
 */
 type PeerNode struct {
-	OpenConnections     SafeSet_Conn
-	PeersInArrivalOrder SafeArray_string
-	MessagesSent        SafeSet_string
-	Listener            net.Listener
-	Ipc                 IPC
-	TestMock            Mock
-	LocalLedger         *Ledger
-	TransactionsSeen   SafeArray_Transaction
+	OpenConnections     	SafeSet_Conn
+	PeersInArrivalOrder 	SafeArray_string
+	MessagesSent        	SafeSet_string
+	Listener            	net.Listener
+	Ipc                 	IPC
+	TestMock            	Mock
+	LocalLedger         	*Ledger
+	TransactionsSeen    	SafeArray_Transaction
+	SignedTransactionsSeen  SafeArray_SignedTransaction
+	Keys				    KeyPair
+}
+type KeyPair struct {
+	Pk PublicKey
+	Sk SecretKey
 }
 
 /*
@@ -186,6 +193,9 @@ func (p *PeerNode) PullFromNeighbors() {
 		}
 	}
 }
-
+func GetKeyPair(k int) KeyPair {
+	pk, sk := GetKeys(k)
+	return KeyPair{ Pk: pk, Sk: sk }
+}
 
 
