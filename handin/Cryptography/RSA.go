@@ -140,6 +140,8 @@ func Verify(signature string, msg string, pk PublicKey) bool {
 	msgByteArr := []byte(msg)
 	msgBigInt := new(big.Int)
 	msgBigInt.SetBytes(msgByteArr)
+	fmt.Println("Vefify ----")
+	fmt.Println("msg: " + msg + "\nbigint: " + signature)
 	return BigInt_verify(sigBigInt, msgBigInt, pk)
 }
 
@@ -159,5 +161,6 @@ func CreateSignature(msg string, sk SecretKey) string {
 	byteArr := []byte(msg)
 	bigInt := new(big.Int)
 	bigInt.SetBytes(byteArr)
+	fmt.Println("msg: " + msg + "\nbigint: " + bigInt.String())
 	return BigInt_createSignature(bigInt, sk).String()
 }

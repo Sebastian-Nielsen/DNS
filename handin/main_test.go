@@ -36,11 +36,18 @@ func createPeerNode( shouldMockInput bool, shouldPrintDebug bool ) PeerNode {
 
 
 func TestUseThisToDebug(t *testing.T) {
-	pk, sk := GetKeys(2000)
-	msg := "123hellothere123"
-	sign := CreateSignature(msg, sk)
+	// pk, sk := GetKeys(2000)
+	// msg := "123hellothere123"
+	// sign := CreateSignature(msg, sk)
 
-	fmt.Printf("Verified: %t\n", Verify(sign, msg, pk))
+	// fmt.Printf("Verified: %t\n", Verify(sign, msg, pk))
+	a := big.NewInt(int64(123123123))
+	x := []byte(a.String())
+	y := new(big.Int)
+	y.SetBytes(x)
+	fmt.Print("a: " + a.String() +  "\nb: ")
+	fmt.Println(x)
+	fmt.Println("c: " + y.String())
 }
 
 func TestReceiverPeernodeVerifiesSignatureOnReceivedSignedTransaction(t *testing.T) {
