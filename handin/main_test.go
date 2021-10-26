@@ -36,18 +36,11 @@ func createPeerNode( shouldMockInput bool, shouldPrintDebug bool ) PeerNode {
 
 
 func TestUseThisToDebug(t *testing.T) {
-	// pk, sk := GetKeys(2000)
-	// msg := "123hellothere123"
-	// sign := CreateSignature(msg, sk)
+	pk, sk := GetKeys(2000)
+	msg := "test123123"
+	sign := CreateSignature(msg, sk)
+	fmt.Println(Verify(sign, msg, pk))
 
-	// fmt.Printf("Verified: %t\n", Verify(sign, msg, pk))
-	a := big.NewInt(int64(123123123))
-	x := []byte(a.String())
-	y := new(big.Int)
-	y.SetBytes(x)
-	fmt.Print("a: " + a.String() +  "\nb: ")
-	fmt.Println(x)
-	fmt.Println("c: " + y.String())
 }
 
 func TestReceiverPeernodeVerifiesSignatureOnReceivedSignedTransaction(t *testing.T) {
@@ -55,6 +48,8 @@ func TestReceiverPeernodeVerifiesSignatureOnReceivedSignedTransaction(t *testing
 
 	ledger1 := MakeLedger()
 	id_1, pk_1, sk_1 := createAccountAt(ledger1)
+	//fmt.Println("start\n\n\n" + pk_1.ToString())
+
 
 	ledger2 := MakeLedger()
 	_, pk_2, _ := createAccountAt(ledger2)
@@ -64,13 +59,12 @@ func TestReceiverPeernodeVerifiesSignatureOnReceivedSignedTransaction(t *testing
 	signedTransaction := ledger1.MakeSignedTransaction(transaction, sk_1)
 
 	// Account_2 at ledger_2 verifies the signed transaction
-	isVerified := ledger2.Verify(signedTransaction)
+	isVerified := ledger1.Verify(signedTransaction)
 	if !isVerified {
-		t.Error("Error: the signedTransaction (" + signedTransaction.ToString() + ") should be verified")
+		t.Error("\nError: the signedTransaction (" + signedTransaction.ToString() + "\n) should be verified")
 	}
 
 }
-
 func createAccountAt(ledger *Ledger) (string, PublicKey, SecretKey) {
 	pk, sk := GetKeys(2000)
 	id := CreateSignature(pk.ToString(), sk)
@@ -160,17 +154,17 @@ func TestHashingTime(t *testing.T) {
 
 
 
-func TestRSAsigning(t *testing.T) {
+func TestRSASigning(t *testing.T) {
 	pk, sk := GetKeys(2000)
 	msg := big.NewInt( 25632212678324 )
 
 	// CreateSignature the message with the secret key
-	signedMsg := BigInt_createSignature(msg, sk)
+	signature := BigInt_createSignature(msg, sk)
 	
 	// BigInt_verify the signed message against msg using the public key
-	verified := BigInt_verify(signedMsg, msg, pk)
+	verified := BigInt_verify(signature, msg, pk)
 	if !verified {
-		t.Error("Signed message '" + Encrypt(signedMsg, pk).String() +
+		t.Error("Signed message '" + Encrypt(signature, pk).String() +
 			"' was not verified for original message: " + msg.String())
 	}
 
@@ -178,7 +172,7 @@ func TestRSAsigning(t *testing.T) {
 	modifiedMsg := big.NewInt(0).Add(msg, big.NewInt(1))
 
 	// Since the signature is modified, we shouldn't get verification
-	verified = BigInt_verify(signedMsg, modifiedMsg, pk)
+	verified = BigInt_verify(signature, modifiedMsg, pk)
 	if verified {
 		t.Error("The modified message '" + Encrypt(modifiedMsg, pk).String() +
 			"' was wrongly verified for original message: " + msg.String())

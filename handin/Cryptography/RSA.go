@@ -128,20 +128,31 @@ func BigInt_verify(signature *big.Int, msg *big.Int, pk PublicKey) bool {
 	hashedMsg := new(big.Int)
 	hashedMsg.SetBytes(Hash(msg))
 	unsignedMsg := Encrypt(signature, pk)
+	//fmt.Println("Verify2 ----")
+	//fmt.Println("msg: " + msg.String() + "\nhashed: " + hashedMsg.String())
+	//fmt.Println("bigint: " + unsignedMsg.String() + "\nsignature: " + signature.String())
 	return hashedMsg.Cmp(unsignedMsg) == 0
 }
 
 func Verify(signature string, msg string, pk PublicKey) bool {
 	// convert {signature} of type string to big.Int
-	sigByteArr := []byte(signature)
+	/*sigByteArr := []byte(signature)
 	sigBigInt := new(big.Int)
-	sigBigInt.SetBytes(sigByteArr)
+	sigBigInt.SetBytes(sigByteArr)*/
+
+	sigBigInt := new(big.Int)
+	sigBigInt.SetString(signature, 10)
+
+
 	// convert {msg} of type string to big.Int
 	msgByteArr := []byte(msg)
 	msgBigInt := new(big.Int)
 	msgBigInt.SetBytes(msgByteArr)
-	fmt.Println("Vefify ----")
-	fmt.Println("msg: " + msg + "\nbigint: " + signature)
+
+
+	//fmt.Println("Vefify1 ----")
+	//fmt.Println("msg: " + msg + "\nbigint: " + msgBigInt.String())
+	//fmt.Println("signature: " + signature + "\nbigint: " + sigBigInt.String())
 	return BigInt_verify(sigBigInt, msgBigInt, pk)
 }
 
@@ -154,6 +165,8 @@ func Hash(msg *big.Int) []byte {
 func BigInt_createSignature(msg *big.Int, sk SecretKey) *big.Int {
 	hashedMsg := new(big.Int)
 	hashedMsg.SetBytes(Hash(msg))
+	//fmt.Println("sign2 ----")
+	//fmt.Println("msg: " + msg.String() + "\nhashed: " + hashedMsg.String())
 	return Decrypt(hashedMsg, sk)
 }
 
@@ -161,6 +174,10 @@ func CreateSignature(msg string, sk SecretKey) string {
 	byteArr := []byte(msg)
 	bigInt := new(big.Int)
 	bigInt.SetBytes(byteArr)
-	fmt.Println("msg: " + msg + "\nbigint: " + bigInt.String())
+
+
+	//fmt.Println("Sign ----")
+	//fmt.Println("msg: " + msg + "\nbigint: " + bigInt.String())
+	//fmt.Println("after: " + BigInt_createSignature(bigInt, sk).String())
 	return BigInt_createSignature(bigInt, sk).String()
 }

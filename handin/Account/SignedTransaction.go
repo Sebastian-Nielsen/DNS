@@ -56,12 +56,12 @@ func (l *Ledger) Verify(st SignedTransaction) bool {
 }
 
 func extractPublicKeyFrom(st SignedTransaction) PublicKey {
-	y := strings.Split(st.To, ":")
+	y := strings.Split(st.From, ":")
 
-	i, _ := strconv.Atoi(y[0])
-	j, _ := strconv.Atoi(y[0])
-	n := big.NewInt(int64(i))
-	e := big.NewInt(int64(j))
+	n := new(big.Int)
+	e := new(big.Int)
+	n.SetString(y[0], 10)
+	e.SetString(y[1], 10)
 
 	return PublicKey{ N: n, E: e}
 }

@@ -5,26 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a473623c-3760-4b60-9758-0b085a2e5373" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/handin/Account/SignedTransaction.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/handin/Peernode/Incoming.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/handin/Peernode/Outgoing.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/handin/Peernode/Server.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/handin/Peernode/Transaction.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/handin/Peernode/main.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/handin/Peernode/printMethods.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/temp.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handin/Account/Ledger.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Account/Ledger.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handin/Account/Transaction.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Account/Transaction.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/handin/Cryptography/RSA.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Cryptography/RSA.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handin/Helper/SafeSet.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Helper/SafeSet.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handin/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/handin/main_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/main_test.go" afterDir="false" />
     </list>
     <list id="e9a7fb15-2854-49e4-a42f-7419d36ff913" name="Changes by Andreas 🌚" comment="">
+      <change beforePath="$PROJECT_DIR$/handin/Account/SignedTransaction.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Account/SignedTransaction.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/handin/Cryptography/RSA.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Cryptography/RSA.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handin/main_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/main_test.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,40 +57,15 @@
     <auto-save>true</auto-save>
   </component>
   <component name="LineStatusTrackerManager">
-    <file path="$PROJECT_DIR$/handin/main_test.go">
-      <ranges>
-        <range start1="6" end1="6" start2="6" end2="7" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="36" end1="49" start2="37" end2="43" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="50" end1="50" start2="44" end2="116" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="53" end1="55" start2="119" end2="120" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="56" end1="57" start2="121" end2="122" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="65" end1="66" start2="130" end2="131" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="90" end1="93" start2="155" end2="156" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="95" end1="97" start2="158" end2="160" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="98" end1="100" start2="161" end2="163" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="101" end1="102" start2="164" end2="165" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="109" end1="110" start2="172" end2="173" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="111" end1="112" start2="174" end2="175" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="118" end1="121" start2="181" end2="182" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="122" end1="123" start2="183" end2="184" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="127" end1="128" start2="188" end2="189" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="187" end1="188" start2="248" end2="249" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="191" end1="192" start2="252" end2="253" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="195" end1="196" start2="256" end2="257" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="231" end1="232" start2="292" end2="293" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="235" end1="236" start2="296" end2="297" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="239" end1="240" start2="300" end2="301" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="243" end1="244" start2="304" end2="305" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-      </ranges>
-    </file>
     <file path="$PROJECT_DIR$/handin/Cryptography/RSA.go">
       <ranges>
-        <range start1="17" end1="17" start2="17" end2="21" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="36" end1="37" start2="40" end2="49" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="114" end1="115" start2="126" end2="127" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="119" end1="119" start2="131" end2="143" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="127" end1="128" start2="151" end2="152" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="133" end1="134" start2="157" end2="163" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
+        <range start1="130" end1="130" start2="130" end2="133" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
+        <range start1="135" end1="136" start2="138" end2="139" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
+        <range start1="137" end1="138" start2="140" end2="146" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
+        <range start1="142" end1="144" start2="150" end2="155" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="156" end1="156" start2="167" end2="169" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
+        <range start1="163" end1="163" start2="176" end2="179" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
+        <range start1="164" end1="164" start2="180" end2="181" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
       </ranges>
     </file>
   </component>
@@ -146,8 +109,8 @@
       <recent name="C:\Users\sebas\GolandProjects\Distribuerede_systemer_og_sikkerhed\exercise2-2" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Test.TestUseThisToDebug in DNO/handin">
-    <configuration name="TestRSAsigningTime in DNO/handin (1)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Go Test.TestReceiverPeernodeVerifiesSignatureOnReceivedSignedTransaction in DNO/handin (1)">
+    <configuration name="TestRSAsigning in DNO/handin" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="DNO" />
       <working_directory value="$PROJECT_DIR$/handin" />
       <root_directory value="$PROJECT_DIR$" />
@@ -156,10 +119,22 @@
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <pattern value="^\QTestRSAsigningTime\E$" />
+      <pattern value="^\QTestRSAsigning\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestReceiverPeernodeVerifiesSignatureOnReceivedSignedTransaction in DNO/handin" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestReceiverPeernodeVerifiesSignatureOnReceivedSignedTransaction in DNO/handin (1)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="DNO" />
+      <working_directory value="$PROJECT_DIR$/handin" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="DNO/handin" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/handin/main_test.go" />
+      <framework value="gotest" />
+      <pattern value="^\QTestReceiverPeernodeVerifiesSignatureOnReceivedSignedTransaction\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestUseThisToDebug in DNO/handin (1)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="DNO" />
       <working_directory value="$PROJECT_DIR$/handin" />
       <root_directory value="$PROJECT_DIR$" />
@@ -168,7 +143,7 @@
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <pattern value="^\QTestReceiverPeernodeVerifiesSignatureOnReceivedSignedTransaction\E$" />
+      <pattern value="^\QTestUseThisToDebug\E$" />
       <method v="2" />
     </configuration>
     <configuration name="TestUseThisToDebug in DNO/handin" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -183,18 +158,7 @@
       <pattern value="^\QTestUseThisToDebug\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="main_test.go (1)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="DNO" />
-      <working_directory value="$PROJECT_DIR$/handin" />
-      <root_directory value="$PROJECT_DIR$" />
-      <kind value="FILE" />
-      <package value="DNO" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/handin/main_test.go" />
-      <framework value="gotest" />
-      <method v="2" />
-    </configuration>
-    <configuration name="main_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="main_test.go (2)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="DNO" />
       <working_directory value="$PROJECT_DIR$/handin" />
       <root_directory value="$PROJECT_DIR$" />
@@ -207,11 +171,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.TestReceiverPeernodeVerifiesSignatureOnReceivedSignedTransaction in DNO/handin (1)" />
+        <item itemvalue="Go Test.TestUseThisToDebug in DNO/handin (1)" />
+        <item itemvalue="Go Test.TestRSAsigning in DNO/handin" />
+        <item itemvalue="Go Test.main_test.go (2)" />
         <item itemvalue="Go Test.TestUseThisToDebug in DNO/handin" />
-        <item itemvalue="Go Test.TestReceiverPeernodeVerifiesSignatureOnReceivedSignedTransaction in DNO/handin" />
-        <item itemvalue="Go Test.main_test.go (1)" />
-        <item itemvalue="Go Test.main_test.go" />
-        <item itemvalue="Go Test.TestRSAsigningTime in DNO/handin (1)" />
       </list>
     </recent_temporary>
   </component>
@@ -236,5 +200,16 @@
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/handin/main_test.go</url>
+          <line>74</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
