@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"math/big"
+	"strings"
 )
 
 type PublicKey struct {
@@ -18,6 +19,28 @@ type SecretKey struct {
 
 func (p *PublicKey) ToString() string {
 	return p.N.String() + ":" + p.E.String()
+}
+
+func (p *SecretKey) ToString() string {
+	return p.N.String() + ":" + p.D.String()
+}
+func ToSecretKey (sk string) SecretKey{
+	y := strings.Split(sk, ":")
+
+	n := new(big.Int)
+	d := new(big.Int)
+	n.SetString(y[0], 10)
+	d.SetString(y[1], 10)
+	return SecretKey{N: n, D: d}
+}
+func ToPublicKey (pk string) PublicKey{
+	y := strings.Split(pk, ":")
+
+	n := new(big.Int)
+	e := new(big.Int)
+	n.SetString(y[0], 10)
+	e.SetString(y[1], 10)
+	return PublicKey{N: n, E: e}
 }
 
 

@@ -3,9 +3,7 @@ package Account
 import (
 	. "DNO/handin/Cryptography"
 	"fmt"
-	"math/big"
 	"strconv"
-	"strings"
 )
 
 type SignedTransaction struct {
@@ -58,17 +56,6 @@ func (l *Ledger) MakeSignedTransaction(t Transaction, sk SecretKey) SignedTransa
 
 func (l *Ledger) Verify(st SignedTransaction) bool {
 	msg := st.ID + ":" + st.From + ":" + st.To + ":" + strconv.Itoa(st.Amount)
-	pk := extractPublicKeyFrom(st)
+	pk := ToPublicKey(st.From)
 	return Verify(st.Signature, msg, pk)
-}
-
-func extractPublicKeyFrom(st SignedTransaction) PublicKey {
-	y := strings.Split(st.From, ":")
-
-	n := new(big.Int)
-	e := new(big.Int)
-	n.SetString(y[0], 10)
-	e.SetString(y[1], 10)
-
-	return PublicKey{ N: n, E: e}
 }

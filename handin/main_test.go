@@ -34,6 +34,128 @@ func createPeerNode( shouldMockInput bool, shouldPrintDebug bool ) PeerNode {
 
 
 
+// ============================================ crypto tests ========= START
+func TestGenerateAndSignature(t *testing.T) {
+	validPassword := "AB$45btc"
+	filename := "test_1"
+	msg := "this is the msg"
+
+	pk, _ := Generate(filename, validPassword)
+
+	// Try to get signature with correct validPassword
+	signature, _ := Sign(filename, validPassword, []byte(msg))
+	isValidSignature := !Verify(signature, msg, pk)
+	if !isValidSignature {
+		t.Error("Signature was not verified")
+	}
+
+	// Try to get signature with invalid validPassword
+	_, err := Sign(filename, validPassword, []byte(msg))
+	if err != nil {
+		t.Error("A signature was generated with the wrong Password")
+	}
+
+	// Try to Generate wallet using a weak validPassword
+	_, err = Generate("file", "weak password")
+	if err == nil {
+		t.Error("Accepted a weak password for encryption")
+	}
+}
+
+
+func TestRSAsigningTime(t *testing.T) {
+	_, sk := GetKeys(200)
+	msg := big.NewInt( 25632212678324 )
+	fmt.Println("d:", sk.D.BitLen())
+
+	hashedMsg := new(big.Int)
+	hashedMsg.SetBytes(Hash(msg))
+
+	// Time the signing of a hash. Since our signing function computes the hash
+	// we just manually compute the hash and the time just the signing (which is the
+	// same as what our Decrypt function does)
+	startTime := time.Now()
+	Decrypt(hashedMsg, sk)
+	timeElapsed := time.Since(startTime)
+
+	bitsPerSec := float64(hashedMsg.BitLen() + 1) / timeElapsed.Seconds()
+	fmt.Printf("It took %s to sign a hashed message of size 256 bits = %f bits per sec", timeElapsed.String(), bitsPerSec)
+}
+
+func TestHashingTime(t *testing.T) {
+	data := make([]byte, 10000)
+	rand.Read(data)
+	msg := new(big.Int)
+	msg.SetBytes(data)
+
+	// Time the hashing of the message
+	startTime := time.Now()
+	Hash(msg)
+	timeElapsed := time.Since(startTime)
+
+	bitsPerSec := float64(msg.BitLen()) / timeElapsed.Seconds()
+	fmt.Printf("It took %s to hash a message of size 10.000 bytes = %f bits per sec", timeElapsed.String(), bitsPerSec)
+}
+
+
+
+func TestRSASigning(t *testing.T) {
+	pk, sk := GetKeys(2000)
+	msg := big.NewInt( 25632212678324 )
+
+	// CreateSignature the message with the secret key
+	signature := BigInt_createSignature(msg, sk)
+
+	// BigInt_verify the signed message against msg using the public key
+	verified := BigInt_verify(signature, msg, pk)
+	if !verified {
+		t.Error("Signed message '" + Encrypt(signature, pk).String() +
+			"' was not verified for original message: " + msg.String())
+	}
+
+	// Modify the msg by adding 1
+	modifiedMsg := big.NewInt(0).Add(msg, big.NewInt(1))
+
+	// Since the signature is modified, we shouldn't get verification
+	verified = BigInt_verify(signature, modifiedMsg, pk)
+	if verified {
+		t.Error("The modified message '" + Encrypt(modifiedMsg, pk).String() +
+			"' was wrongly verified for original message: " + msg.String())
+	}
+}
+
+func TestEncryptionAndDecryptionWithRSAandAES(t *testing.T) {
+	// RSA decrypt
+	pk, sk := GetKeys(2000)
+	msg := big.NewInt( 8795378532487390 )
+	RSAEncryptedMsg := Encrypt(msg, pk)
+
+	// AES encrypt the secret key
+	ctr := CTR{SecretKey: GenerateNewRndmString(32)}
+	filename := "Cryptography/RSAandAEStest"
+	secretKeyString := sk.N.String() + ":" + sk.D.String()
+	ctr.EncryptToFile(filename, secretKeyString)
+
+	// AES decrypt the secret key
+	decryptionFromFile := ctr.DecryptFromFile(filename)
+
+	// Create secret key from AES decryption of the file
+	splitPos := strings.Index(decryptionFromFile, ":")
+	decrN := new(big.Int)
+	decrN.SetString(decryptionFromFile[:splitPos], 10)
+	decrD := new(big.Int)
+	decrD.SetString(decryptionFromFile[splitPos+1:], 10)
+	decryptedSecretKey := SecretKey{N:decrN, D:decrD}
+
+	// RSA decrypt with the new secret key
+	decryptedMsg := Decrypt(RSAEncryptedMsg, decryptedSecretKey)
+
+	if decryptedMsg.String() != msg.String() {
+		t.Error("Original message '" + msg.String() + "' different from decrypted message'" + decryptedMsg.String() + "'")
+	}
+}
+// ============================================ crypto tests ========= END
+
 func TestSignedTransactionsAreBroadcastedAndAppliedOnAllPeerNodes(t *testing.T) {
 	t.Parallel()
 
@@ -105,7 +227,7 @@ func TestSignedTransactionsAreBroadcastedAndAppliedOnAllPeerNodes(t *testing.T) 
 	}
 }
 
-func TestReceiverPeernodeVerifiesSignatureOnReceivedSignedTransaction(t *testing.T) {
+func TestSignedTransactions(t *testing.T) {
 	t.Parallel()
 
 	ledger1 := MakeLedger()
@@ -140,97 +262,7 @@ func createAccountAt(ledger *Ledger) (string, PublicKey, SecretKey) {
 	ledger.CreateAccount(id, 10)
 	return id, pk, sk
 }
-func TestRSAsigningTime(t *testing.T) {
-	_, sk := GetKeys(200)
-	msg := big.NewInt( 25632212678324 )
-	fmt.Println("d:", sk.D.BitLen())
 
-	hashedMsg := new(big.Int)
-	hashedMsg.SetBytes(Hash(msg))
-
-	// Time the signing of a hash. Since our signing function computes the hash
-	// we just manually compute the hash and the time just the signing (which is the
-	// same as what our Decrypt function does)
-	startTime := time.Now()
-	Decrypt(hashedMsg, sk)
-	timeElapsed := time.Since(startTime)
-
-	bitsPerSec := float64(hashedMsg.BitLen() + 1) / timeElapsed.Seconds()
-	fmt.Printf("It took %s to sign a hashed message of size 256 bits = %f bits per sec", timeElapsed.String(), bitsPerSec)
-}
-
-func TestHashingTime(t *testing.T) {
-	data := make([]byte, 10000)
-	rand.Read(data)
-	msg := new(big.Int)
-	msg.SetBytes(data)
-
-	// Time the hashing of the message
-	startTime := time.Now()
-	Hash(msg)
-	timeElapsed := time.Since(startTime)
-
-	bitsPerSec := float64(msg.BitLen()) / timeElapsed.Seconds()
-	fmt.Printf("It took %s to hash a message of size 10.000 bytes = %f bits per sec", timeElapsed.String(), bitsPerSec)
-}
-
-
-
-func TestRSASigning(t *testing.T) {
-	pk, sk := GetKeys(2000)
-	msg := big.NewInt( 25632212678324 )
-
-	// CreateSignature the message with the secret key
-	signature := BigInt_createSignature(msg, sk)
-	
-	// BigInt_verify the signed message against msg using the public key
-	verified := BigInt_verify(signature, msg, pk)
-	if !verified {
-		t.Error("Signed message '" + Encrypt(signature, pk).String() +
-			"' was not verified for original message: " + msg.String())
-	}
-
-	// Modify the msg by adding 1
-	modifiedMsg := big.NewInt(0).Add(msg, big.NewInt(1))
-
-	// Since the signature is modified, we shouldn't get verification
-	verified = BigInt_verify(signature, modifiedMsg, pk)
-	if verified {
-		t.Error("The modified message '" + Encrypt(modifiedMsg, pk).String() +
-			"' was wrongly verified for original message: " + msg.String())
-	}
-}
-
-func TestEncryptionAndDecryptionWithRSAandAES(t *testing.T) {
-	// RSA decrypt
-	pk, sk := GetKeys(2000)
-	msg := big.NewInt( 8795378532487390 )
-	RSAEncryptedMsg := Encrypt(msg, pk)
-
-	// AES encrypt the secret key
-	ctr := CTR{SecretKey: GenerateNewRndmString(32)}
-	filename := "Cryptography/RSAandAEStest"
-	secretKeyString := sk.N.String() + ":" + sk.D.String()
-	ctr.EncryptToFile(filename, secretKeyString)
-
-	// AES decrypt the secret key
-	decryptionFromFile := ctr.DecryptFromFile(filename)
-
-	// Create secret key from AES decryption of the file
-	splitPos := strings.Index(decryptionFromFile, ":")
-	decrN := new(big.Int)
-	decrN.SetString(decryptionFromFile[:splitPos], 10)
-	decrD := new(big.Int)
-	decrD.SetString(decryptionFromFile[splitPos+1:], 10)
-	decryptedSecretKey := SecretKey{N:decrN, D:decrD}
-
-	// RSA decrypt with the new secret key
-	decryptedMsg := Decrypt(RSAEncryptedMsg, decryptedSecretKey)
-
-	if decryptedMsg.String() != msg.String() {
-		t.Error("Original message '" + msg.String() + "' different from decrypted message'" + decryptedMsg.String() + "'")
-	}
-}
 func TestNewcomerNodeReceivesAllTransactionsAppliedBeforeItEnteredNetwork(t *testing.T) {
 	t.Parallel()
 

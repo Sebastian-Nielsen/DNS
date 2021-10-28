@@ -5,11 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a473623c-3760-4b60-9758-0b085a2e5373" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/handin/Cryptography/Wallet.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/handin/test_1" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handin/Account/SignedTransaction.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Account/SignedTransaction.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handin/Cryptography/RSA.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Cryptography/RSA.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/handin/main_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/main_test.go" afterDir="false" />
     </list>
     <list id="e9a7fb15-2854-49e4-a42f-7419d36ff913" name="Changes by Andreas 🌚" comment="">
-      <change beforePath="$PROJECT_DIR$/handin/main_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/main_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handin/Account/SignedTransaction.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Account/SignedTransaction.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handin/Cryptography/RSA.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Cryptography/RSA.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,12 +61,18 @@
     <auto-save>true</auto-save>
   </component>
   <component name="LineStatusTrackerManager">
-    <file path="$PROJECT_DIR$/handin/main_test.go">
+    <file path="$PROJECT_DIR$/handin/Account/SignedTransaction.go">
       <ranges>
-        <range start1="83" end1="84" start2="83" end2="84" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="94" end1="94" start2="94" end2="96" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="124" end1="133" start2="126" end2="126" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="134" end1="134" start2="127" end2="136" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
+        <range start1="5" end1="6" start2="5" end2="5" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="7" end1="8" start2="6" end2="6" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="60" end1="61" start2="58" end2="59" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
+        <range start1="64" end1="74" start2="62" end2="62" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+      </ranges>
+    </file>
+    <file path="$PROJECT_DIR$/handin/Cryptography/RSA.go">
+      <ranges>
+        <range start1="7" end1="7" start2="7" end2="8" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="21" end1="21" start2="22" end2="44" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
       </ranges>
     </file>
   </component>
@@ -97,23 +110,25 @@
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\sebas\GolandProjects\Distribuerede_systemer_og_sikkerhed\handin" />
+      <recent name="C:\Users\sebas\GolandProjects\Distribuerede_systemer_og_sikkerhed\tests" />
       <recent name="C:\Users\sebas\GolandProjects\Distribuerede_systemer_og_sikkerhed" />
       <recent name="C:\Users\sebas\GolandProjects\Distribuerede_systemer_og_sikkerhed\handin\test" />
       <recent name="C:\Users\sebas\GolandProjects\Distribuerede_systemer_og_sikkerhed\handin\Account" />
-      <recent name="C:\Users\sebas\GolandProjects\Distribuerede_systemer_og_sikkerhed\exercise2-2" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Test.main_test.go (1)">
-    <configuration name="go build SignedTransaction.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Go Test.TestGenerateAndSignature in DNO/handin">
+    <configuration name="TestGenerateAndSignature in DNO" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="DNO" />
       <working_directory value="$PROJECT_DIR$" />
-      <kind value="FILE" />
+      <kind value="PACKAGE" />
       <package value="DNO" />
       <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/handin/Account/SignedTransaction.go" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestGenerateAndSignature\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestReceiverPeernodeVerifiesSignatureOnReceivedSignedTransaction in DNO/handin" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestGenerateAndSignature in DNO/handin" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="DNO" />
       <working_directory value="$PROJECT_DIR$/handin" />
       <root_directory value="$PROJECT_DIR$" />
@@ -122,19 +137,18 @@
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <pattern value="^\QTestReceiverPeernodeVerifiesSignatureOnReceivedSignedTransaction\E$" />
+      <pattern value="^\QTestGenerateAndSignature\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestSignedTransactionsAreBroadcastedAndAppliedOnAllPeerNodes in DNO/handin" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestRSAsigningTime in DNO" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="DNO" />
-      <working_directory value="$PROJECT_DIR$/handin" />
-      <root_directory value="$PROJECT_DIR$" />
+      <working_directory value="$PROJECT_DIR$" />
       <kind value="PACKAGE" />
-      <package value="DNO/handin" />
+      <package value="DNO" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <pattern value="^\QTestSignedTransactionsAreBroadcastedAndAppliedOnAllPeerNodes\E$" />
+      <pattern value="^\QTestRSAsigningTime\E$" />
       <method v="2" />
     </configuration>
     <configuration name="main_test.go (1)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -150,22 +164,21 @@
     </configuration>
     <configuration name="main_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="DNO" />
-      <working_directory value="$PROJECT_DIR$/handin" />
-      <root_directory value="$PROJECT_DIR$" />
+      <working_directory value="$PROJECT_DIR$" />
       <kind value="FILE" />
       <package value="DNO" />
       <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/handin/main_test.go" />
+      <filePath value="$PROJECT_DIR$/main_test.go" />
       <framework value="gotest" />
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.TestGenerateAndSignature in DNO/handin" />
         <item itemvalue="Go Test.main_test.go (1)" />
+        <item itemvalue="Go Test.TestRSAsigningTime in DNO" />
+        <item itemvalue="Go Test.TestGenerateAndSignature in DNO" />
         <item itemvalue="Go Test.main_test.go" />
-        <item itemvalue="Go Test.TestSignedTransactionsAreBroadcastedAndAppliedOnAllPeerNodes in DNO/handin" />
-        <item itemvalue="Go Build.go build SignedTransaction.go" />
-        <item itemvalue="Go Test.TestReceiverPeernodeVerifiesSignatureOnReceivedSignedTransaction in DNO/handin" />
       </list>
     </recent_temporary>
   </component>
@@ -190,5 +203,20 @@
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <default-breakpoints>
+        <breakpoint type="DlvErrorBreakpoint" />
+      </default-breakpoints>
+    </breakpoint-manager>
+    <watches-manager>
+      <configuration name="GoTestRunConfiguration">
+        <watch expression="len(string(hashedPw))" language="go" />
+        <watch expression="len(CTRsk)" language="go" />
+        <watch expression="string(hashedPw)" language="go" />
+        <watch expression="string(hashedPw)" language="go" />
+      </configuration>
+    </watches-manager>
   </component>
 </project>
