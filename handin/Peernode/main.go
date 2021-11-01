@@ -4,12 +4,12 @@ import (
 	. "DNO/handin/Account"
 	. "DNO/handin/Cryptography"
 	. "DNO/handin/Helper"
+	"bufio"
 	"fmt"
 	"net"
+	"os"
 	"strings"
 	"time"
-	"os"
-	"bufio"
 )
 
 

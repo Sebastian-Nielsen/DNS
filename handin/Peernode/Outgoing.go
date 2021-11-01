@@ -1,6 +1,7 @@
 package Peernode
 
 import (
+	"DNO/handin/Cryptography"
 	. "DNO/handin/Helper"
 	"fmt"
 	"strings"
@@ -19,7 +20,8 @@ func (p *PeerNode) send() {
 		fmt.Print("\nType 'm' to view MessagesSent\n" +
 			"Type 'c' to view OpenConnections\n" +
 			"Type 'p' to view PeersInArrivalOrder\n" +
-			"Type 'i' to view ListenerPort" +
+			"Type 'i' to view ListenerPort\n" +
+			"Type 'w' to start interacting with Software Wallet\n" +
 			"Or type a message: ")
 		msg := strings.TrimSpace(input(p)) // maybe removes too much?
 		if msg == "m" {
@@ -43,6 +45,24 @@ func (p *PeerNode) send() {
 		if msg == "i" {
 			fmt.Println()
 			p.printPort(p.Listener)
+			continue
+		}
+		if msg == "w" {
+			for true {
+				fmt.Println("Debug: (AB!12abc) is a valid password")
+				fmt.Println("<Software Wallet> Enter a password:")
+				password := input(p)
+				fmt.Println("<Software Wallet> Enter a filename: ")
+				filename := input(p)
+				pk, err := Cryptography.Generate(filename, password)
+				if err == nil {
+					fmt.Println("Your private key is:\n", pk)
+					break
+				} else {
+					fmt.Println("<Software Wallet> ", err)
+					fmt.Println("<Software Wallet> Try again...\n")
+				}
+			}
 			continue
 		}
 		p.HandleOutgoing(Packet{Type: PacketType.BROADCAST_MSG, Msg: msg})

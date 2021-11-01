@@ -2,11 +2,12 @@ package Cryptography
 
 import (
 	"errors"
+	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"regexp"
 )
 
-/*type Signature struct {
+/*type Signature struct {  asdfasdf
 	Value string
 }
 func (s *Signature) ToString() string {
@@ -60,4 +61,8 @@ func Sign(filename string, password string, msg []byte) (string, error) {
 		return CreateSignature(string(msg), RSAsk), nil
 	}
 	return "", errors.New("wrong password for the file")
+}
+
+func main() {
+	fmt.Println("test")
 }

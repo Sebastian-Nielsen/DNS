@@ -37,7 +37,7 @@ func createPeerNode( shouldMockInput bool, shouldPrintDebug bool ) PeerNode {
 // ============================================ crypto tests ========= START
 func TestGenerateAndSignature(t *testing.T) {
 	validPassword := "AB$45btc"
-	filename := "test_1"
+	filename := "Cryptography/wallet_test"
 	msg := "this is the msg"
 
 	pk, _ := Generate(filename, validPassword)
