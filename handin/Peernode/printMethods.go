@@ -30,7 +30,12 @@ func (p *PeerNode) println(args ...interface{}) {
 }
 func (p *PeerNode) printPort(listener net.Listener) {
 	_, port, _ := net.SplitHostPort(listener.Addr().String())
-	p.println("Running on port: " + port)
+	printString := "Running on port: " + port
+	if p.TestMock.ShouldPrintDebug {
+		p.println(printString)
+	} else {
+		fmt.Println(printString)
+	}
 }
 
 

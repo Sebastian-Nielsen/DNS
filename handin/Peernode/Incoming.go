@@ -11,7 +11,7 @@ func (p *PeerNode) handleIncomming(packet Packet, connPacketWasReceivedOn net.Co
 
 	switch packet.Type {
 	case PacketType.BROADCAST_MSG:
-		p.debugPrintln("Received packet: [Type: BROADCAST_MSG][Msg: never_seen_before_msg] ... Broadcasting it")
+		p.debugPrintln("Received packet: [Type: BROADCAST_MSG][Msg: " + packet.Msg + "] ... Broadcasting it")
 		p.BroadcastMessage(packet)
 	case PacketType.PULL:
 		packet = Packet{

@@ -4,8 +4,8 @@ import (
 	. "DNO/handin/Helper"
 	"fmt"
 	"strings"
+	"time"
 )
-
 
 func (p *PeerNode) send() {
 	/* Continously prompt the user for messages to send */
@@ -13,17 +13,36 @@ func (p *PeerNode) send() {
 	//p.println("[PeerNode:send] > Type 'm' to view MessagesSent ")
 	//p.println("[PeerNode:send] > Type 'c' to view OpenConnections ")
 	for {
-		msg := strings.TrimSpace(input(p))
+		if p.TestMock.ShouldPrintDebug {
+			time.Sleep(200 * time.Millisecond)
+		} // wait for all debug prints to finish
+		fmt.Print("\nType 'm' to view MessagesSent\n" +
+			"Type 'c' to view OpenConnections\n" +
+			"Type 'p' to view PeersInArrivalOrder\n" +
+			"Type 'i' to view ListenerPort" +
+			"Or type a message: ")
+		msg := strings.TrimSpace(input(p)) // maybe removes too much?
 		if msg == "m" {
-			println(p.MessagesSent.Values)
+			fmt.Println("\nAll messages:")
+			for k := range p.MessagesSent.Values {
+				fmt.Println("\t" + k)
+			}
+			// fmt.Println(printMessagesSent(p.MessagesSent.Values))
 			continue
 		}
 		if msg == "c" {
-			println(p.OpenConnections.Values)
+			fmt.Println()
+			fmt.Println(p.OpenConnections.Values)
 			continue
 		}
-		if msg == "a" {
-			println(p.PeersInArrivalOrder.Values())
+		if msg == "p" {
+			fmt.Println()
+			fmt.Println(p.PeersInArrivalOrder.Values())
+			continue
+		}
+		if msg == "i" {
+			fmt.Println()
+			p.printPort(p.Listener)
 			continue
 		}
 		p.HandleOutgoing(Packet{Type: PacketType.BROADCAST_MSG, Msg: msg})
@@ -46,7 +65,7 @@ func (p *PeerNode) HandleOutgoing(packet Packet) {
 
 func (p *PeerNode) BroadcastMessage(packet Packet) {
 	if p.MessagesSent.Contains(packet.Msg) {
-		p.debugPrintf("Received msg we already have: %s", packet.Msg)
+		p.debugPrintf("Received msg we already have: %s\n", packet.Msg)
 		return // Ignore the packet
 	}
 	p.println("Adding and broadcasting msg: '" + packet.Msg + "'")
@@ -57,7 +76,7 @@ func (p *PeerNode) BroadcastMessage(packet Packet) {
 func (p *PeerNode) Broadcast(packet Packet) {
 	p.debugPrintf("[There's now %d openConnections:\n\t%s\n", len(p.OpenConnections.Values), p.OpenConnections.ToString())
 	for openConn := range p.OpenConnections.Values {
-		p.println("Sending msg to openConn:", openConn.RemoteAddr())
+		p.debugPrintln("Sending msg to openConn:", openConn.RemoteAddr())
 		p.Ipc.Send(packet, openConn)
 	}
 }

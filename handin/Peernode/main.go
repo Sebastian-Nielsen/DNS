@@ -8,6 +8,8 @@ import (
 	"net"
 	"strings"
 	"time"
+	"os"
+	"bufio"
 )
 
 
@@ -45,9 +47,11 @@ type KeyPair struct {
 				user for a port.
 */
 func (p *PeerNode) Start(atPort, remotePort string) {
+	socket := p.createSocket(remotePort)
+	
 	p.startServer(atPort)
-
-	p.DialNetwork(p.createSocket(remotePort))
+	
+	p.DialNetwork(socket)
 
 	go p.PullFromNeighbors() // Occassionally send pull-requests to neighbors, asking for their messagesSent set
 
@@ -61,15 +65,18 @@ func PromptForRemoteSocket(p *PeerNode) Socket {
 
 	fmt.Print("Connect to port: ")
 	port := strings.TrimSpace(input(p))
-	p.debugPrintf("You wrote port: '%s'\n", port)
+	fmt.Printf("Connecting to: '%s'\n", port)
 
 	return Socket{Ip: ip, Port: port}
 }
 func input(p *PeerNode) string {
 	if !p.TestMock.ShouldMockInput {
-		var returnString string
-		fmt.Scanln(&returnString)
-		return returnString
+		// var returnString string
+		// fmt.Scanln(&returnString)
+		// return returnString
+		scanner := bufio.NewScanner(os.Stdin)
+		scanner.Scan()
+		return scanner.Text()
 	}
 
 	for p.TestMock.SimulatedInputString == "" {
