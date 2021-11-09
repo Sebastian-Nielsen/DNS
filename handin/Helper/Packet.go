@@ -1,6 +1,9 @@
 package Helper
 
-import "DNO/handin/Account"
+import (
+	"DNO/handin/Account"
+	"DNO/handin/Cryptography"
+)
 
 type Packet struct {
 	Type string
@@ -13,6 +16,9 @@ type Packet struct {
 
 	SignedTransaction Account.SignedTransaction
 	SignedTransactionsSeen []Account.SignedTransaction
+
+	SequencerPublicKey Cryptography.PublicKey
+	SignedBlock SignedBlock
 }
 
 var PacketType = struct {
@@ -26,6 +32,8 @@ var PacketType = struct {
 	BROADCAST_MSG string
 	PULL          string
 	PULL_REPLY string
+	BROADCAST_BLOCK string
+	BROADCAST_KNOWN_BLOCK string
 } {
 	BROADCAST_KNOWN_TRANSACTION: "BROADCAST_KNOWN_TRANSACTION",
 	BROADCAST_TRANSACTION: "BROADCAST_TRANSACTION",
@@ -37,4 +45,6 @@ var PacketType = struct {
 	BROADCAST_MSG:           "BROADCAST_MSG",
 	PULL:                    "PULL",
 	PULL_REPLY:              "PULL_REPLY",
+	BROADCAST_BLOCK: 		 "BROADCAST_BLOCK",
+	BROADCAST_KNOWN_BLOCK:   "BROADCAST_KNOWN_BLOCK",
 }

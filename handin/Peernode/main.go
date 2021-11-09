@@ -8,7 +8,9 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -32,13 +34,17 @@ type PeerNode struct {
 	TestMock            	Mock
 	LocalLedger         	*Ledger
 	TransactionsSeen    	SafeArray_Transaction
-	SignedTransactionsSeen  SafeArray_SignedTransaction
+	SignedTransactionsSeen  SafeMap_string_to_SignedTransaction
 	Keys				    KeyPair
+	Sequencer               Sequencer
+	UnappliedIDs            SafeArray_string
+	unappliedIDsMutex       sync.Mutex
+	unappliedIDSMutexIsLocked bool
+	//UnsequensedTransactions SafeArray_SignedTransaction
+	//Sequencer               PublicKey
+	//SequencerKeyPair		KeyPair
 }
-type KeyPair struct {
-	Pk PublicKey
-	Sk SecretKey
-}
+
 
 /*
 	atPort: port at which the PeerNode should listen at.
@@ -53,12 +59,35 @@ func (p *PeerNode) Start(atPort, remotePort string) {
 	
 	p.DialNetwork(socket)
 
-	go p.PullFromNeighbors() // Occassionally send pull-requests to neighbors, asking for their messagesSent set
+	if p.IsSequencer() {
+		go p.PeriodicallySendUnsequencedTransactions()
+	}
+	//go p.PullFromNeighbors() // Occassionally send pull-requests to neighbors, asking for their messagesSent set
 
 	p.send() // Continously prompt the user msgs for the peerNode to broadcast
 }
 
 
+func (p *PeerNode) IsSequencer() bool {
+	return p.Sequencer.KeyPair != KeyPair{}
+}
+func (p *PeerNode) PeriodicallySendUnsequencedTransactions() {
+	for {
+		time.Sleep(10 * time.Second)
+		p.BroadcastBlock()
+	}
+}
+func (p *PeerNode) BroadcastBlock() {
+	block := Block {
+		BlockNumber: p.Sequencer.BlockNumber + 1,
+		TransactionIDs: p.Sequencer.UnsequensedTransactionIDs.PopAll(),
+	}
+
+	p.debugPrintln("Broadcasting block with", strconv.Itoa(len(block.TransactionIDs)), "elements")
+	p.Broadcast(
+		Packet { Type: PacketType.BROADCAST_BLOCK, SignedBlock: p.Sequencer.Sign(block) },
+	)
+}
 func PromptForRemoteSocket(p *PeerNode) Socket {
 
 	ip := "127.0.0.1"  // The handin asks us to also prompt the user for an ip, but really no need for it ...
@@ -108,6 +137,10 @@ func (p *PeerNode) DialNetwork(remoteSocket Socket) {
 		p.debugPrintln("--------------")
 		p.debugPrintln("Adding local port to list")
 		p.PeersInArrivalOrder.Append(PortOf(p.Listener.Addr()))
+		p.debugPrintln("Setting ourself as the sequencer")
+		p.Sequencer.KeyPair = GenKeyPair()
+		p.Sequencer.PublicKey = p.Sequencer.KeyPair.Pk
+		p.debugPrintln("Sequencer public key is:", p.Sequencer.PublicKey.ToString()[:10], "...")
 		return
 	} else {
 		p.debugPrintln("--------------")
@@ -200,8 +233,8 @@ func (p *PeerNode) PullFromNeighbors() {
 		}
 	}
 }
-func GetKeyPair(k int) KeyPair {
-	pk, sk := GetKeys(k)
+func GenKeyPair() KeyPair {
+	pk, sk := GenKeys(2000)
 	return KeyPair{ Pk: pk, Sk: sk }
 }
 

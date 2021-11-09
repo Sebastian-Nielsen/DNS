@@ -30,17 +30,24 @@ func (l *Ledger) ApplySignedTransaction(t SignedTransaction) {
 	 * the public key t.From.
 	 */
 	validSignature := l.Verify(t)
-	amountPositive := t.Amount > 0
 	if !validSignature  {
 		fmt.Printf("Signature is invalid! Transaction from (%s...) to (%s...).\n", t.From[:8], t.To[:8])
 		return
 	}
+	amountPositive := t.Amount > 0
 	if !amountPositive {
 		fmt.Printf("The amount %d on the signed transaction is negative\n", t.Amount)
 		return
 	}
+	willAmountInFromAccBecomeNegative := l.Accounts[t.From] - t.Amount < 0
+	if willAmountInFromAccBecomeNegative {
+		//fmt.Printf("Will become less than 0\n", t.Amount)
+		return
+	}
 	l.Accounts[t.From] -= t.Amount
 	l.Accounts[t.To] += t.Amount
+	//fmt.Println("Account t.From (", t.From[:4] ,") is now:", l.Accounts[t.From])
+	//fmt.Println("Account t.To (", t.To[:4] ,") is now:", l.Accounts[t.To])
 }
 
 func (l *Ledger) MakeSignedTransaction(t Transaction, sk SecretKey) SignedTransaction {

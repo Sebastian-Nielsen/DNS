@@ -38,7 +38,7 @@ func Generate(filename string, password string) (PublicKey, error) {
 	if !isPasswordStrongEnough(password) {
 		return PublicKey{}, errors.New("password too weak! (atleast two uppercase letters, one special letter, two digits, three lowercase letters and a length of 8)")
 	}
-	pk, sk := GetKeys(2000)
+	pk, sk := GenKeys(2000)
 
 	// We assume that the hashed password byte array has a length of exactly 60
 	hashedPw, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.MinCost)

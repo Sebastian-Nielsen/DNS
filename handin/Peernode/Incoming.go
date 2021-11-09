@@ -15,12 +15,14 @@ func (p *PeerNode) handleIncomming(packet Packet, connPacketWasReceivedOn net.Co
 		p.BroadcastMessage(packet)
 	case PacketType.PULL:
 		packet = Packet{
-			Type: PacketType.PULL_REPLY,
-			MessagesSent: p.MessagesSent.Values,
-			PeersInArrivalOrderValues: p.PeersInArrivalOrder.Values(),
-			TransactionsSeen: p.TransactionsSeen.Values(),
+			Type: 						PacketType.PULL_REPLY,
+			MessagesSent: 				p.MessagesSent.Values,
+			PeersInArrivalOrderValues:  p.PeersInArrivalOrder.Values(),
+			TransactionsSeen: 			p.TransactionsSeen.Values(),
+			SequencerPublicKey: 		p.Sequencer.KeyPair.Pk,
 		}
 		p.debugPrintln("Received packet: [Type: PULL] ... Sending back: \n\tpacket{peersInArrivalOrder:", packet.PeersInArrivalOrderValues, "}")
+		p.debugPrintln("Sending public key:", p.Sequencer.KeyPair.Pk.ToString()[:10], "...")
 		p.Ipc.Send(packet, connPacketWasReceivedOn)
 	case PacketType.PULL_REPLY:
 		p.debugPrintln("Received packet: [Type: PULL-REPLY] ... Extending our messagesSent set with the messages in the packet")
@@ -76,10 +78,11 @@ func (p *PeerNode) handleIncomming(packet Packet, connPacketWasReceivedOn net.Co
 		p.debugPrintln("received signed packet: [PacketType: BROADCAST_SIGNED_TRANSACTION]", packet.SignedTransaction.ToString())
 		signedTransaction := packet.SignedTransaction
 
-		signedTransactionIsNotSeen := !p.SignedTransactionsSeen.Contains(signedTransaction)
-		if signedTransactionIsNotSeen {
-			p.SignedTransactionsSeen.Append(signedTransaction)
-			p.LocalLedger.ApplySignedTransaction(signedTransaction)
+		_,  signedTransactionIsSeen := p.SignedTransactionsSeen.Get(signedTransaction.ID)
+		if !signedTransactionIsSeen {
+			p.SignedTransactionsSeen.Put(signedTransaction.ID, signedTransaction)
+			p.Sequencer.UnsequensedTransactionIDs.Append(signedTransaction.ID)
+			go p.ApplyUnappliedIDs()
 		}
 
 		packet.Type = PacketType.BROADCAST_KNOWN_SIGNED_TRANSACTION
@@ -88,15 +91,28 @@ func (p *PeerNode) handleIncomming(packet Packet, connPacketWasReceivedOn net.Co
 		p.debugPrintln("received signed packet: [PacketType: BROADCASTED_KNOWN_SIGNED_TRANSACTION]", packet.SignedTransaction.ToString())
 		signedTransaction := packet.SignedTransaction
 
-		signedTransactionIsNotSeen := !p.SignedTransactionsSeen.Contains(signedTransaction)
-		if signedTransactionIsNotSeen {
-			p.SignedTransactionsSeen.Append(signedTransaction)
-			p.LocalLedger.ApplySignedTransaction(signedTransaction)
+		_,  signedTransactionIsSeen := p.SignedTransactionsSeen.Get(signedTransaction.ID)
+		if !signedTransactionIsSeen {
+			p.SignedTransactionsSeen.Put(signedTransaction.ID, signedTransaction)
+			p.Sequencer.UnsequensedTransactionIDs.Append(signedTransaction.ID)
 			p.Broadcast(packet)
+			go p.ApplyUnappliedIDs()
 		}
+	case PacketType.BROADCAST_BLOCK:
+		//p.debugPrintln("received signed packet: [PacketType: BROADCAST_BLOCK]", packet.SignedBlock.Block.ToString())
+		p.ExtendUnappliedIDsIfValidBlock(packet.SignedBlock)
+		packet.Type = PacketType.BROADCAST_KNOWN_BLOCK
+		p.Broadcast(packet)
+	case PacketType.BROADCAST_KNOWN_BLOCK:
+		p.debugPrintln("received signed packet: [PacketType: BROADCAST_KNOWN_BLOCK]", packet.SignedBlock.Block.ToString())
+		p.ExtendUnappliedIDsIfValidBlock(packet.SignedBlock)
 	}
 }
 func (p *PeerNode) HandlePullReplyPacket(packet Packet) {
+	// Put the sequencer public to the received pk
+	p.debugPrintln("Setting sequencer public key to:", packet.SequencerPublicKey.ToString()[:10])
+	p.Sequencer.PublicKey = packet.SequencerPublicKey
+
 	// Add all messages contained in the PULL-REPLY packet to our set of messages
 	p.extendMessagesSentSet(packet.MessagesSent)
 
@@ -104,17 +120,65 @@ func (p *PeerNode) HandlePullReplyPacket(packet Packet) {
 	p.extendPeersInArrivalOrder(packet.PeersInArrivalOrderValues)
 
 	// Apply all transactions contained in the PULL-REPLY packet on our local ledger
-	p.applyAllTransactions(packet.TransactionsSeen)
+	//p.applyAllTransactions(packet.TransactionsSeen)
 
 	// Apply all signed transactions contained in the PULL-REPLY packet on our local ledger
-	p.applyAllSignedTransactions(packet.SignedTransactionsSeen)
+	//p.applyAllSignedTransactions(packet.SignedTransactionsSeen)
+
+
+	//p.ExtendUnappliedIDsIfValidBlock(packet.SignedBlock)
+}
+func (p *PeerNode) ApplyUnappliedIDs() {
+	if p.unappliedIDSMutexIsLocked { return }
+	p.debugPrint("A thread entered 'ApplyUnappliedIDS")
+	//fmt.Println("A thread entered 'ApplyUnappliedIDS")
+	p.unappliedIDsMutex.Lock()
+	p.unappliedIDSMutexIsLocked = true
+	defer p.unappliedIDsMutex.Unlock()
+
+	for !(p.UnappliedIDs.IsEmpty()) {
+
+		id := p.UnappliedIDs.Get(0)
+		transaction, doWeHaveNextTransactionToApply := p.SignedTransactionsSeen.Get(id)
+		if !doWeHaveNextTransactionToApply {
+			//fmt.Println("A thread EXITED 'ApplyUnappliedIDS")
+			p.unappliedIDSMutexIsLocked = false
+			return
+		}
+
+		p.UnappliedIDs.PopHead()
+		//p.debugPrintln("Applying transaction", transaction.ToString())
+		//fmt.Println("Applying transaction", transaction.ToString())
+		p.LocalLedger.ApplySignedTransaction(transaction)
+	}
+	//fmt.Println("A thread EXITED 'ApplyUnappliedIDS")
+	p.unappliedIDSMutexIsLocked = false
+}
+func (p* PeerNode) ExtendUnappliedIDsIfValidBlock(signedBlock SignedBlock) {
+	isValidSignature := p.Sequencer.Verify(signedBlock)
+	if !isValidSignature {
+		p.debugPrintln("Signature on block invalid")
+		return
+	}
+	isNextBlock := p.Sequencer.BlockNumber + 1 == signedBlock.Block.BlockNumber
+	if !isNextBlock {
+		p.debugPrintln("Block with number", signedBlock.Block.BlockNumber, "is not the next. Current is number", p.Sequencer.BlockNumber)
+		return
+	}
+
+	p.debugPrintln("Extending list of unapplied Ids of transactions for block number:", signedBlock.Block.BlockNumber)
+	for _, id := range signedBlock.Block.TransactionIDs {
+		p.UnappliedIDs.Append(id)
+	}
+	p.Sequencer.BlockNumber += 1
+	p.ApplyUnappliedIDs()
 }
 func (p *PeerNode) applyAllSignedTransactions(signedTransactions []SignedTransaction) {
 	p.debugPrintln("Applying ", len(signedTransactions), " signed transactions")
 	for _, signedTransaction := range signedTransactions {
 		p.debugPrintln("Applying signed transaction: " + signedTransaction.ToString())
 		p.LocalLedger.ApplySignedTransaction(signedTransaction)
-		p.SignedTransactionsSeen.Append(signedTransaction)
+		p.SignedTransactionsSeen.Put(signedTransaction.ID, signedTransaction)
 	}
 }
 func (p *PeerNode) applyAllTransactions(transactions []Transaction) {

@@ -13,6 +13,10 @@ func MakeLedger() *Ledger {
 	return ledger
 }
 
+//func (l *Ledger) printAccounts() {
+//
+//}
+
 func (l *Ledger) CreateAccount(id string, initialAmount int) {
 	l.lock.Lock() ; defer l.lock.Unlock()
 	l.Accounts[id] = initialAmount

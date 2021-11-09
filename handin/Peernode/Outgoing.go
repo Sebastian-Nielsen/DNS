@@ -10,19 +10,18 @@ import (
 
 func (p *PeerNode) send() {
 	/* Continously prompt the user for messages to send */
-	//p.debugPrintln("[PeerNode:send] Awaiting input to send ... ")
-	//p.println("[PeerNode:send] > Type 'm' to view MessagesSent ")
-	//p.println("[PeerNode:send] > Type 'c' to view OpenConnections ")
 	for {
 		if p.TestMock.ShouldPrintDebug {
 			time.Sleep(200 * time.Millisecond)
 		} // wait for all debug prints to finish
-		fmt.Print("\nType 'm' to view MessagesSent\n" +
-			"Type 'c' to view OpenConnections\n" +
-			"Type 'p' to view PeersInArrivalOrder\n" +
-			"Type 'i' to view ListenerPort\n" +
-			"Type 'w' to start interacting with Software Wallet\n" +
-			"Or type a message: ")
+		if !p.TestMock.ShouldMockInput {
+			fmt.Print("\nType 'm' to view MessagesSent\n" +
+				"Type 'c' to view OpenConnections\n" +
+				"Type 'p' to view PeersInArrivalOrder\n" +
+				"Type 'i' to view ListenerPort\n" +
+				"Type 'w' to start interacting with Software Wallet\n" +
+				"Or type a message: ")
+		}
 		msg := strings.TrimSpace(input(p)) // maybe removes too much?
 		if msg == "m" {
 			fmt.Println("\nAll messages:")

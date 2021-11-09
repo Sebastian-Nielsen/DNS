@@ -8,6 +8,11 @@ import (
 	"strings"
 )
 
+
+type KeyPair struct {
+	Pk PublicKey
+	Sk SecretKey
+}
 type PublicKey struct {
 	N *big.Int
 	E *big.Int
@@ -62,7 +67,7 @@ func ToPublicKey (pk string) PublicKey{
 //}
 
 
-func GetKeys(k int) (PublicKey, SecretKey) {
+func GenKeys(k int) (PublicKey, SecretKey) {
 	n, d := keyGen(k)
 	pk := PublicKey{N:n, E:big.NewInt(3)}
 	sk := SecretKey{N:n, D:d}
