@@ -47,7 +47,7 @@ func (p *PeerNode) send() {
 			continue
 		}
 		if msg == "w" {
-			for true {
+			for {
 				fmt.Println("Debug: (AB!12abc) is a valid password")
 				fmt.Println("<Software Wallet> Enter a password:")
 				password := input(p)
@@ -59,7 +59,8 @@ func (p *PeerNode) send() {
 					break
 				} else {
 					fmt.Println("<Software Wallet> ", err)
-					fmt.Println("<Software Wallet> Try again...\n")
+					fmt.Println("<Software Wallet> Try again...")
+					fmt.Println()
 				}
 			}
 			continue
@@ -87,7 +88,7 @@ func (p *PeerNode) BroadcastMessage(packet Packet) {
 		p.debugPrintf("Received msg we already have: %s\n", packet.Msg)
 		return // Ignore the packet
 	}
-	p.println("Adding and broadcasting msg: '" + packet.Msg + "'")
+	p.debugPrint("Adding and broadcasting msg: '" + packet.Msg + "'")
 	p.MessagesSent.Add(packet.Msg)
 	p.Broadcast(packet)
 }

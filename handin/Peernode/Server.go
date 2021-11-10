@@ -16,13 +16,16 @@ func (p *PeerNode) Listen(conn net.Conn) {
 	defer conn.Close()
 	for {
 		packet, ok := p.Ipc.Receive(conn)
-		if !ok { p.debugPrintln("Receive error") }
+		if !ok { 
+			p.debugPrintln("Listen: Receive error")
+			return
+		}
 		go p.handleIncomming(packet, conn)
 	}
 }
 func (p *PeerNode) startServer(port string) {
-	p.Listener, _ = net.Listen("tcp", ":" + port)
+	p.Listener, _ = net.Listen("tcp", "localhost:" + port)
 	p.printPort(p.Listener)
 
-	go p.ListenForNewConns()
+	// go p.ListenForNewConns()
 }

@@ -40,9 +40,6 @@ type PeerNode struct {
 	UnappliedIDs            SafeArray_string
 	unappliedIDsMutex       sync.Mutex
 	unappliedIDSMutexIsLocked bool
-	//UnsequensedTransactions SafeArray_SignedTransaction
-	//Sequencer               PublicKey
-	//SequencerKeyPair		KeyPair
 }
 
 
@@ -141,7 +138,6 @@ func (p *PeerNode) DialNetwork(remoteSocket Socket) {
 		p.Sequencer.KeyPair = GenKeyPair()
 		p.Sequencer.PublicKey = p.Sequencer.KeyPair.Pk
 		p.debugPrintln("Sequencer public key is:", p.Sequencer.PublicKey.ToString()[:10], "...")
-		return
 	} else {
 		p.debugPrintln("--------------")
 		p.debugPrintln("Local  Addr:", conn.LocalAddr())
@@ -180,7 +176,9 @@ func (p *PeerNode) DialNetwork(remoteSocket Socket) {
 			Packet{ Type: PacketType.BROADCAST_LISTENER_PORT , Msg: PortOf(p.Listener.Addr()) },
 		)
 
-		go p.Listen(conn)}
+		go p.Listen(conn)
+	}
+	go p.ListenForNewConns()
 }
 func (p *PeerNode) connectToPeers(portsOfPeers []string) {
 	Assert(p.Listener != nil)

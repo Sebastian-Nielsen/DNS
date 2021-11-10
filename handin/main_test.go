@@ -44,6 +44,87 @@ func createPeerNode( shouldMockInput bool, shouldPrintDebug bool ) PeerNode {
 
 
 
+func TestConcurrentTransactions(t *testing.T) {
+	//t.Parallel()
+	
+	var peerNodeA_port = AvailablePorts.Next() // The sequencer
+	var peerNodeB_port = AvailablePorts.Next()
+	var peerNodeC_port = AvailablePorts.Next()
+	
+	peerNodeA := createPeerNode(true, false)
+	peerNodeB := createPeerNode(true, false)
+	peerNodeC := createPeerNode(true, false)
+	
+	goStart(&peerNodeA, peerNodeA_port, "no_port")
+	goStart(&peerNodeB, peerNodeB_port, peerNodeA_port)
+	goStart(&peerNodeC, peerNodeC_port, peerNodeA_port)
+
+	AccountNames := []string{
+		peerNodeA.Keys.Pk.ToString(),
+		peerNodeB.Keys.Pk.ToString(),
+		peerNodeC.Keys.Pk.ToString(),
+	}
+	initialAmounts := []int{600, 0, 0}
+	makeAccountsAt(&peerNodeA, AccountNames, initialAmounts)
+	makeAccountsAt(&peerNodeB, AccountNames, initialAmounts)
+	makeAccountsAt(&peerNodeC, AccountNames, initialAmounts)
+
+	peerNodeB.Keys = peerNodeA.Keys
+	peerNodeC.Keys = peerNodeA.Keys
+
+	// wait for phase 1 to finish
+	for peerNodeA.Sequencer.PublicKey.N == nil ||
+		peerNodeB.Sequencer.PublicKey.N == nil ||
+		peerNodeC.Sequencer.PublicKey.N == nil {
+		time.Sleep(100 * time.Millisecond)
+	}
+	fmt.Println("Sequencer pk A:", peerNodeA.Sequencer.PublicKey.ToString()[:10])
+	fmt.Println("Sequencer pk B:", peerNodeB.Sequencer.PublicKey.ToString()[:10])
+	fmt.Println("Sequencer pk C:", peerNodeC.Sequencer.PublicKey.ToString()[:10])
+
+	var wg sync.WaitGroup
+	wg.Add(2)
+
+	go MakeManyTransactions(&peerNodeB, Transaction {Amount: 1, ID: "fromAtoB", From: AccountNames[0], To: AccountNames[1]}, &wg)
+	// time.Sleep(100 * time.Millisecond)
+	go MakeManyTransactions(&peerNodeC, Transaction {Amount: 1, ID: "fromAToC", From: AccountNames[0], To: AccountNames[2]}, &wg)
+
+	wg.Wait() // wait for the goroutines to finish
+
+	peerNodeA.BroadcastBlock()
+
+	time.Sleep(1 * time.Second)
+
+	ledgerB := peerNodeB.LocalLedger.Accounts
+	ledgerC := peerNodeC.LocalLedger.Accounts
+	allAccountsAreEqual := reflect.DeepEqual(ledgerB, ledgerC)
+	if !allAccountsAreEqual {
+		t.Error("Accounts in peerNodeB:", ledgerB, "are not the same as accounts in peerNodeC:", ledgerC)
+	}
+
+	amountInAccountA := peerNodeA.LocalLedger.Accounts[AccountNames[0]]
+	if amountInAccountA != 0 {
+		t.Error("Amount in account A is", amountInAccountA, "but should be 0")
+	}
+
+	fmt.Println("Account B has:", peerNodeA.LocalLedger.Accounts[AccountNames[1]])
+	fmt.Println("Account C has:", peerNodeA.LocalLedger.Accounts[AccountNames[2]])
+	// fmt.Println("Transactions seen by B:", len(peerNodeB.SignedTransactionsSeen.Values))
+	// fmt.Println("Transactions seen by C:", len(peerNodeC.SignedTransactionsSeen.Values))
+}
+
+func MakeManyTransactions(peerNode *PeerNode, t Transaction, wg *sync.WaitGroup) {
+	for i := 1; i < 601; i++ {
+		peerNode.MakeAndBroadcastSignedTransaction(t.Amount, t.ID+strconv.Itoa(i), t.From, t.To)
+		if (i % 100 == 0) {
+			fmt.Println("Sent " + strconv.Itoa(i) + " '" + t.ID + "' transactions so far")
+		}
+	}
+	wg.Done()
+	fmt.Println("Sent all '" + t.ID + "' transactions")
+}
+
+
 // ============================================ crypto tests ========= START
 func TestGenerateAndSignature(t *testing.T) {
 	validPassword := "AB$45btc"
@@ -71,8 +152,6 @@ func TestGenerateAndSignature(t *testing.T) {
 		t.Error("Accepted a weak password for encryption")
 	}
 }
-
-
 func TestRSAsigningTime(t *testing.T) {
 	_, sk := GenKeys(200)
 	msg := big.NewInt( 25632212678324 )
@@ -89,9 +168,8 @@ func TestRSAsigningTime(t *testing.T) {
 	timeElapsed := time.Since(startTime)
 
 	bitsPerSec := float64(hashedMsg.BitLen() + 1) / timeElapsed.Seconds()
-	fmt.Printf("It took %s to sign a hashed message of size 256 bits = %f bits per sec", timeElapsed.String(), bitsPerSec)
+	fmt.Printf("It took %s to sign a hashed message of size 256 bits = %f bits per sec\n", timeElapsed.String(), bitsPerSec)
 }
-
 func TestHashingTime(t *testing.T) {
 	data := make([]byte, 10000)
 	rand.Read(data)
@@ -104,10 +182,8 @@ func TestHashingTime(t *testing.T) {
 	timeElapsed := time.Since(startTime)
 
 	bitsPerSec := float64(msg.BitLen()) / timeElapsed.Seconds()
-	fmt.Printf("It took %s to hash a message of size 10.000 bytes = %f bits per sec", timeElapsed.String(), bitsPerSec)
+	fmt.Printf("It took %s to hash a message of size 10.000 bytes = %f bits per sec\n", timeElapsed.String(), bitsPerSec)
 }
-
-
 func TestRSASigning(t *testing.T) {
 	pk, sk := GenKeys(2000)
 	msg := big.NewInt( 25632212678324 )
@@ -132,7 +208,6 @@ func TestRSASigning(t *testing.T) {
 			"' was wrongly verified for original message: " + msg.String())
 	}
 }
-
 func TestEncryptionAndDecryptionWithRSAandAES(t *testing.T) {
 	// RSA decrypt
 	pk, sk := GenKeys(2000)
@@ -164,77 +239,6 @@ func TestEncryptionAndDecryptionWithRSAandAES(t *testing.T) {
 	}
 }
 // ============================================ crypto tests ========= END
-
-
-
-func TestConcurrentTransactions(t *testing.T) {
-	//t.Parallel()
-
-	var peerNodeA_port = AvailablePorts.Next() // The sequencer
-	var peerNodeB_port = AvailablePorts.Next()
-	var peerNodeC_port = AvailablePorts.Next()
-
-	peerNodeA := createPeerNode(true, false)
-	peerNodeB := createPeerNode(true, false)
-	peerNodeC := createPeerNode(true, false)
-
-	goStart(&peerNodeA, peerNodeA_port, "no_port")
-	goStart(&peerNodeB, peerNodeB_port, peerNodeA_port)
-	goStart(&peerNodeC, peerNodeC_port, peerNodeA_port)
-
-	AccountNames := []string{
-		peerNodeA.Keys.Pk.ToString(),
-		peerNodeB.Keys.Pk.ToString(),
-		peerNodeC.Keys.Pk.ToString(),
-	}
-	initialAmounts := []int{1000, 0, 0}
-	makeAccountsAt(&peerNodeA, AccountNames, initialAmounts)
-	makeAccountsAt(&peerNodeB, AccountNames, initialAmounts)
-	makeAccountsAt(&peerNodeC, AccountNames, initialAmounts)
-
-	peerNodeB.Keys = peerNodeA.Keys
-	peerNodeC.Keys = peerNodeA.Keys
-
-	var wg sync.WaitGroup
-	wg.Add(1)   // this should be 2, but works only with 1   ?!
-
-	go Send(&peerNodeB, Transaction {Amount: 1, ID: "fromAtoB", From: AccountNames[0], To: AccountNames[1]}, &wg)
-	go Send(&peerNodeC, Transaction {Amount: 1, ID: "fromAToC", From: AccountNames[0], To: AccountNames[2]}, &wg)
-
-	//time.Sleep(5 * time.Second)
-	wg.Wait() // wait for the goroutines to finish, but didn't work
-
-	peerNodeA.BroadcastBlock()
-
-	time.Sleep(2 * time.Second)
-
-	ledgerB := peerNodeB.LocalLedger.Accounts
-	ledgerC := peerNodeC.LocalLedger.Accounts
-	allAccountsAreEqual := reflect.DeepEqual(ledgerB, ledgerC)
-	if !allAccountsAreEqual {
-		t.Error("Accounts in peerNodeB:", ledgerB, "are not the same as accounts in peerNodeC:", ledgerC)
-	}
-
-	amountInAccountA := peerNodeA.LocalLedger.Accounts[AccountNames[0]]
-	if amountInAccountA != 0 {
-		t.Error("Amount in account A is", amountInAccountA, "but should be 0")
-	}
-
-	fmt.Println("Account B has:", peerNodeA.LocalLedger.Accounts[AccountNames[1]])
-	fmt.Println("Account C has:", peerNodeA.LocalLedger.Accounts[AccountNames[2]])
-
-}
-
-func Send(peerNode *PeerNode, t Transaction, wg *sync.WaitGroup) {
-	for i := 0; i < 1000; i++ {
-		peerNode.MakeAndBroadcastSignedTransaction(t.Amount, t.ID+strconv.Itoa(i), t.From, t.To)
-		if (i % 100 == 0) {
-			fmt.Println("Sent", strconv.Itoa(i), " transactions so far")
-		}
-	}
-	wg.Done()
-}
-
 
 
 // Legacy test from handin_8 and onwards
@@ -311,7 +315,7 @@ func TestSignedTransactionsAreBroadcastedAndAppliedOnAllPeerNodes(t *testing.T) 
 }
 */
 func TestSignedTransactions(t *testing.T) {
-	t.Parallel()
+	// t.Parallel()
 
 	ledger1 := MakeLedger()
 	id_1, pk_1, sk_1 := createAccountAt(ledger1)
@@ -406,7 +410,7 @@ func TestNewcomerNodeReceivesAllTransactionsAppliedBeforeItEnteredNetwork(t *tes
 */
 
 func TestTransactionsAreBroadcastedAndAppliedOnAllPeerNodes(t *testing.T) {
-	t.Parallel()
+	// t.Parallel()
 
 	var peerNode1_port = AvailablePorts.Next()
 	var peerNode2_port = AvailablePorts.Next()
@@ -450,7 +454,7 @@ func TestTransactionsAreBroadcastedAndAppliedOnAllPeerNodes(t *testing.T) {
 	}
 }
 func TestNodeConnectsToThreeOthersWhenEnteringNetwork(t *testing.T) {
-	t.Parallel()
+	// t.Parallel()
 
 	peerNode1 := createPeerNode(true, true)
 	peer1Port := AvailablePorts.Next()
@@ -487,7 +491,7 @@ func TestNodeConnectsToThreeOthersWhenEnteringNetwork(t *testing.T) {
 	}
 }
 func TestNodeConnectsToTenOthersWhenEnteringNetwork(t *testing.T) {
-	t.Parallel()
+	// t.Parallel()
 
 	peerNode1 := createPeerNode(true, true)
 	peer1Port := AvailablePorts.Next()
@@ -544,7 +548,7 @@ func TestNodeConnectsToTenOthersWhenEnteringNetwork(t *testing.T) {
 	}
 }
 func TestPeerNodeConnectsToAllNodesWhenEnteringNetwork(t *testing.T) {
-	//t.Parallel()
+	// t.Parallel()
 
 	var peerNode1_port = AvailablePorts.Next()
 	var peerNode2_port = AvailablePorts.Next()
@@ -569,7 +573,7 @@ func TestPeerNodeConnectsToAllNodesWhenEnteringNetwork(t *testing.T) {
 	}
 }
 func TestReceivedPeerListWhenJoining(t *testing.T) {
-	t.Parallel()
+	// t.Parallel()
 
 	var peerNode1_port = AvailablePorts.Next()
 	var peerNode2_port = AvailablePorts.Next()
@@ -600,7 +604,7 @@ func TestReceivedPeerListWhenJoining(t *testing.T) {
 
 }
 func TestMessageIsSentFromNode1To3Via2(t *testing.T) {
-	t.Parallel()
+	// t.Parallel()
 
 	var peerNode1_port = AvailablePorts.Next()
 	var peerNode2_port = AvailablePorts.Next()
@@ -618,12 +622,13 @@ func TestMessageIsSentFromNode1To3Via2(t *testing.T) {
 
 	simulateInputFor(&peerNode1, "some_msg")
 
+
 	if !peerNode3.MessagesSent.Contains("some_msg") {
 		t.Errorf("peerNode3 didn't receive peerNode1's msgs")
 	}
 }
 func TestLatercomerNodeEventuallyGetsAllMsgs(t *testing.T) {
-	t.Parallel()
+	// t.Parallel()
 
 	var peerNode1_port = AvailablePorts.Next()
 	var peerNode2_port = AvailablePorts.Next()
@@ -646,7 +651,7 @@ func TestLatercomerNodeEventuallyGetsAllMsgs(t *testing.T) {
 	}
 }
 func TestPeer1ReceivesMsgFromPeer2(t *testing.T) {
-	t.Parallel()
+	// t.Parallel()
 
 	var peerNode1_port = AvailablePorts.Next()
 	var peerNode2_port = AvailablePorts.Next()
@@ -667,7 +672,7 @@ func TestPeer1ReceivesMsgFromPeer2(t *testing.T) {
 
 }
 func TestPeer1CanConnectToPeer2(t *testing.T) {
-	t.Parallel()
+	// t.Parallel()
 
 
 	peerNode1 := createPeerNode(true, true)
@@ -695,7 +700,7 @@ func simulateInputFor(peerNode *PeerNode, text string) {
 }
 func goStart(peerNode *PeerNode, atPort string, remotePort string) {
 	go peerNode.Start(atPort, remotePort)
-	time.Sleep(1000 * time.Millisecond)
+	time.Sleep(250 * time.Millisecond)
 }
 
 func makeAccountsAt(peerNode *PeerNode, IDs []string, startAmounts []int){

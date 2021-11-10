@@ -83,10 +83,10 @@ func (p *PeerNode) handleIncomming(packet Packet, connPacketWasReceivedOn net.Co
 			p.SignedTransactionsSeen.Put(signedTransaction.ID, signedTransaction)
 			p.Sequencer.UnsequensedTransactionIDs.Append(signedTransaction.ID)
 			go p.ApplyUnappliedIDs()
+			packet.Type = PacketType.BROADCAST_KNOWN_SIGNED_TRANSACTION
+			p.Broadcast(packet)
 		}
 
-		packet.Type = PacketType.BROADCAST_KNOWN_SIGNED_TRANSACTION
-		p.Broadcast(packet)
 	case PacketType.BROADCAST_KNOWN_SIGNED_TRANSACTION:
 		p.debugPrintln("received signed packet: [PacketType: BROADCASTED_KNOWN_SIGNED_TRANSACTION]", packet.SignedTransaction.ToString())
 		signedTransaction := packet.SignedTransaction
@@ -95,7 +95,7 @@ func (p *PeerNode) handleIncomming(packet Packet, connPacketWasReceivedOn net.Co
 		if !signedTransactionIsSeen {
 			p.SignedTransactionsSeen.Put(signedTransaction.ID, signedTransaction)
 			p.Sequencer.UnsequensedTransactionIDs.Append(signedTransaction.ID)
-			p.Broadcast(packet)
+			// p.Broadcast(packet)
 			go p.ApplyUnappliedIDs()
 		}
 	case PacketType.BROADCAST_BLOCK:
@@ -150,11 +150,18 @@ func (p *PeerNode) ApplyUnappliedIDs() {
 		//p.debugPrintln("Applying transaction", transaction.ToString())
 		//fmt.Println("Applying transaction", transaction.ToString())
 		p.LocalLedger.ApplySignedTransaction(transaction)
+		
+		
 	}
 	//fmt.Println("A thread EXITED 'ApplyUnappliedIDS")
 	p.unappliedIDSMutexIsLocked = false
 }
 func (p* PeerNode) ExtendUnappliedIDsIfValidBlock(signedBlock SignedBlock) {
+	SequencerPkIsReceived := p.Sequencer.PublicKey.N != nil
+	if !SequencerPkIsReceived {
+		p.debugPrintln("The sequencer public key has not been received yet, ignoring block")
+		return
+	}
 	isValidSignature := p.Sequencer.Verify(signedBlock)
 	if !isValidSignature {
 		p.debugPrintln("Signature on block invalid")
