@@ -28,10 +28,10 @@ func (s *SafeMap_string_to_SignedTransaction) Get(key string) (Account.SignedTra
 //func (s *SafeMap_Transaction) delete(transaction ApplyTransaction) {
 //	s.mu.Lock()
 //	defer s.mu.Unlock()
-//	delete(s.Values, transaction)
+//	delete(s.Vals, transaction)
 //}
 //func (s *SafeMap_Transaction) Contains(transaction ApplyTransaction) bool {
 //	s.mu.Lock()
 //	defer s.mu.Unlock()
-//	return s.Values[transaction]
+//	return s.Vals[transaction]
 //}

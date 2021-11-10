@@ -70,20 +70,21 @@ func (p *PeerNode) IsSequencer() bool {
 }
 func (p *PeerNode) PeriodicallySendUnsequencedTransactions() {
 	for {
-		time.Sleep(10 * time.Second)
+		time.Sleep(30 * time.Second)
 		p.BroadcastBlock()
 	}
 }
 func (p *PeerNode) BroadcastBlock() {
 	block := Block {
-		BlockNumber: p.Sequencer.BlockNumber + 1,
-		TransactionIDs: p.Sequencer.UnsequensedTransactionIDs.PopAll(),
+		BlockNumber: p.Sequencer.BlockNumber.Value + 1,
+		TransactionIDs: p.Sequencer.UnsequencedTransactionIDs.PopAll(),
 	}
 
 	p.debugPrintln("Broadcasting block with", strconv.Itoa(len(block.TransactionIDs)), "elements")
 	p.Broadcast(
 		Packet { Type: PacketType.BROADCAST_BLOCK, SignedBlock: p.Sequencer.Sign(block) },
 	)
+	p.ExtendUnappliedIDsIfValidBlock(SignedBlock{})
 }
 func PromptForRemoteSocket(p *PeerNode) Socket {
 
@@ -224,7 +225,7 @@ func (p *PeerNode) PullFromNeighbors() {
 	time.Sleep(300 * time.Second)
 	packet := Packet{Type: PacketType.PULL}
 	for {
-		for openConn := range p.OpenConnections.Values {
+		for openConn := range p.OpenConnections.Values() {
 			p.println("Sending pull-request to neighbor:", openConn.RemoteAddr().String())
 			p.Ipc.Send(packet, openConn)
 			time.Sleep(30 * time.Second)

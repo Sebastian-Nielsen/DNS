@@ -23,7 +23,7 @@ import (
 
 func createPeerNode( shouldMockInput bool, shouldPrintDebug bool ) PeerNode {
 	return PeerNode{
-		OpenConnections:     SafeSet_Conn{   Values: make(map[net.Conn]bool) },
+		OpenConnections:     SafeSet_Conn{   Vals: make(map[net.Conn]bool) },
 		PeersInArrivalOrder: SafeArray_string{},
 		MessagesSent:        SafeSet_string{ Values: make(map[string  ]bool) },
 		Ipc:                 IPC{ ConnToEncDecPair: make(map[net.Conn]EncoderDecoderPair) },
@@ -34,10 +34,10 @@ func createPeerNode( shouldMockInput bool, shouldPrintDebug bool ) PeerNode {
 		UnappliedIDs:        SafeArray_string{},
 		SignedTransactionsSeen:  SafeMap_string_to_SignedTransaction{ Values: make(map[string] SignedTransaction) },
 		Sequencer:			  Sequencer{
-								 UnsequensedTransactionIDs: SafeArray_string{},
+								 UnsequencedTransactionIDs: SafeArray_string{},
 								 PublicKey:                 PublicKey{},
 								 KeyPair:                   KeyPair{},
-								 BlockNumber:               -1,
+								 BlockNumber:               SafeCounter{Value: -1},
 							 },
 	}
 }
@@ -46,7 +46,7 @@ func createPeerNode( shouldMockInput bool, shouldPrintDebug bool ) PeerNode {
 
 func TestConcurrentTransactions(t *testing.T) {
 	//t.Parallel()
-	
+
 	var peerNodeA_port = AvailablePorts.Next() // The sequencer
 	var peerNodeB_port = AvailablePorts.Next()
 	var peerNodeC_port = AvailablePorts.Next()
@@ -64,7 +64,7 @@ func TestConcurrentTransactions(t *testing.T) {
 		peerNodeB.Keys.Pk.ToString(),
 		peerNodeC.Keys.Pk.ToString(),
 	}
-	initialAmounts := []int{600, 0, 0}
+	initialAmounts := []int{500, 0, 0}
 	makeAccountsAt(&peerNodeA, AccountNames, initialAmounts)
 	makeAccountsAt(&peerNodeB, AccountNames, initialAmounts)
 	makeAccountsAt(&peerNodeC, AccountNames, initialAmounts)
@@ -86,7 +86,6 @@ func TestConcurrentTransactions(t *testing.T) {
 	wg.Add(2)
 
 	go MakeManyTransactions(&peerNodeB, Transaction {Amount: 1, ID: "fromAtoB", From: AccountNames[0], To: AccountNames[1]}, &wg)
-	// time.Sleep(100 * time.Millisecond)
 	go MakeManyTransactions(&peerNodeC, Transaction {Amount: 1, ID: "fromAToC", From: AccountNames[0], To: AccountNames[2]}, &wg)
 
 	wg.Wait() // wait for the goroutines to finish
@@ -101,7 +100,6 @@ func TestConcurrentTransactions(t *testing.T) {
 	if !allAccountsAreEqual {
 		t.Error("Accounts in peerNodeB:", ledgerB, "are not the same as accounts in peerNodeC:", ledgerC)
 	}
-
 	amountInAccountA := peerNodeA.LocalLedger.Accounts[AccountNames[0]]
 	if amountInAccountA != 0 {
 		t.Error("Amount in account A is", amountInAccountA, "but should be 0")
@@ -109,12 +107,10 @@ func TestConcurrentTransactions(t *testing.T) {
 
 	fmt.Println("Account B has:", peerNodeA.LocalLedger.Accounts[AccountNames[1]])
 	fmt.Println("Account C has:", peerNodeA.LocalLedger.Accounts[AccountNames[2]])
-	// fmt.Println("Transactions seen by B:", len(peerNodeB.SignedTransactionsSeen.Values))
-	// fmt.Println("Transactions seen by C:", len(peerNodeC.SignedTransactionsSeen.Values))
 }
 
 func MakeManyTransactions(peerNode *PeerNode, t Transaction, wg *sync.WaitGroup) {
-	for i := 1; i < 601; i++ {
+	for i := 1; i < 501; i++ {
 		peerNode.MakeAndBroadcastSignedTransaction(t.Amount, t.ID+strconv.Itoa(i), t.From, t.To)
 		if (i % 100 == 0) {
 			fmt.Println("Sent " + strconv.Itoa(i) + " '" + t.ID + "' transactions so far")
@@ -402,9 +398,9 @@ func TestNewcomerNodeReceivesAllTransactionsAppliedBeforeItEnteredNetwork(t *tes
 		t.Error("ApplyTransaction 'tran3' from 'acc2' to 'acc3' on peerNode1 didn't apply to 'acc3' on latecomer peerNode4.",
 			"\npeerNode4 Accounts:", peerNode4.LocalLedger.Accounts, "\n")
 	}
-	if len(peerNode4.TransactionsSeen.Values()) != 2 {
+	if len(peerNode4.TransactionsSeen.Vals()) != 2 {
 		t.Error("Not all transactions was seen by latecomer peerNode4",
-			"\npeerNode4 Accounts:", peerNode4.TransactionsSeen.Values(), "\n")
+			"\npeerNode4 Accounts:", peerNode4.TransactionsSeen.Vals(), "\n")
 	}
 }
 */
@@ -471,17 +467,17 @@ func TestNodeConnectsToThreeOthersWhenEnteringNetwork(t *testing.T) {
 
 	time.Sleep(1 * time.Second)
 
-	if len(peerNode1.OpenConnections.Values) != 3 {
+	if len(peerNode1.OpenConnections.Values()) != 3 {
 		t.Error("PeerNode1 doesn't have exactly 3 connections")
 	}
-	if len(peerNode2.OpenConnections.Values) != 3 {
+	if len(peerNode2.OpenConnections.Values()) != 3 {
 		t.Error("PeerNode2 doesn't have exactly 3 connections.\npeerNode2 openConnections:",
 			peerNode2.OpenConnections.ToString())
 	}
-	if len(peerNode3.OpenConnections.Values) != 3 {
+	if len(peerNode3.OpenConnections.Values()) != 3 {
 		t.Error("PeerNode3 doesn't have exactly 3 connections")
 	}
-	if len(peerNode4.OpenConnections.Values) != 3 {
+	if len(peerNode4.OpenConnections.Values()) != 3 {
 		t.Error("PeerNode4 doesn't have exactly 3 connections")
 	}
 
@@ -522,16 +518,16 @@ func TestNodeConnectsToTenOthersWhenEnteringNetwork(t *testing.T) {
 	time.Sleep(1 * time.Second)
 
 	// By now, all nodefs should have 10 openConnections, just test that 4 of them have it
-	if len(peerNode1.OpenConnections.Values) != 10 {
+	if len(peerNode1.OpenConnections.Values()) != 10 {
 		t.Error("PeerNode1 doesn't have exactly 10 connections")
 	}
-	if len(peerNode2.OpenConnections.Values) != 10 {
+	if len(peerNode2.OpenConnections.Values()) != 10 {
 		t.Error("PeerNode2 doesn't have exactly 10 connections")
 	}
-	if len(peerNode10.OpenConnections.Values) != 10 {
+	if len(peerNode10.OpenConnections.Values()) != 10 {
 		t.Error("PeerNode3 doesn't have exactly 10 connections")
 	}
-	if len(peerNode11.OpenConnections.Values) != 10 {
+	if len(peerNode11.OpenConnections.Values()) != 10 {
 		t.Error("PeerNode4 doesn't have exactly 10 connections")
 	}
 
@@ -566,7 +562,7 @@ func TestPeerNodeConnectsToAllNodesWhenEnteringNetwork(t *testing.T) {
 	goStart(&peerNode4, peerNode4_port, peerNode1_port)
 
 	time.Sleep(4 * time.Second)
-	p4Conns := peerNode4.OpenConnections.Values
+	p4Conns := peerNode4.OpenConnections.Values()
 	if len(p4Conns) != 3 {
 		t.Error("peerNode4 doesn't have an open connection to each node in the network.\n" +
 			"PeerNode4's openConnections:", p4Conns)
@@ -684,11 +680,11 @@ func TestPeer1CanConnectToPeer2(t *testing.T) {
 	goStart(&peerNode1, peerNode1_port, "no_port")
 	goStart(&peerNode2, peerNode2_port, peerNode1_port)
 
-	if len(peerNode1.OpenConnections.Values) != 1 {
-		t.Error("peerNode1 doesn't have peerNode2 in its openConnections set:", peerNode1.OpenConnections.Values)
+	if len(peerNode1.OpenConnections.Values()) != 1 {
+		t.Error("peerNode1 doesn't have peerNode2 in its openConnections set:", peerNode1.OpenConnections.Values())
 	}
-	if len(peerNode2.OpenConnections.Values) != 1 {
-		t.Error("peerNode2 doesn't have peerNode1 in its openConnections set:", peerNode2.OpenConnections.Values)
+	if len(peerNode2.OpenConnections.Values()) != 1 {
+		t.Error("peerNode2 doesn't have peerNode1 in its openConnections set:", peerNode2.OpenConnections.Values())
 	}
 }
 

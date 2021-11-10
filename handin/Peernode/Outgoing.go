@@ -28,7 +28,7 @@ func (p *PeerNode) send() {
 			for k := range p.MessagesSent.Values {
 				fmt.Println("\t" + k)
 			}
-			// fmt.Println(printMessagesSent(p.MessagesSent.Values))
+			// fmt.Println(printMessagesSent(p.MessagesSent.Vals))
 			continue
 		}
 		if msg == "c" {
@@ -94,8 +94,10 @@ func (p *PeerNode) BroadcastMessage(packet Packet) {
 }
 
 func (p *PeerNode) Broadcast(packet Packet) {
-	p.debugPrintf("[There's now %d openConnections:\n\t%s\n", len(p.OpenConnections.Values), p.OpenConnections.ToString())
-	for openConn := range p.OpenConnections.Values {
+
+	vals := p.OpenConnections.Values()
+	p.debugPrintf("[There's now %d openConnections:\n\t%s\n", len(vals), p.OpenConnections.ToString())
+	for openConn := range vals {
 		p.debugPrintln("Sending msg to openConn:", openConn.RemoteAddr())
 		p.Ipc.Send(packet, openConn)
 	}

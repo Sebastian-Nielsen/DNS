@@ -11,7 +11,7 @@ import (
 
 func main() {
 	var peerNode = PeerNode{
-		OpenConnections:     	SafeSet_Conn{ Values: make(map[net.Conn]bool) },
+		OpenConnections:     	SafeSet_Conn{ Vals: make(map[net.Conn]bool) },
 		PeersInArrivalOrder: 	SafeArray_string{},
 		MessagesSent:        	SafeSet_string{ Values: make(map[string  ]bool) },
 		Ipc:                 	IPC{ ConnToEncDecPair: make(map[net.Conn]EncoderDecoderPair) },
@@ -20,10 +20,10 @@ func main() {
 		UnappliedIDs:        	SafeArray_string{},
 		SignedTransactionsSeen: SafeMap_string_to_SignedTransaction{ Values: make(map[string] SignedTransaction) },
 		Sequencer:			 	Sequencer{
-									UnsequensedTransactionIDs: SafeArray_string{},
+									UnsequencedTransactionIDs: SafeArray_string{},
 								 	PublicKey:                 PublicKey{},
 								 	KeyPair:                   KeyPair{},
-								 	BlockNumber:               -1,
+								 	BlockNumber:               SafeCounter{Value: -1},
 								},
 	}
 

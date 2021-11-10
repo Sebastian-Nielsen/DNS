@@ -81,7 +81,7 @@ func (p *PeerNode) handleIncomming(packet Packet, connPacketWasReceivedOn net.Co
 		_,  signedTransactionIsSeen := p.SignedTransactionsSeen.Get(signedTransaction.ID)
 		if !signedTransactionIsSeen {
 			p.SignedTransactionsSeen.Put(signedTransaction.ID, signedTransaction)
-			p.Sequencer.UnsequensedTransactionIDs.Append(signedTransaction.ID)
+			p.Sequencer.UnsequencedTransactionIDs.Append(signedTransaction.ID)
 			go p.ApplyUnappliedIDs()
 			packet.Type = PacketType.BROADCAST_KNOWN_SIGNED_TRANSACTION
 			p.Broadcast(packet)
@@ -94,7 +94,7 @@ func (p *PeerNode) handleIncomming(packet Packet, connPacketWasReceivedOn net.Co
 		_,  signedTransactionIsSeen := p.SignedTransactionsSeen.Get(signedTransaction.ID)
 		if !signedTransactionIsSeen {
 			p.SignedTransactionsSeen.Put(signedTransaction.ID, signedTransaction)
-			p.Sequencer.UnsequensedTransactionIDs.Append(signedTransaction.ID)
+			p.Sequencer.UnsequencedTransactionIDs.Append(signedTransaction.ID)
 			// p.Broadcast(packet)
 			go p.ApplyUnappliedIDs()
 		}
@@ -130,7 +130,6 @@ func (p *PeerNode) HandlePullReplyPacket(packet Packet) {
 }
 func (p *PeerNode) ApplyUnappliedIDs() {
 	if p.unappliedIDSMutexIsLocked { return }
-	p.debugPrint("A thread entered 'ApplyUnappliedIDS")
 	//fmt.Println("A thread entered 'ApplyUnappliedIDS")
 	p.unappliedIDsMutex.Lock()
 	p.unappliedIDSMutexIsLocked = true
@@ -142,6 +141,8 @@ func (p *PeerNode) ApplyUnappliedIDs() {
 		transaction, doWeHaveNextTransactionToApply := p.SignedTransactionsSeen.Get(id)
 		if !doWeHaveNextTransactionToApply {
 			//fmt.Println("A thread EXITED 'ApplyUnappliedIDS")
+			//p.debugPrint("A thread tries to unlock entered 'ApplyUnappliedIDS",
+			//	p.UnappliedIDs.Get(0), p.UnappliedIDs.Get(1),  p.UnappliedIDs.Get(-2), p.UnappliedIDs.Get(-1))
 			p.unappliedIDSMutexIsLocked = false
 			return
 		}
@@ -167,18 +168,26 @@ func (p* PeerNode) ExtendUnappliedIDsIfValidBlock(signedBlock SignedBlock) {
 		p.debugPrintln("Signature on block invalid")
 		return
 	}
-	isNextBlock := p.Sequencer.BlockNumber + 1 == signedBlock.Block.BlockNumber
+
+	//fmt.Println("Thread trying to lock with blockNumber", p.Sequencer.BlockNumber.Value)
+	p.Sequencer.BlockNumber.Lock()
+	isNextBlock := p.Sequencer.BlockNumber.Value + 1 == signedBlock.Block.BlockNumber
 	if !isNextBlock {
-		p.debugPrintln("Block with number", signedBlock.Block.BlockNumber, "is not the next. Current is number", p.Sequencer.BlockNumber)
+		p.debugPrintln("Block with number", signedBlock.Block.BlockNumber, "is not the next. Current is number", p.Sequencer.BlockNumber.Value)
+
+		//fmt.Println("Thread unlock with blockNumber", p.Sequencer.BlockNumber.Value)
+		p.Sequencer.BlockNumber.Unlock()
 		return
 	}
+	p.Sequencer.BlockNumber.Value += 1
+	//fmt.Println("Thread unlock with blockNumber", p.Sequencer.BlockNumber.Value)
+	p.Sequencer.BlockNumber.Unlock()
 
 	p.debugPrintln("Extending list of unapplied Ids of transactions for block number:", signedBlock.Block.BlockNumber)
 	for _, id := range signedBlock.Block.TransactionIDs {
 		p.UnappliedIDs.Append(id)
 	}
-	p.Sequencer.BlockNumber += 1
-	p.ApplyUnappliedIDs()
+	go p.ApplyUnappliedIDs()
 }
 func (p *PeerNode) applyAllSignedTransactions(signedTransactions []SignedTransaction) {
 	p.debugPrintln("Applying ", len(signedTransactions), " signed transactions")

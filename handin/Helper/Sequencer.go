@@ -7,16 +7,19 @@ import (
 )
 
 type Sequencer struct {
-	UnsequensedTransactionIDs SafeArray_string
+	UnsequencedTransactionIDs SafeArray_string
 	PublicKey                 PublicKey
 	KeyPair                   KeyPair
-	BlockNumber               int
+	BlockNumber               SafeCounter
 }
 
 type Block struct {
 	BlockNumber             int
 	TransactionIDs          []string
 }
+
+
+
 type SignedBlock struct {
 	Block     Block
 	Signature string

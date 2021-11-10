@@ -31,6 +31,7 @@ func (ipc *IPC) Send(packet Packet, conn net.Conn) bool {
 		}
 	}
 
+
 	enc := ipc.ConnToEncDecPair[conn].Encoder
 	err := enc.Encode( packet )
 	if err != nil {
