@@ -86,7 +86,6 @@ func (p *PeerNode) handleIncomming(packet Packet, connPacketWasReceivedOn net.Co
 			packet.Type = PacketType.BROADCAST_KNOWN_SIGNED_TRANSACTION
 			p.Broadcast(packet)
 		}
-
 	case PacketType.BROADCAST_KNOWN_SIGNED_TRANSACTION:
 		p.debugPrintln("received signed packet: [PacketType: BROADCASTED_KNOWN_SIGNED_TRANSACTION]", packet.SignedTransaction.ToString())
 		signedTransaction := packet.SignedTransaction
@@ -106,6 +105,16 @@ func (p *PeerNode) handleIncomming(packet Packet, connPacketWasReceivedOn net.Co
 	case PacketType.BROADCAST_KNOWN_BLOCK:
 		p.debugPrintln("received signed packet: [PacketType: BROADCAST_KNOWN_BLOCK]", packet.SignedBlock.Block.ToString())
 		p.ExtendUnappliedIDsIfValidBlock(packet.SignedBlock)
+	case PacketType.BROADCAST_GENESIS_BLOCK:
+		p.debugPrintln("received signed packet: [PacketType: BROADCAST_GENESIS_BLOCK] with seed", packet.GenesisBlock.Seed)
+		p.handleGensisBlock(packet.GenesisBlock)
+	}
+}
+func (p *PeerNode) handleGensisBlock(G GenesisBlock) {
+	p.Sequencer.Hardness = G.Hardness
+	p.Sequencer.Seed = G.Seed
+	for _, pk := range G.InitialAccounts {
+		p.LocalLedger.CreateAccount(pk.ToString(), G.InitialAmount)
 	}
 }
 func (p *PeerNode) HandlePullReplyPacket(packet Packet) {
@@ -140,21 +149,14 @@ func (p *PeerNode) ApplyUnappliedIDs() {
 		id := p.UnappliedIDs.Get(0)
 		transaction, doWeHaveNextTransactionToApply := p.SignedTransactionsSeen.Get(id)
 		if !doWeHaveNextTransactionToApply {
-			//fmt.Println("A thread EXITED 'ApplyUnappliedIDS")
-			//p.debugPrint("A thread tries to unlock entered 'ApplyUnappliedIDS",
-			//	p.UnappliedIDs.Get(0), p.UnappliedIDs.Get(1),  p.UnappliedIDs.Get(-2), p.UnappliedIDs.Get(-1))
 			p.unappliedIDSMutexIsLocked = false
 			return
 		}
 
 		p.UnappliedIDs.PopHead()
-		//p.debugPrintln("Applying transaction", transaction.ToString())
-		//fmt.Println("Applying transaction", transaction.ToString())
 		p.LocalLedger.ApplySignedTransaction(transaction)
-		
-		
+
 	}
-	//fmt.Println("A thread EXITED 'ApplyUnappliedIDS")
 	p.unappliedIDSMutexIsLocked = false
 }
 func (p* PeerNode) ExtendUnappliedIDsIfValidBlock(signedBlock SignedBlock) {

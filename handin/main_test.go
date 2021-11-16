@@ -42,7 +42,14 @@ func createPeerNode( shouldMockInput bool, shouldPrintDebug bool ) PeerNode {
 	}
 }
 
+func TestGenerateInitalAccountKeys(t *testing.T) {
+	for i := 0; i < 10; i++ {
+		pk, sk := GenKeys(2000)
+		fmt.Println("KeyPair{ Pk: ToPublicKey(\"" + pk.ToString() + "\"),\nSk:ToSecretKey(\"" + sk.ToString() + "\")},\n")
+	}
 
+
+}
 
 func TestConcurrentTransactions(t *testing.T) {
 	//t.Parallel()

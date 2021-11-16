@@ -18,7 +18,8 @@ type Packet struct {
 	SignedTransactionsSeen []Account.SignedTransaction
 
 	SequencerPublicKey Cryptography.PublicKey
-	SignedBlock SignedBlock
+	SignedBlock  SignedBlock
+	GenesisBlock GenesisBlock
 }
 
 var PacketType = struct {
@@ -34,6 +35,7 @@ var PacketType = struct {
 	PULL_REPLY string
 	BROADCAST_BLOCK string
 	BROADCAST_KNOWN_BLOCK string
+	BROADCAST_GENESIS_BLOCK string
 } {
 	BROADCAST_KNOWN_TRANSACTION: "BROADCAST_KNOWN_TRANSACTION",
 	BROADCAST_TRANSACTION: "BROADCAST_TRANSACTION",
@@ -47,4 +49,5 @@ var PacketType = struct {
 	PULL_REPLY:              "PULL_REPLY",
 	BROADCAST_BLOCK: 		 "BROADCAST_BLOCK",
 	BROADCAST_KNOWN_BLOCK:   "BROADCAST_KNOWN_BLOCK",
+	BROADCAST_GENESIS_BLOCK:  "BROADCAST_GENESIS_BLOCK",
 }

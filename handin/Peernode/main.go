@@ -56,8 +56,9 @@ func (p *PeerNode) Start(atPort, remotePort string) {
 	
 	p.DialNetwork(socket)
 
-	if p.IsSequencer() {
-		go p.PeriodicallySendUnsequencedTransactions()
+	if p.IsInitialSequencer() {
+		p.waitUntilTenOpenConnections()
+		go p.SendInitialGenisisBlock()
 	}
 	//go p.PullFromNeighbors() // Occassionally send pull-requests to neighbors, asking for their messagesSent set
 
@@ -65,14 +66,25 @@ func (p *PeerNode) Start(atPort, remotePort string) {
 }
 
 
-func (p *PeerNode) IsSequencer() bool {
+func (p *PeerNode) IsInitialSequencer() bool {
 	return p.Sequencer.KeyPair != KeyPair{}
 }
-func (p *PeerNode) PeriodicallySendUnsequencedTransactions() {
-	for {
-		time.Sleep(30 * time.Second)
-		p.BroadcastBlock()
+func (p *PeerNode) waitUntilTenOpenConnections() {
+	for len(p.OpenConnections.Values()) < 10 {
+		time.Sleep(500 * time.Millisecond)
 	}
+}
+func (p *PeerNode) SendInitialGenisisBlock() {
+	genesisBlock := GenesisBlock{
+		Seed: "SebastianAndAndreasBlockchain",
+		InitialAccounts: GetHardcodedAccPublicKeys(),
+		Hardness: 999999999999999999,
+		InitialAmount: 10e6,
+	}
+	fmt.Print("Broadcasting Genesis block", genesisBlock)
+	p.Broadcast(
+		Packet { Type: PacketType.BROADCAST_GENESIS_BLOCK, GenesisBlock: genesisBlock },
+	)
 }
 func (p *PeerNode) BroadcastBlock() {
 	block := Block {

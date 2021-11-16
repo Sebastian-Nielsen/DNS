@@ -11,6 +11,8 @@ type Sequencer struct {
 	PublicKey                 PublicKey
 	KeyPair                   KeyPair
 	BlockNumber               SafeCounter
+	Seed					  string
+	Hardness				  int
 }
 
 type Block struct {
@@ -19,6 +21,12 @@ type Block struct {
 }
 
 
+type GenesisBlock struct {
+	Seed				   string
+	InitialAccounts        []PublicKey
+	InitialAmount		   int
+	Hardness			   int
+}
 
 type SignedBlock struct {
 	Block     Block

@@ -5,23 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a473623c-3760-4b60-9758-0b085a2e5373" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/handin/Helper/SafeInt.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/handin/Account/hardcodedAccounts.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handin/Helper/SafeMap.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Helper/SafeMap.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handin/Helper/SafeSet.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Helper/SafeSet.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/handin/Helper/Sequencer.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Helper/Sequencer.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/handin/Peernode/Incoming.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Peernode/Incoming.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handin/Peernode/Outgoing.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Peernode/Outgoing.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handin/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handin/main_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/main_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handin/Peernode/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Peernode/main.go" afterDir="false" />
     </list>
     <list id="e9a7fb15-2854-49e4-a42f-7419d36ff913" name="Changes by Andreas 🌚" comment="">
-      <change beforePath="$PROJECT_DIR$/handin/Helper/IPC.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Helper/IPC.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handin/Helper/SafeSet.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Helper/SafeSet.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handin/Helper/Packet.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Helper/Packet.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/handin/Helper/Sequencer.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Helper/Sequencer.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/handin/Peernode/Incoming.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Peernode/Incoming.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handin/Peernode/Outgoing.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Peernode/Outgoing.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handin/Peernode/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Peernode/main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/handin/main_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/main_test.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -69,72 +62,19 @@
   <component name="LineStatusTrackerManager">
     <file path="$PROJECT_DIR$/handin/Helper/Sequencer.go">
       <ranges>
-        <range start1="9" end1="10" start2="9" end2="10" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="12" end1="13" start2="12" end2="13" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="19" end1="19" start2="19" end2="22" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-      </ranges>
-    </file>
-    <file path="$PROJECT_DIR$/handin/Peernode/Outgoing.go">
-      <ranges>
-        <range start1="30" end1="31" start2="30" end2="31" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="96" end1="98" start2="96" end2="100" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-      </ranges>
-    </file>
-    <file path="$PROJECT_DIR$/handin/main_test.go">
-      <ranges>
-        <range start1="25" end1="26" start2="25" end2="26" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="36" end1="37" start2="36" end2="37" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="39" end1="40" start2="39" end2="40" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="48" end1="49" start2="48" end2="49" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="66" end1="67" start2="66" end2="67" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="88" end1="89" start2="88" end2="88" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="103" end1="104" start2="102" end2="102" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="111" end1="113" start2="109" end2="109" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="116" end1="117" start2="112" end2="113" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="404" end1="405" start2="400" end2="401" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="406" end1="407" start2="402" end2="403" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="473" end1="474" start2="469" end2="470" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="476" end1="477" start2="472" end2="473" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="480" end1="481" start2="476" end2="477" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="483" end1="484" start2="479" end2="480" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="524" end1="525" start2="520" end2="521" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="527" end1="528" start2="523" end2="524" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="530" end1="531" start2="526" end2="527" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="533" end1="534" start2="529" end2="530" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="568" end1="569" start2="564" end2="565" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="686" end1="688" start2="682" end2="684" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="689" end1="691" start2="685" end2="687" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
+        <range start1="13" end1="13" start2="13" end2="15" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
+        <range start1="21" end1="21" start2="23" end2="29" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
       </ranges>
     </file>
     <file path="$PROJECT_DIR$/handin/Peernode/Incoming.go">
       <ranges>
-        <range start1="83" end1="84" start2="83" end2="84" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="96" end1="97" start2="96" end2="97" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="132" end1="133" start2="132" end2="132" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="144" end1="144" start2="143" end2="145" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="169" end1="170" start2="170" end2="174" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="171" end1="172" start2="175" end2="179" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="174" end1="174" start2="181" end2="184" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="179" end1="181" start2="189" end2="190" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-      </ranges>
-    </file>
-    <file path="$PROJECT_DIR$/handin/Helper/SafeSet.go">
-      <ranges>
-        <range start1="12" end1="14" start2="12" end2="14" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="16" end1="16" start2="16" end2="25" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="19" end1="20" start2="28" end2="29" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="24" end1="25" start2="33" end2="34" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="29" end1="30" start2="38" end2="39" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="32" end1="33" start2="41" end2="42" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="41" end1="42" start2="50" end2="51" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="78" end1="79" start2="87" end2="88" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="84" end1="85" start2="93" end2="94" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="89" end1="90" start2="98" end2="99" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="94" end1="95" start2="103" end2="104" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="104" end1="105" start2="113" end2="114" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="110" end1="111" start2="119" end2="120" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="115" end1="116" start2="124" end2="125" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="120" end1="121" start2="129" end2="130" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="88" end1="89" start2="88" end2="88" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
+        <range start1="108" end1="108" start2="107" end2="110" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
+        <range start1="110" end1="110" start2="112" end2="119" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="142" end1="145" start2="151" end2="151" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="150" end1="152" start2="156" end2="156" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="153" end1="155" start2="157" end2="158" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="156" end1="157" start2="159" end2="159" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
       </ranges>
     </file>
   </component>
@@ -178,15 +118,7 @@
       <recent name="C:\Users\sebas\GolandProjects\Distribuerede_systemer_og_sikkerhed\handin\Account" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Test.TestConcurrentTransactions in DNO/handin">
-    <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
-      <module name="DNO" />
-      <working_directory value="$PROJECT_DIR$" />
-      <kind value="FILE" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <method v="2" />
-    </configuration>
+  <component name="RunManager" selected="Go Test.TestGenerateInitalAccountKeys in DNO/handin">
     <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="DNO" />
       <working_directory value="$PROJECT_DIR$" />
@@ -220,25 +152,16 @@
       <pattern value="^\QTestConcurrentTransactions\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestPeerNodeConnectsToAllNodesWhenEnteringNetwork in DNO/handin" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestGenerateInitalAccountKeys in DNO/handin" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="DNO" />
       <working_directory value="$PROJECT_DIR$/handin" />
       <root_directory value="$PROJECT_DIR$" />
       <kind value="PACKAGE" />
       <package value="DNO/handin" />
       <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/handin/main_test.go" />
-      <framework value="gotest" />
-      <pattern value="^\QTestPeerNodeConnectsToAllNodesWhenEnteringNetwork\E$" />
-      <method v="2" />
-    </configuration>
-    <configuration default="true" type="GoTestRunConfiguration" factoryName="Go Test">
-      <module name="DNO" />
-      <working_directory value="$PROJECT_DIR$" />
-      <kind value="DIRECTORY" />
-      <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
+      <pattern value="^\QTestGenerateInitalAccountKeys\E$" />
       <method v="2" />
     </configuration>
     <configuration name="main_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -253,11 +176,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.TestGenerateInitalAccountKeys in DNO/handin" />
         <item itemvalue="Go Test.TestConcurrentTransactions in DNO/handin" />
         <item itemvalue="Go Test.TestConcurrentTransactions in DNO/handin (1)" />
         <item itemvalue="Go Build.go build main.go" />
         <item itemvalue="Go Test.main_test.go" />
-        <item itemvalue="Go Test.TestPeerNodeConnectsToAllNodesWhenEnteringNetwork in DNO/handin" />
       </list>
     </recent_temporary>
   </component>
