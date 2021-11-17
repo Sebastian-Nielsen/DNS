@@ -6,6 +6,7 @@ import (
 	. "DNO/handin/Helper"
 	"bufio"
 	"fmt"
+	"math/big"
 	"net"
 	"os"
 	"strconv"
@@ -75,10 +76,11 @@ func (p *PeerNode) waitUntilTenOpenConnections() {
 	}
 }
 func (p *PeerNode) SendInitialGenisisBlock() {
+	hardness, _ := new(big.Int).SetString("9999999", 10)
 	genesisBlock := GenesisBlock{
 		Seed: "SebastianAndAndreasBlockchain",
 		InitialAccounts: GetHardcodedAccPublicKeys(),
-		Hardness: 999999999999999999,
+		Hardness: hardness,
 		InitialAmount: 10e6,
 	}
 	fmt.Print("Broadcasting Genesis block", genesisBlock)
@@ -86,17 +88,26 @@ func (p *PeerNode) SendInitialGenisisBlock() {
 		Packet { Type: PacketType.BROADCAST_GENESIS_BLOCK, GenesisBlock: genesisBlock },
 	)
 }
-func (p *PeerNode) BroadcastBlock() {
-	block := Block {
-		BlockNumber: p.Sequencer.BlockNumber.Value + 1,
-		TransactionIDs: p.Sequencer.UnsequencedTransactionIDs.PopAll(),
-	}
 
+//func (p *PeerNode) BroadcastBlock() {
+//	block := Block {
+//		SlotNumber:     p.Sequencer.SlotNumber.Value + 1,
+//		TransactionIDs: p.Sequencer.UnsequencedTransactionIDs.PopAll(),
+//	}
+//
+//	p.debugPrintln("Broadcasting block with", strconv.Itoa(len(block.TransactionIDs)), "elements")
+//	p.Broadcast(
+//		Packet { Type: PacketType.BROADCAST_BLOCK, SignedBlock: p.Sequencer.Sign(block) },
+//	)
+//	p.handleBlock(SignedBlock{})
+//}
+
+func (p *PeerNode) BroadcastBlock(block Block) {
 	p.debugPrintln("Broadcasting block with", strconv.Itoa(len(block.TransactionIDs)), "elements")
 	p.Broadcast(
 		Packet { Type: PacketType.BROADCAST_BLOCK, SignedBlock: p.Sequencer.Sign(block) },
 	)
-	p.ExtendUnappliedIDsIfValidBlock(SignedBlock{})
+	p.handleBlock(SignedBlock{})
 }
 func PromptForRemoteSocket(p *PeerNode) Socket {
 

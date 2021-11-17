@@ -23,7 +23,7 @@ func main() {
 									UnsequencedTransactionIDs: SafeArray_string{},
 								 	PublicKey:                 PublicKey{},
 								 	KeyPair:                   KeyPair{},
-								 	BlockNumber:               SafeCounter{Value: -1},
+								 	SlotNumber:                SafeCounter{Value: -1},
 								},
 	}
 

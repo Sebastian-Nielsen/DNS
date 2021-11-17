@@ -37,7 +37,8 @@ func createPeerNode( shouldMockInput bool, shouldPrintDebug bool ) PeerNode {
 								 UnsequencedTransactionIDs: SafeArray_string{},
 								 PublicKey:                 PublicKey{},
 								 KeyPair:                   KeyPair{},
-								 BlockNumber:               SafeCounter{Value: -1},
+								 SlotNumber:                SafeCounter{Value: -1},
+								 Tree:                      Tree{BlockHashToBlock: make(map[string]Block)},
 							 },
 	}
 }
@@ -51,6 +52,7 @@ func TestGenerateInitalAccountKeys(t *testing.T) {
 
 }
 
+/* Legacy test
 func TestConcurrentTransactions(t *testing.T) {
 	//t.Parallel()
 
@@ -115,6 +117,7 @@ func TestConcurrentTransactions(t *testing.T) {
 	fmt.Println("Account B has:", peerNodeA.LocalLedger.Accounts[AccountNames[1]])
 	fmt.Println("Account C has:", peerNodeA.LocalLedger.Accounts[AccountNames[2]])
 }
+*/
 
 func MakeManyTransactions(peerNode *PeerNode, t Transaction, wg *sync.WaitGroup) {
 	for i := 1; i < 501; i++ {

@@ -2,6 +2,7 @@ package Helper
 
 import (
 	. "DNO/handin/Cryptography"
+	"math/big"
 	"strconv"
 	"strings"
 )
@@ -9,23 +10,29 @@ import (
 type Sequencer struct {
 	UnsequencedTransactionIDs SafeArray_string
 	PublicKey                 PublicKey
-	KeyPair                   KeyPair
-	BlockNumber               SafeCounter
-	Seed					  string
-	Hardness				  int
+	KeyPair    				  KeyPair
+	SlotNumber 				  SafeCounter
+	Seed       				  string
+	Hardness				  *big.Int
+	Tree 				      Tree
 }
 
 type Block struct {
-	BlockNumber             int
+	VerificationKey 		PublicKey
+	SlotNumber      		int
+	Draw            		*big.Int
 	TransactionIDs          []string
+	PrevBlockHash			string
+	LengthToRoot            int
 }
+
 
 
 type GenesisBlock struct {
 	Seed				   string
 	InitialAccounts        []PublicKey
 	InitialAmount		   int
-	Hardness			   int
+	Hardness			   *big.Int
 }
 
 type SignedBlock struct {
@@ -34,13 +41,24 @@ type SignedBlock struct {
 }
 
 func (b *Block) ToString() string {
-	return strconv.Itoa(b.BlockNumber) + ":" + strings.Join(b.TransactionIDs, ",")
+	return b.VerificationKey.ToString() + ":" +
+		   strconv.Itoa(b.SlotNumber) + ":" +
+		   b.Draw.String() + ":" +
+		   strings.Join(b.TransactionIDs, ",") + ":" +
+		   string(b.PrevBlockHash) + ":" +
+		   strconv.Itoa(b.LengthToRoot)
 }
 
 func (s *Sequencer) Sign(block Block) SignedBlock {
 	blockString := block.ToString()
 	signature := CreateSignature(blockString, s.KeyPair.Sk)
 	return SignedBlock {Block: block, Signature: signature}
+}
+
+func (b *Block) Hash() string {
+	n := new(big.Int)
+	n.SetString(b.ToString(), 10)
+	return string(Hash(n))
 }
 
 func (s *Sequencer) Verify(signedBlock SignedBlock) bool {
