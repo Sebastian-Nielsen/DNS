@@ -6,7 +6,7 @@ type Tree struct {
 	Root                GenesisBlock
 	BlockHashToBlock    map[string]Block
 	LengthOfBestPath    int
-	BlocksWhoseParentIsNotInTree map[string]Block    // Map containing:        block.prevHash -> block
+	BlocksThatAreWaitingForTheirParent map[string]*SafeArray_Block    // Map containing:        block.prevHash -> block
 }
 
 func (t *Tree) Insert(block Block) {
@@ -30,6 +30,14 @@ func (t *Tree) Insert(block Block) {
 	}
 }
 
-
-
+func (t *Tree) FindFinalBlock(rollbackLimit int) (Block, bool) {
+	if rollbackLimit >= t.LengthOfBestPath {
+		return Block{}, false
+	}
+	currentBlockHash := t.LeafHashOfBestPath
+	for i := 0; i < rollbackLimit; i++ {
+		currentBlockHash = t.BlockHashToBlock[currentBlockHash].PrevBlockHash
+	}
+	return t.BlockHashToBlock[currentBlockHash], true
+}
 

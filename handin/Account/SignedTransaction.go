@@ -6,6 +6,8 @@ import (
 	"strconv"
 )
 
+const TRANSACTIONFEE = 1
+
 type SignedTransaction struct {
 	ID string // Any string
 	From string // A verification key coded as a string
@@ -34,8 +36,8 @@ func (l *Ledger) ApplySignedTransaction(t SignedTransaction) {
 		fmt.Printf("Signature is invalid! Transaction from (%s...) to (%s...).\n", t.From[:8], t.To[:8])
 		return
 	}
-	amountPositive := t.Amount > 0
-	if !amountPositive {
+	amountValid := t.Amount >= 1
+	if !amountValid {
 		fmt.Printf("The amount %d on the signed transaction is negative\n", t.Amount)
 		return
 	}
@@ -44,8 +46,11 @@ func (l *Ledger) ApplySignedTransaction(t SignedTransaction) {
 		//fmt.Printf("Will become less than 0\n", t.Amount)
 		return
 	}
-	l.Accounts[t.From] -= t.Amount
-	l.Accounts[t.To] += t.Amount
+
+	// Apply transaction fee
+	afterFee := t.Amount - TRANSACTIONFEE
+	l.Accounts[t.From] -= afterFee
+	l.Accounts[t.To] += afterFee
 	//fmt.Println("Account t.From (", t.From[:4] ,") is now:", l.Accounts[t.From])
 	//fmt.Println("Account t.To (", t.To[:4] ,") is now:", l.Accounts[t.To])
 }
@@ -65,4 +70,9 @@ func (l *Ledger) Verify(st SignedTransaction) bool {
 	msg := st.ID + ":" + st.From + ":" + st.To + ":" + strconv.Itoa(st.Amount)
 	pk := ToPublicKey(st.From)
 	return Verify(st.Signature, msg, pk)
+}
+
+func (l *Ledger) GiftToAccount(amount int, idOfAccount string) {
+	l.lock.Lock() ; defer l.lock.Unlock()
+	l.Accounts[idOfAccount] += amount
 }

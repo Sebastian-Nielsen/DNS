@@ -5,17 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a473623c-3760-4b60-9758-0b085a2e5373" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/handin/Helper/Tree.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handin/Account/Transaction.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Account/Transaction.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handin/Helper/SafeArray.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Helper/SafeArray.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/handin/Helper/Sequencer.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Helper/Sequencer.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handin/Helper/Tree.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Helper/Tree.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/handin/Peernode/Incoming.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Peernode/Incoming.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handin/Peernode/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Peernode/main.go" afterDir="false" />
     </list>
     <list id="e9a7fb15-2854-49e4-a42f-7419d36ff913" name="Changes by Andreas 🌚" comment="">
-      <change beforePath="$PROJECT_DIR$/handin/Helper/Sequencer.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Helper/Sequencer.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handin/Account/Ledger.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Account/Ledger.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handin/Account/SignedTransaction.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Account/SignedTransaction.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handin/Helper/Tree.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Helper/Tree.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/handin/Peernode/Incoming.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Peernode/Incoming.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handin/Peernode/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/Peernode/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handin/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/handin/main_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/handin/main_test.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -61,46 +62,34 @@
     <auto-save>true</auto-save>
   </component>
   <component name="LineStatusTrackerManager">
-    <file path="$PROJECT_DIR$/handin/Peernode/main.go">
-      <ranges>
-        <range start1="8" end1="8" start2="8" end2="9" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="77" end1="77" start2="78" end2="79" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="80" end1="81" start2="82" end2="83" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="88" end1="93" start2="90" end2="90" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="94" end1="94" start2="91" end2="105" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="98" end1="99" start2="109" end2="110" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-      </ranges>
-    </file>
-    <file path="$PROJECT_DIR$/handin/Helper/Sequencer.go">
-      <ranges>
-        <range start1="4" end1="4" start2="4" end2="5" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="11" end1="15" start2="12" end2="17" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="18" end1="19" start2="20" end2="23" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="20" end1="20" start2="24" end2="26" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="22" end1="22" start2="28" end2="29" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="27" end1="28" start2="34" end2="35" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="36" end1="37" start2="43" end2="49" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="44" end1="44" start2="56" end2="62" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-      </ranges>
-    </file>
     <file path="$PROJECT_DIR$/handin/Peernode/Incoming.go">
       <ranges>
-        <range start1="5" end1="5" start2="5" end2="7" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="6" end1="6" start2="8" end2="11" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="7" end1="7" start2="12" end2="14" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="101" end1="102" start2="108" end2="109" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="106" end1="107" start2="113" end2="114" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="115" end1="115" start2="122" end2="125" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="118" end1="118" start2="128" end2="129" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="119" end1="119" start2="130" end2="174" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="137" end1="138" start2="192" end2="193" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="161" end1="164" start2="216" end2="220" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="173" end1="176" start2="229" end2="247" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="177" end1="178" start2="248" end2="249" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="179" end1="181" start2="250" end2="252" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="183" end1="186" start2="254" end2="285" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
-        <range start1="187" end1="189" start2="286" end2="288" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
-        <range start1="193" end1="193" start2="292" end2="299" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="4" end1="4" start2="4" end2="5" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="5" end1="6" start2="6" end2="9" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="10" end1="11" start2="13" end2="13" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="14" end1="14" start2="16" end2="17" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
+        <range start1="91" end1="92" start2="94" end2="95" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
+        <range start1="104" end1="105" start2="107" end2="108" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
+        <range start1="132" end1="132" start2="135" end2="140" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="133" end1="134" start2="141" end2="141" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="136" end1="138" start2="143" end2="144" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="151" end1="152" start2="157" end2="163" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="154" end1="154" start2="165" end2="181" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
+        <range start1="194" end1="216" start2="221" end2="244" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="228" end1="228" start2="256" end2="261" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="242" end1="259" start2="275" end2="277" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
+        <range start1="261" end1="274" start2="279" end2="280" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="278" end1="279" start2="284" end2="285" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="281" end1="282" start2="287" end2="295" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="284" end1="291" start2="297" end2="297" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
+        <range start1="292" end1="294" start2="298" end2="329" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="295" end1="297" start2="330" end2="334" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+      </ranges>
+    </file>
+    <file path="$PROJECT_DIR$/handin/Helper/Tree.go">
+      <ranges>
+        <range start1="8" end1="9" start2="8" end2="9" changelist="a473623c-3760-4b60-9758-0b085a2e5373" />
+        <range start1="32" end1="34" start2="32" end2="42" changelist="e9a7fb15-2854-49e4-a42f-7419d36ff913" />
       </ranges>
     </file>
   </component>

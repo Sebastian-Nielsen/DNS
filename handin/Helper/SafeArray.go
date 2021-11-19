@@ -93,6 +93,27 @@ func (a *SafeArray_Transaction) Contains(transactionToSearchFor Account.Transact
 }
 
 
+
+type SafeArray_Block struct {
+	values []Block
+	mu     sync.Mutex
+}
+func (a *SafeArray_Block) Append(value Block) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	a.values = append(a.values, value)
+}
+func (a *SafeArray_Block) Values() []Block {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	cpy := make([]Block, len(a.values))
+	copy(cpy, a.values)
+	return cpy
+}
+
+
+
+
 type SafeArray_SignedTransaction struct {
 	values []Account.SignedTransaction
 	mu     sync.Mutex

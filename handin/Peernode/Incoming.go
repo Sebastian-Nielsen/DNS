@@ -2,16 +2,19 @@ package Peernode
 
 import (
 	. "DNO/handin/Account"
+	. "DNO/handin/Cryptography"
 	. "DNO/handin/Helper"
-	"golang.org/x/crypto/pkcs12"
+	"fmt"
+
+	//"golang.org/x/crypto/pkcs12"
 	"math/big"
 	"net"
 	"strconv"
 	"time"
-	. "DNO/handin/Cryptography"
 )
 
 const SLOT_LENGTH = 1000
+const ROLLBACK_LIMIT = 4
 
 
 func (p *PeerNode) handleIncomming(packet Packet, connPacketWasReceivedOn net.Conn) {
@@ -89,7 +92,7 @@ func (p *PeerNode) handleIncomming(packet Packet, connPacketWasReceivedOn net.Co
 		if !signedTransactionIsSeen {
 			p.SignedTransactionsSeen.Put(signedTransaction.ID, signedTransaction)
 			p.Sequencer.UnsequencedTransactionIDs.Append(signedTransaction.ID)
-			go p.ApplyUnappliedIDs()
+			// go p.ApplyUnappliedIDs()
 			packet.Type = PacketType.BROADCAST_KNOWN_SIGNED_TRANSACTION
 			p.Broadcast(packet)
 		}
@@ -102,7 +105,7 @@ func (p *PeerNode) handleIncomming(packet Packet, connPacketWasReceivedOn net.Co
 			p.SignedTransactionsSeen.Put(signedTransaction.ID, signedTransaction)
 			p.Sequencer.UnsequencedTransactionIDs.Append(signedTransaction.ID)
 			// p.Broadcast(packet)
-			go p.ApplyUnappliedIDs()
+			// go p.ApplyUnappliedIDs()
 		}
 	case PacketType.BROADCAST_BLOCK:
 		//p.debugPrintln("received signed packet: [PacketType: BROADCAST_BLOCK]", packet.SignedBlock.Block.ToString())
@@ -130,12 +133,15 @@ func (p *PeerNode) handleGensisBlock(G GenesisBlock) {
 }
 func (p *PeerNode) startLotteryProtocol() {
 	for {
-		//p.Sequencer.SlotNumber.Lock()
+		slotStartTime := time.Now()
 		p.Sequencer.SlotNumber.Value += 1
+
+		p.applyFinalBlock()
+
+		//p.Sequencer.SlotNumber.Lock()
 		//p.Sequencer.SlotNumber.Unlock()
 		draw := p.getDraw(p.Sequencer.Seed, p.Sequencer.SlotNumber.Value, p.Keys.Sk)
-		lotteryString := p.lotteryString(p.Sequencer.Seed, p.Sequencer.SlotNumber.Value)
-		if p.isWinner(draw, p.Keys.Pk, lotteryString) {
+		if p.isWinner(draw, p.Keys.Pk, p.lotteryString(p.Sequencer.Seed, p.Sequencer.SlotNumber.Value)) {
 
 			block := Block{
 				VerificationKey: p.Keys.Pk,
@@ -149,7 +155,28 @@ func (p *PeerNode) startLotteryProtocol() {
 			}
 			p.BroadcastBlock(block)
 		}
-		time.Sleep(SLOT_LENGTH * time.Millisecond)
+
+
+
+		timeElapsedSinceSlotStart := time.Since(slotStartTime).Milliseconds()
+		if timeElapsedSinceSlotStart > SLOT_LENGTH{ fmt.Println("ERROR: SLOTLENGTH TOO SHORT") }
+		time.Sleep(time.Duration((SLOT_LENGTH - timeElapsedSinceSlotStart) * int64(time.Millisecond)))
+	}
+}
+func (p *PeerNode) applyFinalBlock() {
+	finalBlock, exists := p.Sequencer.Tree.FindFinalBlock(ROLLBACK_LIMIT)
+	if exists {
+		p.debugPrintln("Extending list of unapplied Ids of transactions for block number:", finalBlock.SlotNumber)
+		for _, transactionId := range finalBlock.TransactionIDs {
+			transaction, _ := p.SignedTransactionsSeen.Get(transactionId)
+			p.LocalLedger.ApplySignedTransaction(transaction)
+		}
+
+		// Give compensation to the node that created the block
+		amountToCompensate := len(finalBlock.TransactionIDs) + 10
+		p.debugPrint("Compensating the account '" + finalBlock.VerificationKey.ToString()[:10] +
+			"...' for creating the block, with " + strconv.Itoa(amountToCompensate) + " AUs")
+		p.LocalLedger.GiftToAccount(amountToCompensate, finalBlock.VerificationKey.ToString())
 	}
 }
 func (p *PeerNode) isWinner(draw *big.Int, publicKey PublicKey, lotteryString string) bool {
@@ -192,28 +219,29 @@ func (p *PeerNode) HandlePullReplyPacket(packet Packet) {
 
 	//p.handleBlock(packet.SignedBlock)
 }
-func (p *PeerNode) ApplyUnappliedIDs() {
-	if p.unappliedIDSMutexIsLocked { return }
-	//fmt.Println("A thread entered 'ApplyUnappliedIDS")
-	p.unappliedIDsMutex.Lock()
-	p.unappliedIDSMutexIsLocked = true
-	defer p.unappliedIDsMutex.Unlock()
-
-	for !(p.UnappliedIDs.IsEmpty()) {
-
-		id := p.UnappliedIDs.Get(0)
-		transaction, doWeHaveNextTransactionToApply := p.SignedTransactionsSeen.Get(id)
-		if !doWeHaveNextTransactionToApply {
-			p.unappliedIDSMutexIsLocked = false
-			return
-		}
-
-		p.UnappliedIDs.PopHead()
-		p.LocalLedger.ApplySignedTransaction(transaction)
-
-	}
-	p.unappliedIDSMutexIsLocked = false
-}
+//func (p *PeerNode) ApplyUnappliedIDs() {
+	//if p.unappliedIDSMutexIsLocked { return }
+	////fmt.Println("A thread entered 'ApplyUnappliedIDS")
+	//p.unappliedIDsMutex.Lock()
+	//p.unappliedIDSMutexIsLocked = true
+	//defer p.unappliedIDsMutex.Unlock()
+	//
+	//for !(p.UnappliedIDs.IsEmpty()) {
+	//
+	//	id := p.UnappliedIDs.Get(0)
+	//	transaction, doWeHaveNextTransactionToApply := p.SignedTransactionsSeen.Get(id)
+	//	if !doWeHaveNextTransactionToApply {
+	//		p.unappliedIDSMutexIsLocked = false
+	//		return
+	//	}
+	//
+	//	p.UnappliedIDs.PopHead()
+	//	p.LocalLedger.ApplySignedTransaction(transaction)
+	//
+	//
+	//}
+	//p.unappliedIDSMutexIsLocked = false
+//}
 func (p* PeerNode) handleBlock(signedBlock SignedBlock) {
 	block := signedBlock.Block
 	isSequencerPkReceived := p.Sequencer.PublicKey.N != nil
@@ -224,6 +252,11 @@ func (p* PeerNode) handleBlock(signedBlock SignedBlock) {
 	isValidSignature := p.Sequencer.Verify(signedBlock)
 	if !isValidSignature {
 		p.debugPrintln("Signature on block invalid")
+		return
+	}
+
+	if !p.doOnlyContainValidTransactions(block) {
+		p.debugPrintln("The block contains transactions that make an account go below 0")
 		return
 	}
 
@@ -240,61 +273,65 @@ func (p* PeerNode) handleBlock(signedBlock SignedBlock) {
 		return
 	}
 
-
-/*
-	//fmt.Println("Thread trying to lock with blockNumber", p.Sequencer.SlotNumber.Value)
-	p.Sequencer.SlotNumber.Lock()
-	isNextBlock := p.Sequencer.SlotNumber.Value + 1 == signedBlock.Block.SlotNumber
-	if !isNextBlock {
-		p.debugPrintln("Block with number", signedBlock.Block.SlotNumber, "is not the next. Current is number", p.Sequencer.SlotNumber.Value)
-
-		//fmt.Println("Thread unlock with blockNumber", p.Sequencer.SlotNumber.Value)
-		p.Sequencer.SlotNumber.Unlock()
-		return
-	}
-	p.Sequencer.SlotNumber.Value += 1
-	//fmt.Println("Thread unlock with blockNumber", p.Sequencer.SlotNumber.Value)
-	p.Sequencer.SlotNumber.Unlock()
-*/
+	// Set default vals for block
+	block.HasBeenApplied = false
 
 
-
-
-//newBlock
-//
-//	get newblock in
-//
-//	check if we cannot insert newBlock into map:
-//		map.insert(newBlock)
-//
-//	check if in map
-//		(block.prevHash) -> block
-//	(block.prevHash) -> block
-
-
+	// Block is valid, so try to insert it into tree
 	_, parentExistInTree := p.Sequencer.Tree.BlockHashToBlock[block.PrevBlockHash]
 	if parentExistInTree {
 		p.Sequencer.Tree.Insert(block)
 
-		p.insertRecursivelyBlocksThatAreParentTo(block)
+		p.insertRecursivelyBlocksThatAreChildrenTo(block)
 	} else {
 		// We cant add the block to the tree since its parent isn't in the tree
-		p.Sequencer.Tree.BlocksWhoseParentIsNotInTree[block.Hash()] = block
+		listOfWaitingBlocks, keyExists := p.Sequencer.Tree.BlocksThatAreWaitingForTheirParent[block.PrevBlockHash]
+		if keyExists {
+			listOfWaitingBlocks.Append(block)
+		} else {
+			newArray := SafeArray_Block{}
+			newArray.Append(block)
+			p.Sequencer.Tree.BlocksThatAreWaitingForTheirParent[block.PrevBlockHash] = &newArray
+		}
 	}
 
-	// Block is valid, so insert it into tree
-
-	p.debugPrintln("Extending list of unapplied Ids of transactions for block number:", block.SlotNumber)
-	for _, id := range block.TransactionIDs {
-		p.UnappliedIDs.Append(id)
-	}
-	go p.ApplyUnappliedIDs()
 }
-func (p *PeerNode) insertRecursivelyBlocksThatAreParentTo(block Block) {
-	childToBlock, doExistChildToBlock := p.Sequencer.Tree.BlocksWhoseParentIsNotInTree[block.Hash()]
+func (p *PeerNode) doOnlyContainValidTransactions(block Block) bool { //  A B F d e   <- g        rollback=2
+	//block.parent.isApplied
+	tempLedger := p.LocalLedger.MakeCopy()
+	currentBlock := p.Sequencer.Tree.BlockHashToBlock[block.PrevBlockHash]
+	for {
+		if currentBlock.HasBeenApplied {
+			break
+		}
+		for _, transactionId := range currentBlock.TransactionIDs {
+			transaction, _ := p.SignedTransactionsSeen.Get(transactionId)
+			// Apply it to tempLedger
+			tempLedger[transaction.From] -= transaction.Amount
+			tempLedger[transaction.To] += transaction.Amount
+		}
+		currentBlock = p.Sequencer.Tree.BlockHashToBlock[block.PrevBlockHash]
+	}
+
+	// Now apply the received block to see if the transactions are all valid
+	for _, transactionId := range block.TransactionIDs {
+		transaction, _ := p.SignedTransactionsSeen.Get(transactionId)
+		// Apply it to tempLedger
+		tempLedger[transaction.From] -= transaction.Amount
+		tempLedger[transaction.To] += transaction.Amount
+		if tempLedger[transaction.From] < 0 || transaction.Amount < 1 {
+			return false
+		}
+	}
+	return true
+}
+func (p *PeerNode) insertRecursivelyBlocksThatAreChildrenTo(block Block) {
+	childrenToBlock, doExistChildToBlock := p.Sequencer.Tree.BlocksThatAreWaitingForTheirParent[block.Hash()]
 	if doExistChildToBlock {
-		p.Sequencer.Tree.Insert(childToBlock)
-		p.insertRecursivelyBlocksThatAreParentTo(childToBlock)
+		for _, child := range childrenToBlock.Values() {
+			p.Sequencer.Tree.Insert(child)
+			p.insertRecursivelyBlocksThatAreChildrenTo(child)
+		}
 	}
 }
 func (p *PeerNode) applyAllSignedTransactions(signedTransactions []SignedTransaction) {

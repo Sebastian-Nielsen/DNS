@@ -24,6 +24,7 @@ type Block struct {
 	TransactionIDs          []string
 	PrevBlockHash			string
 	LengthToRoot            int
+	HasBeenApplied			bool
 }
 
 

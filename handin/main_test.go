@@ -43,6 +43,53 @@ func createPeerNode( shouldMockInput bool, shouldPrintDebug bool ) PeerNode {
 	}
 }
 
+
+func Test1(t *testing.T) {
+	GetHardcodedAccKeyPairs()
+
+	var peerNode1_port = AvailablePorts.Next()
+	var peerNode2_port = AvailablePorts.Next()
+	var peerNode3_port = AvailablePorts.Next()
+	var peerNode4_port = AvailablePorts.Next()
+	var peerNode5_port = AvailablePorts.Next()
+	var peerNode6_port = AvailablePorts.Next()
+	var peerNode7_port = AvailablePorts.Next()
+	var peerNode8_port = AvailablePorts.Next()
+	var peerNode9_port = AvailablePorts.Next()
+	var peerNode10_port = AvailablePorts.Next()
+
+	peerNode1 := createPeerNode(true, false)
+	peerNode2 := createPeerNode(true, false)
+	peerNode3 := createPeerNode(true, false)
+	peerNode4 := createPeerNode(true, false)
+	peerNode5 := createPeerNode(true, false)
+	peerNode6 := createPeerNode(true, false)
+	peerNode7 := createPeerNode(true, false)
+	peerNode8 := createPeerNode(true, false)
+	peerNode9 := createPeerNode(true, false)
+	peerNode10 := createPeerNode(true, false)
+
+	goStart(&peerNode1, peerNode1_port, "no_port")
+	goStart(&peerNode2, peerNode2_port, peerNode1_port)
+	goStart(&peerNode3, peerNode3_port, peerNode2_port)
+	goStart(&peerNode4, peerNode4_port, peerNode3_port)
+	goStart(&peerNode5, peerNode5_port, peerNode4_port)
+	goStart(&peerNode6, peerNode6_port, peerNode5_port)
+	goStart(&peerNode7, peerNode7_port, peerNode6_port)
+	goStart(&peerNode8, peerNode8_port, peerNode7_port)
+	goStart(&peerNode9, peerNode9_port, peerNode8_port)
+	goStart(&peerNode10, peerNode10_port, peerNode9_port)
+
+
+	peerNode.MakeAndBroadcastSignedTransaction(t.Amount, t.ID+strconv.Itoa(i), t.From, t.To)
+
+}
+
+
+
+
+
+
 func TestGenerateInitalAccountKeys(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		pk, sk := GenKeys(2000)
