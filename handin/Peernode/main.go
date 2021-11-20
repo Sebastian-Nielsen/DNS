@@ -68,25 +68,33 @@ func (p *PeerNode) Start(atPort, remotePort string) {
 
 
 func (p *PeerNode) IsInitialSequencer() bool {
-	return p.Sequencer.KeyPair != KeyPair{}
+	//return p.Sequencer.KeyPair != KeyPair{}
+	return p.Sequencer.IsSequencer
 }
 func (p *PeerNode) waitUntilTenOpenConnections() {
-	for len(p.OpenConnections.Values()) < 10 {
+	for len(p.OpenConnections.Values()) < 9 {
+		fmt.Println("waiting. Currently: " + strconv.Itoa(len(p.OpenConnections.Values())))
 		time.Sleep(500 * time.Millisecond)
 	}
 }
 func (p *PeerNode) SendInitialGenisisBlock() {
-	hardness, _ := new(big.Int).SetString("9999999", 10)
+	//time.Sleep(5 * time.Second)
+	hardness, _ := new(big.Int).SetString("1129860864649195017936278738467622451102563362381435984249705038832445929304130000000", 10)
+	//hardness, _ := new(big.Int).SetString("999", 10)
+	fmt.Println("Hardness is: " + hardness.String())
 	genesisBlock := GenesisBlock{
 		Seed: "SebastianAndAndreasBlockchain",
 		InitialAccounts: GetHardcodedAccPublicKeys(),
 		Hardness: hardness,
 		InitialAmount: 10e6,
 	}
-	fmt.Print("Broadcasting Genesis block", genesisBlock)
+	p.debugPrintln("Broadcasting Genesis block to ", p.OpenConnections.ToString())
 	p.Broadcast(
+		//Packet { Type: PacketType.BROADCAST_MSG, GenesisBlock: genesisBlock },
 		Packet { Type: PacketType.BROADCAST_GENESIS_BLOCK, GenesisBlock: genesisBlock },
 	)
+
+	p.handleGensisBlock(genesisBlock)
 }
 
 //func (p *PeerNode) BroadcastBlock() {
@@ -104,10 +112,11 @@ func (p *PeerNode) SendInitialGenisisBlock() {
 
 func (p *PeerNode) BroadcastBlock(block Block) {
 	p.debugPrintln("Broadcasting block with", strconv.Itoa(len(block.TransactionIDs)), "elements")
+	signedBlock := p.Sequencer.Sign(block, p.Keys.Sk)
 	p.Broadcast(
-		Packet { Type: PacketType.BROADCAST_BLOCK, SignedBlock: p.Sequencer.Sign(block) },
+		Packet { Type: PacketType.BROADCAST_BLOCK, SignedBlock: signedBlock },
 	)
-	p.handleBlock(SignedBlock{})
+	p.handleBlock(signedBlock)
 }
 func PromptForRemoteSocket(p *PeerNode) Socket {
 
@@ -159,9 +168,10 @@ func (p *PeerNode) DialNetwork(remoteSocket Socket) {
 		p.debugPrintln("Adding local port to list")
 		p.PeersInArrivalOrder.Append(PortOf(p.Listener.Addr()))
 		p.debugPrintln("Setting ourself as the sequencer")
-		p.Sequencer.KeyPair = GenKeyPair()
-		p.Sequencer.PublicKey = p.Sequencer.KeyPair.Pk
-		p.debugPrintln("Sequencer public key is:", p.Sequencer.PublicKey.ToString()[:10], "...")
+		//p.Sequencer.KeyPair = GenKeyPair()
+		//p.Sequencer.PublicKey = p.Sequencer.KeyPair.Pk
+		p.Sequencer.IsSequencer = true
+		//p.debugPrintln("Sequencer public key is:", p.Sequencer.PublicKey.ToString()[:10], "...")
 	} else {
 		p.debugPrintln("--------------")
 		p.debugPrintln("Local  Addr:", conn.LocalAddr())

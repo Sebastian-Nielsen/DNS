@@ -33,7 +33,7 @@ func (p *PeerNode) send() {
 		}
 		if msg == "c" {
 			fmt.Println()
-			fmt.Println(p.OpenConnections.Values)
+			fmt.Println(p.OpenConnections.Values())
 			continue
 		}
 		if msg == "p" {

@@ -2,7 +2,6 @@ package main
 
 import (
 	. "DNO/handin/Account"
-	. "DNO/handin/Cryptography"
 	. "DNO/handin/Helper"
 	. "DNO/handin/Peernode"
 	"net"
@@ -21,8 +20,9 @@ func main() {
 		SignedTransactionsSeen: SafeMap_string_to_SignedTransaction{ Values: make(map[string] SignedTransaction) },
 		Sequencer:			 	Sequencer{
 									UnsequencedTransactionIDs: SafeArray_string{},
-								 	PublicKey:                 PublicKey{},
-								 	KeyPair:                   KeyPair{},
+								 	//PublicKey:                 PublicKey{},
+								 	//KeyPair:                   KeyPair{},
+								 	IsSequencer: false,
 								 	SlotNumber:                SafeCounter{Value: -1},
 								},
 	}

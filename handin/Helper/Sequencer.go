@@ -9,8 +9,9 @@ import (
 
 type Sequencer struct {
 	UnsequencedTransactionIDs SafeArray_string
-	PublicKey                 PublicKey
-	KeyPair    				  KeyPair
+	//PublicKey                 PublicKey
+	IsSequencer				  bool
+	//KeyPair    				  KeyPair
 	SlotNumber 				  SafeCounter
 	Seed       				  string
 	Hardness				  *big.Int
@@ -50,9 +51,9 @@ func (b *Block) ToString() string {
 		   strconv.Itoa(b.LengthToRoot)
 }
 
-func (s *Sequencer) Sign(block Block) SignedBlock {
+func (s *Sequencer) Sign(block Block, sk SecretKey) SignedBlock {
 	blockString := block.ToString()
-	signature := CreateSignature(blockString, s.KeyPair.Sk)
+	signature := CreateSignature(blockString, sk)
 	return SignedBlock {Block: block, Signature: signature}
 }
 
@@ -63,5 +64,5 @@ func (b *Block) Hash() string {
 }
 
 func (s *Sequencer) Verify(signedBlock SignedBlock) bool {
-	return Verify(signedBlock.Signature, signedBlock.Block.ToString(), s.PublicKey)
+	return Verify(signedBlock.Signature, signedBlock.Block.ToString(), signedBlock.Block.VerificationKey)
 }

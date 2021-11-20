@@ -25,6 +25,24 @@ func (s *SafeMap_string_to_SignedTransaction) Get(key string) (Account.SignedTra
 	value, ok := s.Values[key]
 	return value, ok
 }
+
+
+type SafeMap_string_to_Block struct {
+	mu     sync.Mutex
+	Values map[string] Block
+}
+
+func (s *SafeMap_string_to_Block) Put(key string, value Block) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.Values[key] = value
+}
+func (s *SafeMap_string_to_Block) Get(key string) (Block, bool) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	value, ok := s.Values[key]
+	return value, ok
+}
 //func (s *SafeMap_Transaction) delete(transaction ApplyTransaction) {
 //	s.mu.Lock()
 //	defer s.mu.Unlock()

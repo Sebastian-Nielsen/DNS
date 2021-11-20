@@ -15,7 +15,9 @@ func (p *PeerNode) ListenForNewConns() {
 func (p *PeerNode) Listen(conn net.Conn) {
 	defer conn.Close()
 	for {
+		//p.debugPrintln("About to go into receive")
 		packet, ok := p.Ipc.Receive(conn)
+		//p.debugPrintln("[Listen] Received packet: ", packet, " - ok:", ok)
 		if !ok { 
 			p.debugPrintln("Listen: Receive error")
 			return

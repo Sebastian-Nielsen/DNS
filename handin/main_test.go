@@ -35,17 +35,20 @@ func createPeerNode( shouldMockInput bool, shouldPrintDebug bool ) PeerNode {
 		SignedTransactionsSeen:  SafeMap_string_to_SignedTransaction{ Values: make(map[string] SignedTransaction) },
 		Sequencer:			  Sequencer{
 								 UnsequencedTransactionIDs: SafeArray_string{},
-								 PublicKey:                 PublicKey{},
-								 KeyPair:                   KeyPair{},
+								 //PublicKey:                 PublicKey{},
+								 //KeyPair:                   KeyPair{},
+								 IsSequencer: false,
 								 SlotNumber:                SafeCounter{Value: -1},
-								 Tree:                      Tree{BlockHashToBlock: make(map[string]Block)},
+								 Tree:                      Tree{
+															   BlockHashToBlock: SafeMap_string_to_Block{ Values: make(map[string]Block)},
+															   BlocksThatAreWaitingForTheirParent: make(map[string]*SafeArray_Block),
+								 						    },
 							 },
 	}
 }
 
 
 func Test1(t *testing.T) {
-	GetHardcodedAccKeyPairs()
 
 	var peerNode1_port = AvailablePorts.Next()
 	var peerNode2_port = AvailablePorts.Next()
@@ -59,7 +62,7 @@ func Test1(t *testing.T) {
 	var peerNode10_port = AvailablePorts.Next()
 
 	peerNode1 := createPeerNode(true, false)
-	peerNode2 := createPeerNode(true, false)
+	peerNode2 := createPeerNode(true, true)
 	peerNode3 := createPeerNode(true, false)
 	peerNode4 := createPeerNode(true, false)
 	peerNode5 := createPeerNode(true, false)
@@ -69,20 +72,63 @@ func Test1(t *testing.T) {
 	peerNode9 := createPeerNode(true, false)
 	peerNode10 := createPeerNode(true, false)
 
+
+	keypairs := GetHardcodedAccKeyPairs()
+	peerNode1.Keys = keypairs[0]
+	peerNode2.Keys = keypairs[1]
+	peerNode3.Keys = keypairs[2]
+	peerNode4.Keys = keypairs[3]
+	peerNode5.Keys = keypairs[4]
+	peerNode6.Keys = keypairs[5]
+	peerNode7.Keys = keypairs[6]
+	peerNode8.Keys = keypairs[7]
+	peerNode9.Keys = keypairs[8]
+	peerNode10.Keys = keypairs[9]
+
 	goStart(&peerNode1, peerNode1_port, "no_port")
 	goStart(&peerNode2, peerNode2_port, peerNode1_port)
-	goStart(&peerNode3, peerNode3_port, peerNode2_port)
-	goStart(&peerNode4, peerNode4_port, peerNode3_port)
-	goStart(&peerNode5, peerNode5_port, peerNode4_port)
-	goStart(&peerNode6, peerNode6_port, peerNode5_port)
-	goStart(&peerNode7, peerNode7_port, peerNode6_port)
-	goStart(&peerNode8, peerNode8_port, peerNode7_port)
-	goStart(&peerNode9, peerNode9_port, peerNode8_port)
-	goStart(&peerNode10, peerNode10_port, peerNode9_port)
+	goStart(&peerNode3, peerNode3_port, peerNode1_port)
+	goStart(&peerNode4, peerNode4_port, peerNode1_port)
+	goStart(&peerNode5, peerNode5_port, peerNode1_port)
+	goStart(&peerNode6, peerNode6_port, peerNode1_port)
+	goStart(&peerNode7, peerNode7_port, peerNode1_port)
+	goStart(&peerNode8, peerNode8_port, peerNode1_port)
+	goStart(&peerNode9, peerNode9_port, peerNode1_port)
+	goStart(&peerNode10, peerNode10_port, peerNode1_port)
 
-
-	peerNode.MakeAndBroadcastSignedTransaction(t.Amount, t.ID+strconv.Itoa(i), t.From, t.To)
-
+	time.Sleep(5 * time.Second)
+	peerNode1.MakeAndBroadcastSignedTransaction(
+		500,
+		PortOf(peerNode1.Listener.Addr())+ ":" + strconv.Itoa(peerNode1.Sequencer.SlotNumber.Value),
+		peerNode1.Keys.Pk.ToString(),
+		peerNode2.Keys.Pk.ToString(),
+	)
+	time.Sleep(10 * time.Second)
+	for _, p := range []*PeerNode{&peerNode1, &peerNode2, &peerNode3, &peerNode4, &peerNode5,
+								  &peerNode6, &peerNode7, &peerNode8, &peerNode9, &peerNode10} {
+		fmt.Println(PortOf(p.Listener.Addr()))
+		for key, value := range p.LocalLedger.Accounts {
+			fmt.Println("[" + key[0:11] + " ; " + strconv.Itoa(value) + "]")
+		}
+	}
+	time.Sleep(10 * time.Second)
+	for _, p := range []*PeerNode{&peerNode1, &peerNode2, &peerNode3, &peerNode4, &peerNode5,
+		&peerNode6, &peerNode7, &peerNode8, &peerNode9, &peerNode10} {
+		fmt.Println(PortOf(p.Listener.Addr()))
+		for key, value := range p.LocalLedger.Accounts {
+			fmt.Println("[" + key[0:11] + " ; " + strconv.Itoa(value) + "]")
+		}
+	}
+	time.Sleep(10 * time.Second)
+	for _, p := range []*PeerNode{&peerNode1, &peerNode2, &peerNode3, &peerNode4, &peerNode5,
+		&peerNode6, &peerNode7, &peerNode8, &peerNode9, &peerNode10} {
+		fmt.Println(PortOf(p.Listener.Addr()))
+		for key, value := range p.LocalLedger.Accounts {
+			fmt.Println("[" + key[0:11] + " ; " + strconv.Itoa(value) + "]")
+		}
+	}
+	//peerNode.MakeAndBroadcastSignedTransaction(t.Amount, t.ID+strconv.Itoa(i), t.From, t.To)
+	time.Sleep(500 * time.Second)
 }
 
 

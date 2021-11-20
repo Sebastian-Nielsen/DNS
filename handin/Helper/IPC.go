@@ -21,7 +21,7 @@ type EncoderDecoderPair struct {
 
 func (ipc *IPC) Send(packet Packet, conn net.Conn) bool {
 	ok := true
-	//fmt.Println("\t[IPC:Send]    before encoding:", packet)
+	// fmt.Println("\t[IPC:Send]    before encoding:", packet)
 
 	connHasAnEncoderDecoderPair := ipc.ConnToEncDecPair[conn] != (EncoderDecoderPair{})
 	if !connHasAnEncoderDecoderPair {
@@ -55,10 +55,11 @@ func (ipc *IPC) Receive(conn net.Conn) (Packet, bool) {
 
 	dec := ipc.ConnToEncDecPair[conn].Decoder
 	err := dec.Decode(&packet)
-	//fmt.Println("\t[IPC:Receive] Decoded packet:", packet)
+	//fmt.Println("\t1[IPC:Receive] Decoded packet:", err, packet)
 	if err != nil {
 		fmt.Println("Ipc receive err:", err)
 		ok = false
 	}
+	//fmt.Println("\t2[IPC:Receive] Decoded packet:", err, packet)
 	return packet, ok
 }

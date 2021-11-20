@@ -18,10 +18,11 @@ const ROLLBACK_LIMIT = 4
 
 
 func (p *PeerNode) handleIncomming(packet Packet, connPacketWasReceivedOn net.Conn) {
+	// p.debugPrintln("Received packet:", packet)
 
 	switch packet.Type {
 	case PacketType.BROADCAST_MSG:
-		p.debugPrintln("Received packet: [Type: BROADCAST_MSG][Msg: " + packet.Msg + "] ... Broadcasting it")
+		//p.debugPrintln("Received packet: [Type: BROADCAST_MSG][Msg: " + packet.Msg + "] ... Broadcasting it")
 		p.BroadcastMessage(packet)
 	case PacketType.PULL:
 		packet = Packet{
@@ -29,10 +30,10 @@ func (p *PeerNode) handleIncomming(packet Packet, connPacketWasReceivedOn net.Co
 			MessagesSent: 				p.MessagesSent.Values,
 			PeersInArrivalOrderValues:  p.PeersInArrivalOrder.Values(),
 			TransactionsSeen: 			p.TransactionsSeen.Values(),
-			SequencerPublicKey: 		p.Sequencer.KeyPair.Pk,
+			//SequencerPublicKey: 		p.Sequencer.KeyPair.Pk,
 		}
 		p.debugPrintln("Received packet: [Type: PULL] ... Sending back: \n\tpacket{peersInArrivalOrder:", packet.PeersInArrivalOrderValues, "}")
-		p.debugPrintln("Sending public key:", p.Sequencer.KeyPair.Pk.ToString()[:10], "...")
+		//p.debugPrintln("Sending public key:", p.Sequencer.KeyPair.Pk.ToString()[:10], "...")
 		p.Ipc.Send(packet, connPacketWasReceivedOn)
 	case PacketType.PULL_REPLY:
 		p.debugPrintln("Received packet: [Type: PULL-REPLY] ... Extending our messagesSent set with the messages in the packet")
@@ -108,7 +109,7 @@ func (p *PeerNode) handleIncomming(packet Packet, connPacketWasReceivedOn net.Co
 			// go p.ApplyUnappliedIDs()
 		}
 	case PacketType.BROADCAST_BLOCK:
-		//p.debugPrintln("received signed packet: [PacketType: BROADCAST_BLOCK]", packet.SignedBlock.Block.ToString())
+		p.debugPrintln("received signed packet: [PacketType: BROADCAST_BLOCK]", packet.SignedBlock.Block.ToString())
 		p.handleBlock(packet.SignedBlock)
 		packet.Type = PacketType.BROADCAST_KNOWN_BLOCK
 		p.Broadcast(packet)
@@ -116,13 +117,18 @@ func (p *PeerNode) handleIncomming(packet Packet, connPacketWasReceivedOn net.Co
 		p.debugPrintln("received signed packet: [PacketType: BROADCAST_KNOWN_BLOCK]", packet.SignedBlock.Block.ToString())
 		p.handleBlock(packet.SignedBlock)
 	case PacketType.BROADCAST_GENESIS_BLOCK:
-		p.debugPrintln("received signed packet: [PacketType: BROADCAST_GENESIS_BLOCK] with seed", packet.GenesisBlock.Seed)
+		p.debugPrintln("received packet: [PacketType: BROADCAST_GENESIS_BLOCK] with seed", packet.GenesisBlock.Seed)
 		p.handleGensisBlock(packet.GenesisBlock)
+	default:
+		p.debugPrintln("default case ERROR, packet:", packet)
 	}
 }
 func (p *PeerNode) handleGensisBlock(G GenesisBlock) {
+	p.debugPrintln("Handling genesis block")
 	p.Sequencer.Hardness = G.Hardness
 	p.Sequencer.Seed = G.Seed
+	p.Sequencer.Tree.BlockHashToBlock.Put(G.Seed, Block{ HasBeenApplied: true})
+	//p.Sequencer.Tree.BlockHashToBlock[G.Seed] = Block{}
 	p.Sequencer.Tree.Root = G
 	p.Sequencer.Tree.LengthOfBestPath = 0
 	p.Sequencer.Tree.LeafHashOfBestPath = G.Seed // just hardcode the "hash" of the genesis block to be the seed
@@ -135,15 +141,19 @@ func (p *PeerNode) startLotteryProtocol() {
 	for {
 		slotStartTime := time.Now()
 		p.Sequencer.SlotNumber.Value += 1
-
+		p.debugPrintln( "["+p.Keys.Pk.ToString()[:5] + "] Slot " + strconv.Itoa(p.Sequencer.SlotNumber.Value) + " starting")
 		p.applyFinalBlock()
 
 		//p.Sequencer.SlotNumber.Lock()
 		//p.Sequencer.SlotNumber.Unlock()
 		draw := p.getDraw(p.Sequencer.Seed, p.Sequencer.SlotNumber.Value, p.Keys.Sk)
 		if p.isWinner(draw, p.Keys.Pk, p.lotteryString(p.Sequencer.Seed, p.Sequencer.SlotNumber.Value)) {
+			fmt.Println("\n>>> slot " + strconv.Itoa(p.Sequencer.SlotNumber.Value) + " >>> PeerNode" + PortOf(p.Listener.Addr())[:2] +  " [" + p.Keys.Pk.ToString()[:5] + "] got a won\n")
 
-			block := Block{
+			// Remove transactions that appear in earlier blocks
+			// p.Sequencer.UnsequencedTransactionIDs. TODO: remove transactions that appear in the path from
+
+			block := Block{         // Create the winner block
 				VerificationKey: p.Keys.Pk,
 				SlotNumber:      p.Sequencer.SlotNumber.Value,
 				Draw:            draw,
@@ -174,35 +184,42 @@ func (p *PeerNode) applyFinalBlock() {
 
 		// Give compensation to the node that created the block
 		amountToCompensate := len(finalBlock.TransactionIDs) + 10
-		p.debugPrint("Compensating the account '" + finalBlock.VerificationKey.ToString()[:10] +
+		p.debugPrint("Compensating the account '" + finalBlock.VerificationKey.ToString()[:11] +
 			"...' for creating the block, with " + strconv.Itoa(amountToCompensate) + " AUs")
 		p.LocalLedger.GiftToAccount(amountToCompensate, finalBlock.VerificationKey.ToString())
 	}
 }
 func (p *PeerNode) isWinner(draw *big.Int, publicKey PublicKey, lotteryString string) bool {
-	// publicKey := p.Keys.Pk.ToString()
+	//publicKey := p.Keys.Pk.ToString()
 	numberOfTickets := p.LocalLedger.Accounts[publicKey.ToString()]
 	toBeHashed := lotteryString + publicKey.ToString() + string(Hash(draw))
-	hash, _ := new(big.Int).SetString(toBeHashed, 10)
-	hashOfDrawTimesA := new(big.Int).Mul(hash, big.NewInt(int64(numberOfTickets)))
-	return hashOfDrawTimesA.Cmp(p.Sequencer.Hardness) == 0
+	//hash, _ := big.NewInt(1).SetString(toBeHashed, 10)
+	hash := Hash(big.NewInt(1).SetBytes([]byte(toBeHashed)))
+	//p.debugPrintln("Hash is:", string(hash), " - ", hash)
+	hashOfDrawTimesA := big.NewInt(1).Mul(
+		big.NewInt(1).SetBytes(hash),
+		big.NewInt(int64(numberOfTickets)),
+	)
+	//p.debugPrintln("Draw is:     ", hashOfDrawTimesA.String(),     "     len:", len(hashOfDrawTimesA.String()))
+	//p.debugPrintln("Hardness is:", p.Sequencer.Hardness.String(), "     len:", len(p.Sequencer.Hardness.String()))
+	//p.debugPrintln("Diff is:", big.NewInt(1).Sub(p.Sequencer.Hardness, hashOfDrawTimesA))
+	return hashOfDrawTimesA.Cmp(p.Sequencer.Hardness) == 1
 }
 func (p *PeerNode) lotteryString(seed string, slotNumber int) string {
 	return "LOTTERY" + seed + strconv.Itoa(slotNumber)
 }
 
 func (p *PeerNode) getDraw(seed string, slot int, sk SecretKey) *big.Int {
-	 value, _ := new(big.Int).SetString(p.lotteryString(seed, slot), 10)
+	 value := new(big.Int).SetBytes([]byte(p.lotteryString(seed, slot)))
 	 return BigInt_createSignature(value, sk)
 }
-func (p *PeerNode) verifyDraw(signature string, publicKey PublicKey) bool {
-	value := p.lotteryString(p.Sequencer.Seed, p.Sequencer.SlotNumber.Value)
+func (p *PeerNode) verifyDraw(signature string, publicKey PublicKey, slotNumber int) bool {
+	value := p.lotteryString(p.Sequencer.Seed, slotNumber)
 	return Verify(signature, value, publicKey)
 }
 func (p *PeerNode) HandlePullReplyPacket(packet Packet) {
 	// Put the sequencer public to the received pk
-	p.debugPrintln("Setting sequencer public key to:", packet.SequencerPublicKey.ToString()[:10])
-	p.Sequencer.PublicKey = packet.SequencerPublicKey
+	// p.Sequencer.PublicKey = packet.SequencerPublicKey
 
 	// Add all messages contained in the PULL-REPLY packet to our set of messages
 	p.extendMessagesSentSet(packet.MessagesSent)
@@ -244,11 +261,16 @@ func (p *PeerNode) HandlePullReplyPacket(packet Packet) {
 //}
 func (p* PeerNode) handleBlock(signedBlock SignedBlock) {
 	block := signedBlock.Block
+
+	/*
 	isSequencerPkReceived := p.Sequencer.PublicKey.N != nil
 	if !isSequencerPkReceived {
 		p.debugPrintln("The sequencer public key has not been received yet, ignoring block")
 		return
 	}
+	*/
+	p.debugPrintln("Starting verification of block")
+
 	isValidSignature := p.Sequencer.Verify(signedBlock)
 	if !isValidSignature {
 		p.debugPrintln("Signature on block invalid")
@@ -260,7 +282,7 @@ func (p* PeerNode) handleBlock(signedBlock SignedBlock) {
 		return
 	}
 
-	isValidDraw := p.verifyDraw(signedBlock.Signature, block.VerificationKey)
+	isValidDraw := p.verifyDraw(block.Draw.String(), block.VerificationKey, block.SlotNumber)
 	if !isValidDraw {
 		p.debugPrintln("Draw in block invalid")
 		return
@@ -275,15 +297,17 @@ func (p* PeerNode) handleBlock(signedBlock SignedBlock) {
 
 	// Set default vals for block
 	block.HasBeenApplied = false
-
+	p.debugPrintln("Block has been verified")
 
 	// Block is valid, so try to insert it into tree
-	_, parentExistInTree := p.Sequencer.Tree.BlockHashToBlock[block.PrevBlockHash]
+	_, parentExistInTree := p.Sequencer.Tree.BlockHashToBlock.Get(block.PrevBlockHash)
 	if parentExistInTree {
+		p.debugPrintln("Block had a parent")
 		p.Sequencer.Tree.Insert(block)
 
 		p.insertRecursivelyBlocksThatAreChildrenTo(block)
 	} else {
+		p.debugPrintln("Block did not have a parent")
 		// We cant add the block to the tree since its parent isn't in the tree
 		listOfWaitingBlocks, keyExists := p.Sequencer.Tree.BlocksThatAreWaitingForTheirParent[block.PrevBlockHash]
 		if keyExists {
@@ -299,9 +323,9 @@ func (p* PeerNode) handleBlock(signedBlock SignedBlock) {
 func (p *PeerNode) doOnlyContainValidTransactions(block Block) bool { //  A B F d e   <- g        rollback=2
 	//block.parent.isApplied
 	tempLedger := p.LocalLedger.MakeCopy()
-	currentBlock := p.Sequencer.Tree.BlockHashToBlock[block.PrevBlockHash]
+	currentBlock, exists := p.Sequencer.Tree.BlockHashToBlock.Get(block.PrevBlockHash)
 	for {
-		if currentBlock.HasBeenApplied {
+		if currentBlock.HasBeenApplied || !exists {
 			break
 		}
 		for _, transactionId := range currentBlock.TransactionIDs {
@@ -310,7 +334,7 @@ func (p *PeerNode) doOnlyContainValidTransactions(block Block) bool { //  A B F 
 			tempLedger[transaction.From] -= transaction.Amount
 			tempLedger[transaction.To] += transaction.Amount
 		}
-		currentBlock = p.Sequencer.Tree.BlockHashToBlock[block.PrevBlockHash]
+		currentBlock, exists = p.Sequencer.Tree.BlockHashToBlock.Get(currentBlock.PrevBlockHash)
 	}
 
 	// Now apply the received block to see if the transactions are all valid

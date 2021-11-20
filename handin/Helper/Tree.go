@@ -4,7 +4,7 @@ package Helper
 type Tree struct {
 	LeafHashOfBestPath  string
 	Root                GenesisBlock
-	BlockHashToBlock    map[string]Block
+	BlockHashToBlock    SafeMap_string_to_Block
 	LengthOfBestPath    int
 	BlocksThatAreWaitingForTheirParent map[string]*SafeArray_Block    // Map containing:        block.prevHash -> block
 }
@@ -12,16 +12,22 @@ type Tree struct {
 func (t *Tree) Insert(block Block) {
 	blockHash := block.Hash()
 
-	t.BlockHashToBlock[blockHash] = block
+	//t.BlockHashToBlock[blockHash] = block
+	t.BlockHashToBlock.Put(blockHash, block)
 
 	var lenToRoot int
 	if block.PrevBlockHash == t.Root.Seed {
 		lenToRoot = 1
 	} else {
-		lenToRoot = t.BlockHashToBlock[block.PrevBlockHash].LengthToRoot + 1
+		block, _ = t.BlockHashToBlock.Get(block.PrevBlockHash)
+		lenToRoot = block.LengthToRoot + 1
+		//lenToRoot = t.BlockHashToBlock[block.PrevBlockHash].LengthToRoot + 1
 	}
 
 	block.LengthToRoot = lenToRoot
+	t.BlockHashToBlock.Put(blockHash, block)
+	//t.BlockHashToBlock[blockHash] = block
+
 	if (lenToRoot == t.LengthOfBestPath && blockHash > t.LeafHashOfBestPath) ||
 		(lenToRoot > t.LengthOfBestPath) {
 
@@ -36,8 +42,14 @@ func (t *Tree) FindFinalBlock(rollbackLimit int) (Block, bool) {
 	}
 	currentBlockHash := t.LeafHashOfBestPath
 	for i := 0; i < rollbackLimit; i++ {
-		currentBlockHash = t.BlockHashToBlock[currentBlockHash].PrevBlockHash
+		currentBlock, _ := t.BlockHashToBlock.Get(currentBlockHash)
+		currentBlockHash = currentBlock.PrevBlockHash
 	}
-	return t.BlockHashToBlock[currentBlockHash], true
+	block, ok := t.BlockHashToBlock.Get(currentBlockHash)
+	if block.HasBeenApplied || !ok {
+		return Block{}, false
+	}
+	return block, true
+	//return t.BlockHashToBlock[currentBlockHash], true
 }
 
