@@ -43,11 +43,11 @@ type SignedBlock struct {
 }
 
 func (b *Block) ToString() string {
-	return b.VerificationKey.ToString() + ":" +
-		   strconv.Itoa(b.SlotNumber) + ":" +
+	return strconv.Itoa(b.SlotNumber) + ":" +
+	       b.VerificationKey.ToString() + ":" +
 		   b.Draw.String() + ":" +
 		   strings.Join(b.TransactionIDs, ",") + ":" +
-		   string(b.PrevBlockHash) + ":" +
+		   b.PrevBlockHash + ":" +
 		   strconv.Itoa(b.LengthToRoot)
 }
 
@@ -59,7 +59,7 @@ func (s *Sequencer) Sign(block Block, sk SecretKey) SignedBlock {
 
 func (b *Block) Hash() string {
 	n := new(big.Int)
-	n.SetString(b.ToString(), 10)
+	n.SetBytes([]byte(b.ToString()))
 	return string(Hash(n))
 }
 

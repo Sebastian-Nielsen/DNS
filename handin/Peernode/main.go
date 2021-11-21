@@ -15,6 +15,7 @@ import (
 	"time"
 )
 
+const SEED = "SebastianAndAndreasBlockchain"
 
 /*
 	PeerNode
@@ -83,7 +84,7 @@ func (p *PeerNode) SendInitialGenisisBlock() {
 	//hardness, _ := new(big.Int).SetString("999", 10)
 	fmt.Println("Hardness is: " + hardness.String())
 	genesisBlock := GenesisBlock{
-		Seed: "SebastianAndAndreasBlockchain",
+		Seed: SEED,
 		InitialAccounts: GetHardcodedAccPublicKeys(),
 		Hardness: hardness,
 		InitialAmount: 10e6,

@@ -5,6 +5,7 @@ import ( "sync" )
 type Ledger struct {
 	Accounts map[string]int
 	lock sync.Mutex
+
 }
 
 func MakeLedger() *Ledger {

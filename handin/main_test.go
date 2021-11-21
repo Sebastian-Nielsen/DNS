@@ -10,6 +10,7 @@ import (
 	"math/rand"
 	"net"
 	"reflect"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -42,6 +43,7 @@ func createPeerNode( shouldMockInput bool, shouldPrintDebug bool ) PeerNode {
 								 Tree:                      Tree{
 															   BlockHashToBlock: SafeMap_string_to_Block{ Values: make(map[string]Block)},
 															   BlocksThatAreWaitingForTheirParent: make(map[string]*SafeArray_Block),
+
 								 						    },
 							 },
 	}
@@ -49,6 +51,8 @@ func createPeerNode( shouldMockInput bool, shouldPrintDebug bool ) PeerNode {
 
 
 func Test1(t *testing.T) {
+	//os.WriteFile("debug_50002", []byte(""), 0666)
+	//os.WriteFile("debug_accounts", []byte(""), 0666)
 
 	var peerNode1_port = AvailablePorts.Next()
 	var peerNode2_port = AvailablePorts.Next()
@@ -96,43 +100,145 @@ func Test1(t *testing.T) {
 	goStart(&peerNode9, peerNode9_port, peerNode1_port)
 	goStart(&peerNode10, peerNode10_port, peerNode1_port)
 
+	PeerNodes := []*PeerNode{&peerNode1, &peerNode2, &peerNode3, &peerNode4, &peerNode5,
+		&peerNode6, &peerNode7, &peerNode8, &peerNode9, &peerNode10}
+
 	time.Sleep(5 * time.Second)
-	peerNode1.MakeAndBroadcastSignedTransaction(
-		500,
-		PortOf(peerNode1.Listener.Addr())+ ":" + strconv.Itoa(peerNode1.Sequencer.SlotNumber.Value),
-		peerNode1.Keys.Pk.ToString(),
-		peerNode2.Keys.Pk.ToString(),
-	)
+
+	transactionsToDo := 5
+	transactionsAmounts := []int{}
+	for i:=0; i<transactionsToDo; i++ {
+		rndAmount := rand.Intn(900) + 100
+		transactionsAmounts = append(transactionsAmounts, rndAmount)
+		peerNode1.MakeAndBroadcastSignedTransaction(
+			rndAmount,
+			PortOf(peerNode1.Listener.Addr())+ ":" + strconv.Itoa(peerNode1.Sequencer.SlotNumber.Value),
+			peerNode1.Keys.Pk.ToString(),
+			peerNode2.Keys.Pk.ToString(),
+		)
+		time.Sleep(10 * time.Second)
+		printAllAccounts(PeerNodes)
+	}
+
+	// Create and broadcast a malicious block, which shouldn't be added to the tree
+	maliciousBlock := Block{
+		VerificationKey: peerNode1.Keys.Pk,
+		SlotNumber:      2,
+		Draw:            peerNode1.GetDraw(SEED, 2, peerNode1.Keys.Sk),
+		TransactionIDs:  []string{},
+		PrevBlockHash:   SEED,
+		LengthToRoot:    1,
+	}
+	peerNode1.BroadcastBlock(maliciousBlock)
+	// This malicious block shouldn't get accepted by any of the other peerNodes
 	time.Sleep(10 * time.Second)
-	for _, p := range []*PeerNode{&peerNode1, &peerNode2, &peerNode3, &peerNode4, &peerNode5,
-								  &peerNode6, &peerNode7, &peerNode8, &peerNode9, &peerNode10} {
-		fmt.Println(PortOf(p.Listener.Addr()))
-		for key, value := range p.LocalLedger.Accounts {
-			fmt.Println("[" + key[0:11] + " ; " + strconv.Itoa(value) + "]")
+
+	// Check that there can occur rollbacks by setting the hardness for two
+	originalHardness := peerNode2.Sequencer.Hardness
+	//peerNode3.Sequencer.Hardness = big.NewInt(0)
+	setHardnessForAll(big.NewInt(0), PeerNodes)
+	curBlockHash := peerNode1.Sequencer.Tree.LeafHashOfBestPath
+	for {
+		newBlockHash := peerNode1.Sequencer.Tree.LeafHashOfBestPath
+		if curBlockHash != newBlockHash {
+			newBlock, _ := peerNode1.Sequencer.Tree.BlockHashToBlock.Get(newBlockHash)
+			if newBlock.PrevBlockHash != curBlockHash {
+				fmt.Println("Rollback occured")
+				break
+			}
+			curBlockHash = newBlockHash
+		}
+		time.Sleep(500 * time.Millisecond)
+		fmt.Println("No rollback, sleeping...")
+	}
+	setHardnessForAll(originalHardness, PeerNodes)
+
+
+	// Wait for all above transactions to be applied (/become final blocks)
+	startPathLen := peerNode1.Sequencer.Tree.LengthOfBestPath
+	curPathLen := peerNode1.Sequencer.Tree.LengthOfBestPath
+	for curPathLen - startPathLen < ROLLBACK_LIMIT + 2 {
+		time.Sleep(5 * time.Second)
+		curPathLen = peerNode1.Sequencer.Tree.LengthOfBestPath
+	}
+	// Set hardness so high that noone will win, so we can check the amounts
+	veryHardness := new(big.Int)
+	setHardnessForAll(veryHardness.Mul(originalHardness, originalHardness), PeerNodes)
+	time.Sleep(5 * time.Second)
+
+	// Check for peernodes being in different slots
+	// (the calculation takes some time, so if we are unlucky we might get a false positive)
+	p1SlotNumber := peerNode1.Sequencer.SlotNumber.Value
+	for _, p := range PeerNodes {
+		if p1SlotNumber != p.Sequencer.SlotNumber.Value {
+			fmt.Println("Peernodes out of sync!")
 		}
 	}
-	time.Sleep(10 * time.Second)
-	for _, p := range []*PeerNode{&peerNode1, &peerNode2, &peerNode3, &peerNode4, &peerNode5,
-		&peerNode6, &peerNode7, &peerNode8, &peerNode9, &peerNode10} {
-		fmt.Println(PortOf(p.Listener.Addr()))
-		for key, value := range p.LocalLedger.Accounts {
-			fmt.Println("[" + key[0:11] + " ; " + strconv.Itoa(value) + "]")
+
+	// Find the total amounts for all the peernodes
+	totalAmounts := make(map[int]bool)
+	totalAmount := 0
+	for _, p := range PeerNodes {
+		totalAmount = 0
+		for _, value := range p.LocalLedger.Accounts {
+			totalAmount += value
+		}
+		totalAmounts[totalAmount] = true
+	}
+
+	// Check if there is agreement for the total amount
+	if len(totalAmounts) > 1 {
+		t.Error("Not agreement between peernodes.", totalAmounts)
+		keys := reflect.ValueOf(totalAmounts).MapKeys()
+		for key := range keys {
+			fmt.Println(key)
 		}
 	}
-	time.Sleep(10 * time.Second)
-	for _, p := range []*PeerNode{&peerNode1, &peerNode2, &peerNode3, &peerNode4, &peerNode5,
-		&peerNode6, &peerNode7, &peerNode8, &peerNode9, &peerNode10} {
-		fmt.Println(PortOf(p.Listener.Addr()))
-		for key, value := range p.LocalLedger.Accounts {
-			fmt.Println("[" + key[0:11] + " ; " + strconv.Itoa(value) + "]")
-		}
+
+
+	// The start amount for the 10 accounts
+	totalAmountShouldBe := int(10e6) * 10
+	// The extra compensation an account gets when a peernode wins a block that ends up being final
+	totalAmountShouldBe += 10 * (peerNode1.Sequencer.Tree.LengthOfBestPath - ROLLBACK_LIMIT)
+
+	// Check if the amounts in the accounts match what we expect from the transactions we made
+	// and the amount of blocks won
+	if totalAmount != totalAmountShouldBe {
+		t.Error("Total amount", totalAmount, "not equal to expected", totalAmountShouldBe,
+			"for transactions:", transactionsAmounts)
+		fmt.Println("Transactions seen:", peerNode1.SignedTransactionsSeen.Values)
+		printAllAccounts(PeerNodes)
 	}
-	//peerNode.MakeAndBroadcastSignedTransaction(t.Amount, t.ID+strconv.Itoa(i), t.From, t.To)
-	time.Sleep(500 * time.Second)
+
+	fmt.Println("\n\n\nTest passed!\n\n\n ")
+	//time.Sleep(1 * time.Second)
 }
 
+func setHardnessForAll(hardness *big.Int, ps []*PeerNode) {
+	for _, p := range ps {
+		p.Sequencer.Hardness = hardness
+	}
+}
 
+func printAllAccounts(ps []*PeerNode) {
+	fmt.Println("\n\nAll accounts:")
+	for _, p := range ps {
+		fmt.Println("\n", PortOf(p.Listener.Addr()), "in slot", p.Sequencer.SlotNumber.Value)
 
+		keys := []string{}
+		for k := range p.LocalLedger.Accounts {
+			keys = append(keys, k)
+		}
+		sort.Slice(keys, func(i int, j int) bool {
+			return keys[i] < keys[j]
+		})
+
+		for  _, key := range keys {
+			value := p.LocalLedger.Accounts[key]
+			fmt.Println("\t[" + key[0:11] + " ; " + strconv.Itoa(value) + "]")
+		}
+	}
+}
 
 
 

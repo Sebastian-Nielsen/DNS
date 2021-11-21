@@ -1,5 +1,6 @@
 package Helper
 
+import "sync"
 
 type Tree struct {
 	LeafHashOfBestPath  string
@@ -7,24 +8,21 @@ type Tree struct {
 	BlockHashToBlock    SafeMap_string_to_Block
 	LengthOfBestPath    int
 	BlocksThatAreWaitingForTheirParent map[string]*SafeArray_Block    // Map containing:        block.prevHash -> block
+	WaitingForParentMapLock sync.Mutex
 }
 
 func (t *Tree) Insert(block Block) {
-	blockHash := block.Hash()
-
-	//t.BlockHashToBlock[blockHash] = block
-	t.BlockHashToBlock.Put(blockHash, block)
-
 	var lenToRoot int
 	if block.PrevBlockHash == t.Root.Seed {
 		lenToRoot = 1
 	} else {
-		block, _ = t.BlockHashToBlock.Get(block.PrevBlockHash)
-		lenToRoot = block.LengthToRoot + 1
+		prevBlock, _ := t.BlockHashToBlock.Get(block.PrevBlockHash)
+		lenToRoot = prevBlock.LengthToRoot + 1
 		//lenToRoot = t.BlockHashToBlock[block.PrevBlockHash].LengthToRoot + 1
 	}
 
 	block.LengthToRoot = lenToRoot
+	blockHash := block.Hash()
 	t.BlockHashToBlock.Put(blockHash, block)
 	//t.BlockHashToBlock[blockHash] = block
 

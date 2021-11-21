@@ -96,9 +96,9 @@ func (p *PeerNode) BroadcastMessage(packet Packet) {
 func (p *PeerNode) Broadcast(packet Packet) {
 
 	vals := p.OpenConnections.Values()
-	p.debugPrintf("[There's now %d openConnections:\n\t%s\n", len(vals), p.OpenConnections.ToString())
+	//p.debugPrintf("[There's now %d openConnections:\n\t%s\n", len(vals), p.OpenConnections.ToString())
 	for openConn := range vals {
-		p.debugPrintln("Sending msg to openConn:", openConn.RemoteAddr())
+		//p.debugPrintln("Sending msg to openConn:", openConn.RemoteAddr())
 		p.Ipc.Send(packet, openConn)
 	}
 }

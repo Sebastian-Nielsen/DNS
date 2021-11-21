@@ -18,7 +18,7 @@ type SignedTransaction struct {
 
 func (s *SignedTransaction) ToString() string {
 	return "\n" +
-			"ID:   " + s.ID + "\n" +
+			"ID:   " + s.ID[:2] + "\n" +
 			"From: " + s.From[:8] + "\n" +
 			"To:   " + s.To[:8] + "\n" +
 			"Amount: " + strconv.Itoa(s.Amount) + "\n" +
@@ -48,8 +48,8 @@ func (l *Ledger) ApplySignedTransaction(t SignedTransaction) {
 	}
 
 	// Apply transaction fee
+	l.Accounts[t.From] -= t.Amount
 	afterFee := t.Amount - TRANSACTIONFEE
-	l.Accounts[t.From] -= afterFee
 	l.Accounts[t.To] += afterFee
 	//fmt.Println("Account t.From (", t.From[:4] ,") is now:", l.Accounts[t.From])
 	//fmt.Println("Account t.To (", t.To[:4] ,") is now:", l.Accounts[t.To])
