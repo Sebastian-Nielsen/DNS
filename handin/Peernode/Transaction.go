@@ -19,7 +19,7 @@ func (p *PeerNode) MakeAndBroadcastSignedTransaction(amount int, id string, from
 
 	// p.debugPrintln("Applying signed-transaction:", signedTransaction.ToString())//, ". Accounts before:", p.LocalLedger.Accounts)
 	// p.LocalLedger.ApplySignedTransaction(signedTransaction)
-	p.debugPrintln("Adding signed-transaction:", signedTransaction.ToString(), "to signed transactions seen")//, ". Accounts after:", p.LocalLedger.Accounts)
+	//p.debugPrintln("Adding signed-transaction:", signedTransaction.ToString(), "to signed transactions seen")//, ". Accounts after:", p.LocalLedger.Accounts)
 	p.SignedTransactionsSeen.Put(signedTransaction.ID, signedTransaction)
 
 	p.Broadcast(
@@ -33,10 +33,10 @@ func (p *PeerNode) MakeAndBroadcastSignedTransaction(amount int, id string, from
 func (p *PeerNode) MakeAndBroadcastTransaction(amount int, id string, from string, to string) {
 	transaction := Transaction{ID: id, From: from, To: to, Amount: amount}
 
-	p.debugPrintln("Applying transaction:", transaction, ". Accounts before:", p.LocalLedger.Accounts)
+	//p.debugPrintln("Applying transaction:", transaction, ". Accounts before:", p.LocalLedger.Accounts)
 	p.LocalLedger.ApplyTransaction(&transaction)
 	p.TransactionsSeen.Append(transaction)
-	p.debugPrintln("Applying transaction:", transaction, ". Accounts after:", p.LocalLedger.Accounts)
+	//p.debugPrintln("Applying transaction:", transaction, ". Accounts after:", p.LocalLedger.Accounts)
 
 	p.Broadcast(
 		Packet{

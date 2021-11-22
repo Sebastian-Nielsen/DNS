@@ -112,7 +112,7 @@ func (p *PeerNode) SendInitialGenisisBlock() {
 //}
 
 func (p *PeerNode) BroadcastBlock(block Block) {
-	p.debugPrintln("Broadcasting block with", strconv.Itoa(len(block.TransactionIDs)), "elements")
+	fmt.Println("Broadcasting block with", strconv.Itoa(len(block.TransactionIDs)), "elements")
 	signedBlock := p.Sequencer.Sign(block, p.Keys.Sk)
 	p.Broadcast(
 		Packet { Type: PacketType.BROADCAST_BLOCK, SignedBlock: signedBlock },

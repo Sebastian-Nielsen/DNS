@@ -50,7 +50,136 @@ func createPeerNode( shouldMockInput bool, shouldPrintDebug bool ) PeerNode {
 }
 
 
-func Test1(t *testing.T) {
+func TestHowManyTransactionsTheSystemCanHandle(t *testing.T) {
+	//os.WriteFile("debug_50002", []byte(""), 0666)
+	//os.WriteFile("debug_accounts", []byte(""), 0666)
+
+	var peerNode1_port = AvailablePorts.Next()
+	var peerNode2_port = AvailablePorts.Next()
+	var peerNode3_port = AvailablePorts.Next()
+	var peerNode4_port = AvailablePorts.Next()
+	var peerNode5_port = AvailablePorts.Next()
+	var peerNode6_port = AvailablePorts.Next()
+	var peerNode7_port = AvailablePorts.Next()
+	var peerNode8_port = AvailablePorts.Next()
+	var peerNode9_port = AvailablePorts.Next()
+	var peerNode10_port = AvailablePorts.Next()
+
+	peerNode1 := createPeerNode(true, false)
+	peerNode2 := createPeerNode(true, true)
+	peerNode3 := createPeerNode(true, false)
+	peerNode4 := createPeerNode(true, false)
+	peerNode5 := createPeerNode(true, false)
+	peerNode6 := createPeerNode(true, false)
+	peerNode7 := createPeerNode(true, false)
+	peerNode8 := createPeerNode(true, false)
+	peerNode9 := createPeerNode(true, false)
+	peerNode10 := createPeerNode(true, false)
+
+
+	keypairs := GetHardcodedAccKeyPairs()
+	peerNode1.Keys = keypairs[0]
+	peerNode2.Keys = keypairs[1]
+	peerNode3.Keys = keypairs[2]
+	peerNode4.Keys = keypairs[3]
+	peerNode5.Keys = keypairs[4]
+	peerNode6.Keys = keypairs[5]
+	peerNode7.Keys = keypairs[6]
+	peerNode8.Keys = keypairs[7]
+	peerNode9.Keys = keypairs[8]
+	peerNode10.Keys = keypairs[9]
+
+	goStart(&peerNode1, peerNode1_port, "no_port")
+	goStart(&peerNode2, peerNode2_port, peerNode1_port)
+	goStart(&peerNode3, peerNode3_port, peerNode1_port)
+	goStart(&peerNode4, peerNode4_port, peerNode1_port)
+	goStart(&peerNode5, peerNode5_port, peerNode1_port)
+	goStart(&peerNode6, peerNode6_port, peerNode1_port)
+	goStart(&peerNode7, peerNode7_port, peerNode1_port)
+	goStart(&peerNode8, peerNode8_port, peerNode1_port)
+	goStart(&peerNode9, peerNode9_port, peerNode1_port)
+	goStart(&peerNode10, peerNode10_port, peerNode1_port)
+
+	PeerNodes := []*PeerNode{&peerNode1, &peerNode2, &peerNode3, &peerNode4, &peerNode5,
+		&peerNode6, &peerNode7, &peerNode8, &peerNode9, &peerNode10}
+
+	time.Sleep(5 * time.Second)
+
+	transactionsPerSecond := 120
+	transactionsToDo := transactionsPerSecond * 10  // Run for 10 seconds
+	for i:=0; i<transactionsToDo; i++ {
+		go peerNode1.MakeAndBroadcastSignedTransaction(
+			2,
+			PortOf(peerNode1.Listener.Addr())+ ":" + strconv.Itoa(i) + ":" + strconv.Itoa(peerNode1.Sequencer.SlotNumber.Value),
+			peerNode1.Keys.Pk.ToString(),
+			peerNode2.Keys.Pk.ToString(),
+		)
+		time.Sleep(time.Duration(1000 * (1 / transactionsPerSecond)) * time.Millisecond)
+	}
+
+	// Wait for all above transactions to be applied (/become final blocks)
+	startPathLen := peerNode1.Sequencer.Tree.LengthOfBestPath
+	curPathLen := peerNode1.Sequencer.Tree.LengthOfBestPath
+	for curPathLen - startPathLen < ROLLBACK_LIMIT + 2 {
+		time.Sleep(5 * time.Second)
+		curPathLen = peerNode1.Sequencer.Tree.LengthOfBestPath
+	}
+
+	originalHardness := peerNode2.Sequencer.Hardness
+	veryHardness := new(big.Int)
+	setHardnessForAll(veryHardness.Mul(originalHardness, originalHardness), PeerNodes)
+	printAllAccounts(PeerNodes)
+	time.Sleep(5 * time.Second)
+
+
+	// Check for peernodes being in different slots
+	// (the calculation takes some time, so if we are unlucky we might get a false positive)
+	p1SlotNumber := peerNode1.Sequencer.SlotNumber.Value
+	for _, p := range PeerNodes {
+		if p1SlotNumber != p.Sequencer.SlotNumber.Value {
+			fmt.Println("Peernodes out of sync!")
+		}
+	}
+
+	// Find the total amounts for all the peernodes
+	totalAmounts := make(map[int]bool)
+	totalAmount := 0
+	for _, p := range PeerNodes {
+		totalAmount = 0
+		for _, value := range p.LocalLedger.Accounts {
+			totalAmount += value
+		}
+		totalAmounts[totalAmount] = true
+	}
+
+	// Check if there is agreement for the total amount
+	if len(totalAmounts) > 1 {
+		t.Error("Not agreement between peernodes.", totalAmounts)
+		keys := reflect.ValueOf(totalAmounts).MapKeys()
+		for key := range keys {
+			fmt.Println(key)
+		}
+	}
+
+
+	// The start amount for the 10 accounts
+	totalAmountShouldBe := int(10e6) * 10
+	// The extra compensation an account gets when a peernode wins a block that ends up being final
+	totalAmountShouldBe += 10 * (peerNode1.Sequencer.Tree.LengthOfBestPath - ROLLBACK_LIMIT)
+
+	// Check if the amounts in the accounts match what we expect from the transactions we made
+	// and the amount of blocks won
+	if totalAmount != totalAmountShouldBe {
+		t.Error("Total amount", totalAmount, "not equal to expected", totalAmountShouldBe)
+		fmt.Println("Transactions seen:", peerNode1.SignedTransactionsSeen.Values)
+		printAllAccounts(PeerNodes)
+	}
+
+
+	fmt.Println("Test finished!")
+
+}
+func TestBlockchain(t *testing.T) {
 	//os.WriteFile("debug_50002", []byte(""), 0666)
 	//os.WriteFile("debug_accounts", []byte(""), 0666)
 
@@ -199,13 +328,13 @@ func Test1(t *testing.T) {
 	// The start amount for the 10 accounts
 	totalAmountShouldBe := int(10e6) * 10
 	// The extra compensation an account gets when a peernode wins a block that ends up being final
-	totalAmountShouldBe += 10 * (peerNode1.Sequencer.Tree.LengthOfBestPath - ROLLBACK_LIMIT)
+	totalAmountShouldBe += 10 * (peerNode1.Sequencer.Tree.LengthOfBestPath - ROLLBACK_LIMIT - 1)
 
 	// Check if the amounts in the accounts match what we expect from the transactions we made
 	// and the amount of blocks won
 	if totalAmount != totalAmountShouldBe {
 		t.Error("Total amount", totalAmount, "not equal to expected", totalAmountShouldBe,
-			"for transactions:", transactionsAmounts)
+			"for best-path length of", peerNode1.Sequencer.Tree.LengthOfBestPath)
 		fmt.Println("Transactions seen:", peerNode1.SignedTransactionsSeen.Values)
 		printAllAccounts(PeerNodes)
 	}

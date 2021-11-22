@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-const SLOT_LENGTH = 600
+const SLOT_LENGTH = 1000
 const ROLLBACK_LIMIT = 4
 
 
@@ -147,7 +147,7 @@ func (p *PeerNode) startLotteryProtocol() {
 		//p.Sequencer.SlotNumber.Unlock()
 		draw := p.GetDraw(p.Sequencer.Seed, p.Sequencer.SlotNumber.Value, p.Keys.Sk)
 		if p.isWinner(draw, p.Keys.Pk, p.lotteryString(p.Sequencer.Seed, p.Sequencer.SlotNumber.Value)) {
-			fmt.Println("\n>>> slot " + strconv.Itoa(p.Sequencer.SlotNumber.Value) + " >>> PeerNode" + PortOf(p.Listener.Addr())[:2] +  " [" + p.Keys.Pk.ToString()[:5] + "] got a won\n")
+			//fmt.Println("\n>>> slot " + strconv.Itoa(p.Sequencer.SlotNumber.Value) + " <<< PeerNode" + PortOf(p.Listener.Addr())[3:] +  " [" + p.Keys.Pk.ToString()[:5] + "] won\n")
 
 			// Remove transactions that appear in earlier blocks
 			// TODONE: remove transactions that appear in the path from the block to the root (that is, U_i from book)
@@ -201,7 +201,7 @@ func (p *PeerNode) applyFinalBlock() {
 	//p.debugPrintln("Trying to find a final block to apply")
 	finalBlock, exists := p.Sequencer.Tree.FindFinalBlock(ROLLBACK_LIMIT)
 	if exists {
-		p.debugPrintln("Extending list of unapplied Ids of transactions for block number:", finalBlock.SlotNumber)
+		//p.debugPrintln("Extending list of unapplied Ids of transactions for block number:", finalBlock.SlotNumber)
 		for _, transactionId := range finalBlock.TransactionIDs {
 			transaction, _ := p.SignedTransactionsSeen.Get(transactionId)
 			p.LocalLedger.ApplySignedTransaction(transaction)
@@ -209,8 +209,8 @@ func (p *PeerNode) applyFinalBlock() {
 
 		// Give compensation to the node that created the block
 		amountToCompensate := len(finalBlock.TransactionIDs) + 10
-		p.debugPrint("Compensating the account '" + finalBlock.VerificationKey.ToString()[:11] +
-			"...' for creating the block, with " + strconv.Itoa(amountToCompensate) + " AUs")
+		//p.debugPrint("Compensating the account '" + finalBlock.VerificationKey.ToString()[:11] +
+		//	"...' for creating the block, with " + strconv.Itoa(amountToCompensate) + " AUs")
 
 		p.LocalLedger.GiftToAccount(amountToCompensate, finalBlock.VerificationKey.ToString())
 		finalBlock.HasBeenApplied = true
@@ -294,7 +294,7 @@ func (p* PeerNode) handleBlock(signedBlock SignedBlock) {
 	blockHash := block.Hash()
 	_, exists := p.Sequencer.Tree.BlockHashToBlock.Get(blockHash)
 	if exists {
-		p.debugPrintln("Already have added block with for slot", strconv.Itoa(block.SlotNumber), "and hash:", blockHash)
+		//p.debugPrintln("Already have added block with for slot", strconv.Itoa(block.SlotNumber), "and hash:", blockHash)
 		return
 	}
 	/*
@@ -304,35 +304,35 @@ func (p* PeerNode) handleBlock(signedBlock SignedBlock) {
 		return
 	}
 	*/
-	p.debugPrintln("Starting verification of block")
+	//p.debugPrintln("Starting verification of block")
 
 	isValidSignature := p.Sequencer.Verify(signedBlock)
 	if !isValidSignature {
-		p.debugPrintln("Signature on block invalid")
+		//p.debugPrintln("Signature on block invalid")
 		return
 	}
 
 	if !p.doOnlyContainValidTransactions(block) {
-		p.debugPrintln("The block contains transactions that make an account go below 0")
+		//p.debugPrintln("The block contains transactions that make an account go below 0")
 		return
 	}
 
 	isValidDraw := p.verifyDraw(block.Draw.String(), block.VerificationKey, block.SlotNumber)
 	if !isValidDraw {
-		p.debugPrintln("Draw in block invalid")
+		//p.debugPrintln("Draw in block invalid")
 		return
 	}
 
 	ls := p.lotteryString(p.Sequencer.Seed, p.Sequencer.SlotNumber.Value)
 	isWinner := p.isWinner(block.Draw, block.VerificationKey, ls)
 	if !isWinner {
-		p.debugPrintln("Draw in block is not a winner")
+		//p.debugPrintln("Draw in block is not a winner")
 		return
 	}
 
 	// Set default vals for block
 	block.HasBeenApplied = false
-	p.debugPrintln("Block has been verified")
+	//p.debugPrintln("Block has been verified")
 
 	//temp := PortOf(p.Listener.Addr())
 	//if (temp == "50002") {
